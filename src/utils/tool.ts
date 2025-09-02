@@ -235,7 +235,7 @@ export function toolImportFile(exts: string[], size?: number): Promise<File> {
     // 1.创建 input 元素
     const input = document.createElement('input')
     input.type = 'file'
-    input.multiple = false
+    input.multiple = false // 配置为单选文件
     // 2.设置默认勾选文件类型
     let accept = ''
     exts.forEach(ext => {
@@ -253,27 +253,28 @@ export function toolImportFile(exts: string[], size?: number): Promise<File> {
     input.oncancel = () => reject()
     // 4.确认选择文件
     input.onchange = e => {
-      // 4-1.获取提交文件对象
+      // 获取提交文件对象
       const file = (e.target as HTMLInputElement).files[0]
       if (!file) {
         reject()
         return
       }
-      // 4-2.获取提交文件扩展名
+      // 获取提交文件扩展名
       const fileNames = file.name.split('.')
       let extension = fileNames[fileNames.length - 1]
       extension = isString(extension) ? extension.toLowerCase() : null
-      // 4-3.文件扩展名校验
+      // 文件扩展名校验
       if (!exts.includes(extension)) {
         ElMessage.warning('导入文件类型不符合要求')
         reject()
         return
       }
-      // 4-4.文件大小校验
+      // 文件大小校验
       if (size > 0 && file.size > size) {
         ElMessage.warning(
           `导入文件大小超过 ${(size / 1024 / 1024).toFixed(0)} M`
         )
+        reject()
         return
       }
       resolve(file)
@@ -291,16 +292,19 @@ export function toolImportFile(exts: string[], size?: number): Promise<File> {
  */
 export function toolDownloadFile(blob: unknown, name: string): void {
   if (!isBlob(blob) || !isString(name)) {
-    ElMessage.error('导出数据失败，请稍后再试')
     return
   }
+  // 创建 Blob 或 File 对象的临时 URL，可用来本地预览文件（图片、视频）、下载文件等
+  const url = URL.createObjectURL(blob)
+  // 创建 a 标签下载文件
   const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
+  a.href = url
   a.download = `${name}`
   document.body.appendChild(a)
   a.click()
   a.remove()
-  URL.revokeObjectURL(a.href)
+  // 使用完毕后需要释放内存占用
+  URL.revokeObjectURL(url)
 }
 
 /**

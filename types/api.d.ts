@@ -1,3 +1,7 @@
+/**
+ * @description 业务 API 接口定义
+ */
+
 interface CommonJson {
   /** 接口地址拼接：ip */
   SOUTHBOUND_SERVER_IP: { [key: string]: string }
@@ -17,4 +21,3 @@ interface CommonJson {
     }
   }
 }
-

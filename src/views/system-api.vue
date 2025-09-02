@@ -2,7 +2,7 @@
   <div
     class="m-3 flex min-h-[calc(100vh-80px)] flex-col flex-nowrap items-stretch gap-3"
   >
-    <common-title class="shrink-0 grow-0" title="系统调度接口列表" />
+    <common-title class="shrink-0 grow-0" title="接口" />
     <ul class="flex-auto">
       <li
         class="mb-2 select-none overflow-hidden rounded-lg bg-white"

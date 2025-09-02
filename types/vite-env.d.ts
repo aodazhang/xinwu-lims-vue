@@ -19,4 +19,8 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-declare interface Window {}
+/** window 挂载类型 */
+declare interface Window {
+  /** web 存储命名空间 */
+  storageKey: string
+}

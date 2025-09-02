@@ -1,3 +1,7 @@
+/**
+ * @description pinia
+ * @extends https://pinia.vuejs.org/introduction.html
+ */
 import { createPinia } from 'pinia'
 import { commonStore } from './modules/common'
 import { userStore } from './modules/user'

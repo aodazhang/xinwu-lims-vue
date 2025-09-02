@@ -1,3 +1,6 @@
+/**
+ * @description 用户 store
+ */
 import { defineStore } from 'pinia'
 
 export const userStore = defineStore('user', {

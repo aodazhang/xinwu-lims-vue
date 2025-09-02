@@ -37,32 +37,24 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import api from '@/api'
+// import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 
 defineOptions({ name: 'NetworkNode' })
 
 const loading = ref(true)
 const query = ref({ pageNum: 1, pageSize: 10, total: 0 })
-const baseList = ref<CommonNode[]>([])
-const list = ref<CommonNode[]>([])
+const list = ref([])
 
 async function loadDataList(reset: boolean) {
   try {
     if (reset) {
-      loading.value = true
       query.value = { pageNum: 1, pageSize: 10, total: 0 }
-      baseList.value = []
       list.value = []
-      const nodes = await api.loadJson()
-      await api.loadTopology(nodes)
-      baseList.value = nodes
-      query.value.total = nodes.length
     }
-    list.value = baseList.value.slice(
-      (query.value.pageNum - 1) * query.value.pageSize,
-      query.value.pageNum * query.value.pageSize
-    )
+    loading.value = true
+    // const nodes = await api.loadJson({})
+    list.value = []
   } catch (error) {
   } finally {
     loading.value = false

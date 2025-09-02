@@ -20,7 +20,10 @@ class StorageModel {
  * @param key 数据 key
  * @returns 完整 key
  */
-const getFullKey = (key: string) => `${import.meta.env.VITE_STORAGE}_${key}`
+const getFullKey = (key: string) =>
+  isString(import.meta.env.VITE_STORAGE)
+    ? `${import.meta.env.VITE_STORAGE}_${key}`
+    : key
 
 /**
  * 增、改 storage 指定 key

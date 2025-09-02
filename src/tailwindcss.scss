@@ -1,11 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@tailwind base; // tailwind 基础样式（定义全局基础样式，默认包含 css reset）
+@tailwind components; // tailwind 组件样式（定义业务组件样式，默认为空）
+@tailwind utilities; // tailwind 工具样式（定义工具样式，默认包含绝大多数 atomic 样式）
 
-#app {
-  @apply h-dvh w-dvw min-w-[1200px];
-}
-
+// vue-router 路由过渡动画
 .router-leave-active,
 .router-enter-active {
   transition: all 0.35s;
@@ -19,4 +16,9 @@
 .router-leave-to {
   opacity: 0;
   transform: translateX(30px);
+}
+
+// 重置 vue 根元素大小
+#app {
+  @apply h-dvh w-dvw;
 }

@@ -41,7 +41,7 @@
       >
         <ul class="px-3 py-5">
           <li
-            class="mt-3 flex h-10 cursor-pointer items-center gap-2 rounded-lg px-3 transition"
+            class="flex h-10 cursor-pointer items-center gap-2 rounded-lg px-3 transition"
             :class="
               $route.path === '/network-node'
                 ? 'bg-[#EEF5FF] text-[#0059E5]'

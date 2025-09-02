@@ -1,3 +1,9 @@
+/**
+ * @description 资源类文件 shims 定义
+ * @see .d.ts文件在根路径使用import会导致定义失效，尽量在declare内部使用
+ */
+
+/* eslint-disable */
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>

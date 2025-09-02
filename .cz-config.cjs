@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+  // 1.提交类型
   types: [
     { value: 'feat', name: 'feat:         一项新功能' },
     { value: 'fix', name: 'fix:          一个 Bug 修复' },
@@ -17,7 +18,15 @@ module.exports = {
     { value: 'revert', name: 'revert:       回滚先前提交' },
     { value: 'docs', name: 'docs:         文档变更' }
   ],
-  scopes: [{ name: 'src' }, { name: 'all' }],
+  // 2.提交影响范围 scope
+  scopes: [
+    { name: 'src' },
+    { name: 'public' },
+    { name: 'tests' },
+    { name: 'types' },
+    { name: 'all' }
+  ],
+  // 3.交互式问答信息
   messages: {
     type: '请选择一种提交类型:',
     scope: '请选择一个修改范围(可选):',
@@ -27,8 +36,12 @@ module.exports = {
     footer: '关闭关联 issue, 例如: #31, #34 (可选):\n',
     confirmCommit: '确定提交本次 git message?'
   },
+  // 4.非兼容性说明关联提交类型
   allowBreakingChanges: ['feat', 'fix'],
+  // 5.是否允许自定义 scope
   allowCustomScopes: false,
+  // 6.跳过步骤
   skipQuestions: ['body', 'footer'],
+  // 7.短说明字数限制
   subjectLimit: 80
 }
