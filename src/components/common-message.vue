@@ -1,4 +1,5 @@
 <template>
+  <!-- [公共]消息提示 -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition-all duration-300 ease-out"

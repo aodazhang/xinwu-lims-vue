@@ -43,7 +43,7 @@
       </section>
 
       <!-- 标题 -->
-      <h1 class="text-base font-bold text-[#64748b]">
+      <h1 class="md-hidden text-base font-bold text-[#64748b]">
         {{ routeTitle }}
       </h1>
 
@@ -127,7 +127,7 @@
         <transition name="router" mode="out-in">
           <keep-alive :include="[]">
             <component
-              class="mx-auto max-w-[1400px] flex-auto overflow-y-auto p-5"
+              class="mx-auto max-w-[1400px] flex-auto overflow-y-auto px-5 pb-[100px] pt-5"
               :is="Component"
               :key="route.fullPath"
             />

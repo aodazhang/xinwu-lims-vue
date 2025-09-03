@@ -31,6 +31,12 @@ const router = createRouter({
           name: 'SalesDashboard',
           meta: { title: '销售工作台' },
           component: () => import('@/views/sales/sales-dashboard.vue')
+        },
+        {
+          path: '/review-dashboard',
+          name: 'ReviewDashboard',
+          meta: { title: '订单审核工作台' },
+          component: () => import('@/views/sales/review-dashboard.vue')
         }
       ]
     },
