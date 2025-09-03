@@ -127,7 +127,7 @@
         <transition name="router" mode="out-in">
           <keep-alive :include="[]">
             <component
-              class="mx-auto max-w-[1400px] flex-auto overflow-y-auto px-5 pb-[100px] pt-5"
+              class="mx-auto max-w-[1400px] flex-auto overflow-y-auto p-5"
               :is="Component"
               :key="route.fullPath"
             />

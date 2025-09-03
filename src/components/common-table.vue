@@ -1,11 +1,11 @@
 <template>
   <!-- [公共]表格 -->
   <el-table
-    ref="tableRef"
+    class="mt-5 rounded-xl bg-white shadow-sm"
     :header-cell-style="{
-      padding: '6px 0 5px',
-      backgroundColor: '#eff1f4',
-      color: '#000'
+      padding: '10px 0',
+      backgroundColor: '#f9fafb',
+      color: '#6b7280'
     }"
     :height="config.height || null"
     :row-key="config.rowKey"
@@ -71,7 +71,7 @@ defineProps<{
     /** 宽度（默认 auto） */
     width?: number
     /** 列对其方式（默认left） */
-    align?: 'left' | 'center' | 'right'
+    align?: string | 'left' | 'center' | 'right'
     /** 插槽名 */
     slotName?: string
   }[]

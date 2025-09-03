@@ -4,157 +4,91 @@
     <common-title title="订单审核工作台" content="首页 / 订单审核工作台" />
 
     <!-- 统计卡片 -->
-    <div class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-      <div
-        class="rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-      >
-        <div class="mb-2 text-sm text-gray-500">待审核订单数</div>
-        <div class="text-3xl font-bold text-gray-800">
-          {{ stats.pending }}
-        </div>
-      </div>
-      <div
-        class="rounded-xl bg-gradient-to-br from-yellow-100 to-yellow-200 p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-      >
-        <div class="mb-2 text-sm text-gray-500">加急订单数</div>
-        <div class="text-3xl font-bold text-yellow-800">
-          {{ stats.urgent }}
-        </div>
-      </div>
-      <div
-        class="rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-      >
-        <div class="mb-2 text-sm text-gray-500">今日已审核</div>
-        <div class="text-3xl font-bold text-gray-800">
-          {{ stats.approved }}
-        </div>
-      </div>
-    </div>
+    <common-stats :model="statsData" />
 
-    <!-- 搜索栏 -->
-    <div
-      class="mb-5 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
+    <!-- 筛选 -->
+    <common-filter title="待审核订单列表" @filter="handleFilter">
+      <input
+        v-model="searchKeyword"
+        type="text"
+        class="w-64 rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="搜索项目编号..."
+        @input="handleSearch"
+      />
+      <label
+        class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 transition-all duration-200 hover:border-indigo-500 hover:bg-gray-50"
+      >
+        <input v-model="urgentOnly" type="checkbox" class="cursor-pointer" />
+        <span class="cursor-pointer text-sm text-gray-700">
+          仅显示加急订单
+        </span>
+      </label>
+    </common-filter>
+
+    <!-- 待审核订单列表 -->
+    <common-table
+      :config="tableConfig"
+      :items="tableColumns"
+      :model="paginatedOrders"
     >
-      <h3 class="text-xl font-bold text-gray-800">待审核订单列表</h3>
-      <div class="flex flex-col gap-3 sm:flex-row">
-        <input
-          v-model="searchKeyword"
-          type="text"
-          class="w-64 rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="搜索项目编号..."
-          @input="handleSearch"
-        />
-        <label
-          class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 transition-all duration-200 hover:border-indigo-500 hover:bg-gray-50"
+      <!-- 订单号列 -->
+      <template #orderIdSlot="{ scope }">
+        <div
+          class="cursor-pointer font-bold text-indigo-600 hover:underline"
+          @click="viewOrderDetail(scope.id)"
         >
-          <input
-            v-model="urgentOnly"
-            type="checkbox"
-            class="cursor-pointer"
-            @change="handleFilter"
-          />
-          <span class="cursor-pointer text-sm text-gray-700"
-            >仅显示加急订单</span
-          >
-        </label>
-      </div>
-    </div>
-
-    <!-- 订单卡片列表 -->
-    <div
-      v-if="paginatedOrders.length > 0"
-      class="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3"
-    >
-      <div
-        v-for="order in paginatedOrders"
-        :key="order.id"
-        class="relative overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-        :class="{
-          'before:absolute before:left-0 before:right-0 before:top-0 before:h-1 before:bg-gradient-to-r before:from-red-500 before:to-red-600':
-            order.isUrgent
-        }"
-      >
-        <!-- 订单头部 -->
-        <div class="mb-4 flex items-start justify-between">
-          <div
-            class="cursor-pointer text-base font-bold text-indigo-600 hover:underline"
-            @click="viewOrderDetail(order.id)"
-          >
-            {{ order.id }}
-          </div>
-          <span
-            v-if="order.isUrgent"
-            class="rounded bg-red-500 px-2 py-1 text-xs font-bold text-white"
-          >
-            加急
-          </span>
+          {{ scope.id }}
         </div>
+      </template>
 
-        <!-- 订单信息 -->
-        <div class="mb-4 flex flex-col gap-2">
-          <div class="flex gap-2 text-sm">
-            <span class="min-w-20 text-gray-500">客户名称：</span>
-            <span class="flex-1 font-medium text-gray-800">{{
-              order.customer
-            }}</span>
-          </div>
-          <div class="flex gap-2 text-sm">
-            <span class="min-w-20 text-gray-500">受检单位：</span>
-            <span class="flex-1 font-medium text-gray-800">{{
-              order.unit
-            }}</span>
-          </div>
-          <div class="flex gap-2 text-sm">
-            <span class="min-w-20 text-gray-500">检测类型：</span>
-            <span
-              class="flex-1 font-medium"
-              :class="
-                isStandardTest(order.testType)
-                  ? 'text-emerald-600'
-                  : 'text-gray-800'
-              "
-            >
-              {{ order.testType }}
-            </span>
-          </div>
-          <div class="flex gap-2 text-sm">
-            <span class="min-w-20 text-gray-500">提交时间：</span>
-            <span class="flex-1 font-medium text-gray-800">{{
-              order.submitTime
-            }}</span>
-          </div>
-        </div>
+      <!-- 检测类型列 -->
+      <template #testTypeSlot="{ scope }">
+        <span
+          :class="
+            isStandardTest(scope.testType)
+              ? 'font-medium text-emerald-600'
+              : 'text-gray-800'
+          "
+        >
+          {{ scope.testType }}
+        </span>
+      </template>
 
-        <!-- 操作按钮 -->
-        <div class="flex gap-2.5 border-t border-gray-200 pt-4">
+      <!-- 加急状态列 -->
+      <template #urgentSlot="{ scope }">
+        <span
+          v-if="scope.isUrgent"
+          class="inline-block rounded bg-red-500 px-2 py-1 text-xs font-bold text-white"
+        >
+          加急
+        </span>
+        <span v-else class="text-gray-400">-</span>
+      </template>
+
+      <!-- 操作列 -->
+      <template #actionSlot="{ scope }">
+        <div class="flex gap-2">
           <button
-            class="flex-1 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30"
-            @click="viewOrderDetail(order.id)"
+            class="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
+            @click="viewOrderDetail(scope.id)"
           >
             查看详情
           </button>
           <button
-            class="flex-1 rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/30"
-            @click="approveOrder(order.id)"
+            class="rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/30"
+            @click="approveOrder(scope.id)"
           >
             快速通过
           </button>
           <button
-            class="flex-1 rounded-md border border-red-500 bg-white px-4 py-2.5 text-sm font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
-            @click="rejectOrder(order.id)"
+            class="rounded-md border border-red-500 bg-white px-3 py-1.5 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
+            @click="rejectOrder(scope.id)"
           >
             驳回
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- 空状态 -->
-    <div v-else class="py-15 mt-10 rounded-xl bg-white text-center">
-      <div class="mb-4 text-6xl text-gray-300">📋</div>
-      <div class="mb-2 text-xl font-bold text-gray-500">暂无待审核订单</div>
-      <div class="text-sm text-gray-400">当前页面没有需要审核的订单</div>
-    </div>
+      </template>
+    </common-table>
 
     <!-- 分页控件 -->
     <common-pagination
@@ -169,7 +103,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
+import CommonFilter from '@/components/common-filter.vue'
+import CommonTable from '@/components/common-table.vue'
 import CommonPagination from '@/components/common-pagination.vue'
+import CommonStats from '@/components/common-stats.vue'
 
 defineOptions({ name: 'ReviewDashboard' })
 
@@ -193,11 +130,71 @@ const urgentOnly = ref(false)
 const loading = ref(false)
 
 // 统计数据
-const stats = computed(() => ({
-  pending: filteredOrders.value.length,
-  urgent: filteredOrders.value.filter(order => order.isUrgent).length,
-  approved: 28 // 模拟数据
-}))
+const statsData = computed(() => [
+  {
+    label: '待审核订单数',
+    value: filteredOrders.value.length
+  },
+  {
+    label: '加急订单数',
+    value: filteredOrders.value.filter(order => order.isUrgent).length
+  },
+  {
+    label: '今日已审核',
+    value: 28 // 模拟数据
+  }
+])
+
+// 表格配置
+const tableConfig = {
+  rowKey: 'id',
+  selection: false
+}
+
+// 表格列配置
+const tableColumns = [
+  {
+    label: '订单号',
+    props: 'id',
+    minWidth: 180,
+    slotName: 'orderIdSlot'
+  },
+  {
+    label: '客户名称',
+    props: 'customer',
+    minWidth: 150
+  },
+  {
+    label: '受检单位',
+    props: 'unit',
+    minWidth: 120
+  },
+  {
+    label: '检测类型',
+    props: 'testType',
+    minWidth: 120,
+    slotName: 'testTypeSlot'
+  },
+  {
+    label: '提交时间',
+    props: 'submitTime',
+    minWidth: 140
+  },
+  {
+    label: '加急状态',
+    props: 'isUrgent',
+    minWidth: 80,
+    align: 'center',
+    slotName: 'urgentSlot'
+  },
+  {
+    label: '操作',
+    props: 'action',
+    minWidth: 240,
+    align: 'center',
+    slotName: 'actionSlot'
+  }
+]
 
 // 分页计算
 const paginatedOrders = computed(() => {

@@ -1,7 +1,7 @@
 <template>
   <!-- [公共]分页器 -->
   <div
-    class="mt-6 flex flex-col flex-wrap items-center gap-4 rounded-xl bg-white p-5 shadow-sm md:flex-row"
+    class="mt-5 flex flex-col flex-wrap items-center gap-4 rounded-xl bg-white px-5 py-3 shadow-sm md:flex-row"
   >
     <!-- 记录条数 -->
     <div class="flex-shrink-0 flex-grow-0 text-sm text-gray-500">
