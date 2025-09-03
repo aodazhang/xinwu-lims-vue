@@ -1,0 +1,1653 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>采样调度管理中心 - LIMS-XW系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      /* 统计仪表板 */
+      .dashboard-header {
+        margin-bottom: 32px;
+      }
+
+      .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .page-title::before {
+        content: '📊';
+        font-size: 32px;
+      }
+
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--card-color) 0%,
+          var(--card-color-light) 100%
+        );
+      }
+
+      .stat-card.pending {
+        --card-color: #f97316;
+        --card-color-light: #fb923c;
+      }
+
+      .stat-card.assigned {
+        --card-color: #3b82f6;
+        --card-color-light: #60a5fa;
+      }
+
+      .stat-card.urgent {
+        --card-color: #ef4444;
+        --card-color-light: #f87171;
+      }
+
+      .stat-card.today {
+        --card-color: #10b981;
+        --card-color-light: #34d399;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: var(--card-color);
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          var(--card-color) 0%,
+          var(--card-color-light) 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        margin-bottom: 16px;
+      }
+
+      .stat-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .stat-info {
+        flex: 1;
+      }
+
+      .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #1a202c;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--card-color);
+        font-weight: 600;
+        margin-top: 8px;
+      }
+
+      /* Tab导航 */
+      .tabs-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      .tabs-header {
+        display: flex;
+        background: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+        position: relative;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 16px 24px;
+        background: transparent;
+        border: none;
+        font-size: 15px;
+        font-weight: 600;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .tab-btn:hover {
+        background: rgba(59, 130, 246, 0.05);
+        color: #3b82f6;
+      }
+
+      .tab-btn.active {
+        color: #1a202c;
+        background: white;
+      }
+
+      .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+      }
+
+      .tab-badge {
+        background: #ef4444;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        min-width: 24px;
+        text-align: center;
+      }
+
+      .tab-badge.pending {
+        background: #f97316;
+      }
+
+      .tab-badge.assigned {
+        background: #3b82f6;
+      }
+
+      /* 搜索和筛选栏 */
+      .filter-bar {
+        padding: 20px 24px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+      }
+
+      .filter-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .filter-select {
+        padding: 10px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      /* 任务列表 */
+      .tab-content {
+        display: none;
+        padding: 24px;
+        min-height: 500px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .task-grid {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .task-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s;
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .task-card:hover {
+        border-color: #3b82f6;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transform: translateX(4px);
+      }
+
+      .task-card.urgent {
+        border-left: 4px solid #ef4444;
+      }
+
+      .task-main {
+        display: grid;
+        gap: 12px;
+      }
+
+      .task-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .task-number {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a202c;
+      }
+
+      .task-badges {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .badge.urgent {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      .badge.normal {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+
+      .badge.completed {
+        background: #d1fae5;
+        color: #059669;
+      }
+
+      .task-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+      }
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #4b5563;
+      }
+
+      .info-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+      }
+
+      .task-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: scale(1.02);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+      }
+
+      .btn-secondary:hover {
+        background: #e5e7eb;
+      }
+
+      .btn-warning {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+      }
+
+      .btn-warning:hover {
+        background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+        transform: scale(1.02);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 分页控件 */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      .page-btn {
+        padding: 8px 12px;
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        color: #4b5563;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 40px;
+        text-align: center;
+      }
+
+      .page-btn:hover:not(:disabled) {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        background: rgba(59, 130, 246, 0.05);
+      }
+
+      .page-btn.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-color: #3b82f6;
+      }
+
+      .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .page-info {
+        padding: 0 16px;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      /* 模态框 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        padding: 24px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+      }
+
+      .modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .modal-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 4px;
+      }
+
+      .modal-body {
+        padding: 24px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .staff-select-grid {
+        display: grid;
+        gap: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        background: #f9fafb;
+      }
+
+      .staff-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .staff-option:hover {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.05);
+      }
+
+      .staff-option.selected {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+      }
+
+      .staff-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+      }
+
+      .staff-details {
+        flex: 1;
+      }
+
+      .staff-name {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 2px;
+      }
+
+      .staff-status {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .staff-workload {
+        padding: 4px 8px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #4b5563;
+        font-weight: 600;
+      }
+
+      /* 对比显示 */
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      .comparison-column {
+        padding: 16px;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+      }
+
+      .comparison-column.old {
+        border-color: #ef4444;
+      }
+
+      .comparison-column.new {
+        border-color: #10b981;
+      }
+
+      .comparison-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .comparison-column.old .comparison-title {
+        color: #dc2626;
+      }
+
+      .comparison-column.new .comparison-title {
+        color: #059669;
+      }
+
+      .comparison-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+      }
+
+      .comparison-label {
+        color: #6b7280;
+      }
+
+      .comparison-value {
+        font-weight: 600;
+        color: #1a202c;
+      }
+
+      .modal-footer {
+        padding: 20px 24px;
+        background: #f9fafb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      /* 空状态 */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      .empty-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+      }
+
+      .empty-message {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .container {
+          padding: 16px;
+        }
+
+        .stats-container {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .filter-bar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-box {
+          min-width: auto;
+        }
+
+        .task-card {
+          grid-template-columns: 1fr;
+        }
+
+        .task-info {
+          grid-template-columns: 1fr;
+        }
+
+        .task-actions {
+          flex-direction: row;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-container {
+          grid-template-columns: 1fr;
+        }
+
+        .page-title {
+          font-size: 24px;
+        }
+
+        .tab-btn {
+          font-size: 14px;
+          padding: 12px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <div class="container">
+      <!-- 页面标题和统计仪表板 -->
+      <div class="dashboard-header">
+        <h1 class="page-title">采样调度管理中心</h1>
+
+        <div class="stats-container">
+          <div class="stat-card pending">
+            <div class="stat-icon">📋</div>
+            <div class="stat-content">
+              <div class="stat-info">
+                <div class="stat-value" id="pendingCount">30</div>
+                <div class="stat-label">待分派任务</div>
+                <div class="stat-trend">↑ 较昨日增加5个</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card assigned">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <div class="stat-info">
+                <div class="stat-value" id="assignedCount">25</div>
+                <div class="stat-label">已分派任务</div>
+                <div class="stat-trend">→ 执行率 92%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card urgent">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-content">
+              <div class="stat-info">
+                <div class="stat-value" id="urgentCount">8</div>
+                <div class="stat-label">加急任务</div>
+                <div class="stat-trend">需立即处理</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card today">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+              <div class="stat-info">
+                <div class="stat-value" id="todayCount">12</div>
+                <div class="stat-label">今日待采样</div>
+                <div class="stat-trend">→ 完成率 75%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab切换容器 -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-btn active" onclick="switchTab('pending')">
+            <span>待分派任务</span>
+            <span class="tab-badge pending" id="pendingBadge">30</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('assigned')">
+            <span>已分派任务</span>
+            <span class="tab-badge assigned" id="assignedBadge">25</span>
+          </button>
+        </div>
+
+        <!-- 搜索和筛选栏 -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              type="text"
+              class="search-input"
+              id="searchInput"
+              placeholder="搜索任务编号、单位名称或地址..."
+            />
+          </div>
+          <div class="filter-group">
+            <select class="filter-select" id="priorityFilter">
+              <option value="">所有优先级</option>
+              <option value="urgent">紧急</option>
+              <option value="normal">普通</option>
+            </select>
+            <select class="filter-select" id="dateFilter">
+              <option value="">所有日期</option>
+              <option value="today">今日</option>
+              <option value="tomorrow">明日</option>
+              <option value="week">本周</option>
+            </select>
+            <button class="btn btn-secondary" onclick="resetFilters()">
+              重置筛选
+            </button>
+          </div>
+        </div>
+
+        <!-- 待分派任务列表 -->
+        <div class="active tab-content" id="pendingTab">
+          <div class="task-grid" id="pendingTaskList">
+            <!-- 任务卡片将通过JavaScript动态生成 -->
+          </div>
+          <div class="pagination" id="pendingPagination">
+            <!-- 分页控件将通过JavaScript动态生成 -->
+          </div>
+        </div>
+
+        <!-- 已分派任务列表 -->
+        <div class="tab-content" id="assignedTab">
+          <div class="task-grid" id="assignedTaskList">
+            <!-- 任务卡片将通过JavaScript动态生成 -->
+          </div>
+          <div class="pagination" id="assignedPagination">
+            <!-- 分页控件将通过JavaScript动态生成 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分派任务模态框 -->
+    <div class="modal" id="assignModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📝</span>
+            <span>分派任务</span>
+          </div>
+          <div class="modal-subtitle">
+            任务编号: <span id="assignTaskNumber"></span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">采样日期</label>
+            <input type="date" class="form-control" id="samplingDate" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">采样时间</label>
+            <div class="form-row">
+              <input
+                type="time"
+                class="form-control"
+                id="startTime"
+                placeholder="开始时间"
+              />
+              <input
+                type="time"
+                class="form-control"
+                id="endTime"
+                placeholder="结束时间"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">选择采样人员（可多选）</label>
+            <div class="staff-select-grid" id="staffSelectGrid">
+              <!-- 人员选项将通过JavaScript动态生成 -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">备注说明（选填）</label>
+            <textarea
+              class="form-control"
+              id="assignRemark"
+              rows="3"
+              placeholder="请输入特殊要求或注意事项..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('assignModal')">
+            取消
+          </button>
+          <button class="btn btn-primary" onclick="confirmAssign()">
+            确认分派
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 重新调整模态框 -->
+    <div class="modal" id="adjustModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🔄</span>
+            <span>重新调整任务</span>
+          </div>
+          <div class="modal-subtitle">
+            任务编号: <span id="adjustTaskNumber"></span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <!-- 对比显示区域 -->
+          <div class="comparison-grid">
+            <div class="comparison-column old">
+              <div class="comparison-title">当前安排</div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样日期：</span>
+                <span class="comparison-value" id="oldDate">2024-03-15</span>
+              </div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样时间：</span>
+                <span class="comparison-value" id="oldTime">09:00 - 11:00</span>
+              </div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样人员：</span>
+                <span class="comparison-value" id="oldStaff">李采样</span>
+              </div>
+            </div>
+            <div class="comparison-column new">
+              <div class="comparison-title">新的安排</div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样日期：</span>
+                <span class="comparison-value" id="newDateDisplay">-</span>
+              </div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样时间：</span>
+                <span class="comparison-value" id="newTimeDisplay">-</span>
+              </div>
+              <div class="comparison-item">
+                <span class="comparison-label">采样人员：</span>
+                <span class="comparison-value" id="newStaffDisplay">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">新的采样日期</label>
+            <input
+              type="date"
+              class="form-control"
+              id="adjustDate"
+              onchange="updateNewDisplay()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">新的采样时间</label>
+            <div class="form-row">
+              <input
+                type="time"
+                class="form-control"
+                id="adjustStartTime"
+                onchange="updateNewDisplay()"
+              />
+              <input
+                type="time"
+                class="form-control"
+                id="adjustEndTime"
+                onchange="updateNewDisplay()"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">重新选择采样人员</label>
+            <div class="staff-select-grid" id="adjustStaffGrid">
+              <!-- 人员选项将通过JavaScript动态生成 -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">调整原因</label>
+            <textarea
+              class="form-control"
+              id="adjustReason"
+              rows="2"
+              placeholder="请说明调整原因..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('adjustModal')">
+            取消
+          </button>
+          <button class="btn btn-warning" onclick="confirmAdjust()">
+            确认调整
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 全局变量
+      let currentTab = 'pending'
+      let currentPendingPage = 1
+      let currentAssignedPage = 1
+      const itemsPerPage = 10
+      let selectedStaff = new Set()
+      let selectedAdjustStaff = new Set()
+
+      // 测试数据生成
+      const pendingTasks = []
+      const assignedTasks = []
+
+      // 检测类型列表
+      const testTypes = [
+        '50325-2020',
+        'GB/T 18883',
+        'HJ 583-2010',
+        'GB 50325',
+        'ISO 16000'
+      ]
+
+      // 生成30条待分派任务
+      for (let i = 1; i <= 30; i++) {
+        pendingTasks.push({
+          id: `XW202403${String(i).padStart(3, '0')}`,
+          company: [
+            '深圳市某某自来水公司',
+            '福田区某酒店',
+            '罗湖区某小区物业',
+            '南山区某医院',
+            '宝安区某工厂'
+          ][i % 5],
+          address: [
+            '深圳市南山区科技园南路123号',
+            '深圳市福田区福华路88号',
+            '深圳市罗湖区东门北路456号',
+            '深圳市南山区深南大道999号',
+            '深圳市宝安区新安街道'
+          ][i % 5],
+          points: Math.floor(Math.random() * 10) + 5,
+          testType: testTypes[i % testTypes.length],
+          priority: i <= 8 ? 'urgent' : 'normal',
+          createTime: `2024-03-${String(15 - Math.floor(i / 10)).padStart(2, '0')} ${String(9 + (i % 12)).padStart(2, '0')}:00`
+        })
+      }
+
+      // 生成25条已分派任务
+      for (let i = 1; i <= 25; i++) {
+        assignedTasks.push({
+          id: `XW202402${String(100 + i).padStart(3, '0')}`,
+          company: [
+            '龙岗区某商场',
+            '坪山区某学校',
+            '光明区某社区',
+            '盐田区某餐厅',
+            '大鹏新区某度假村'
+          ][i % 5],
+          address: [
+            '深圳市龙岗区龙翔大道1号',
+            '深圳市坪山区坪山大道2号',
+            '深圳市光明区光明大街3号',
+            '深圳市盐田区海山路4号',
+            '深圳市大鹏新区葵涌街道5号'
+          ][i % 5],
+          points: Math.floor(Math.random() * 15) + 3,
+          duration: Math.floor(Math.random() * 3) + 1 + '小时',
+          priority: i <= 3 ? 'urgent' : 'normal',
+          assignedDate: `2024-03-${String(15 + Math.floor(i / 5)).padStart(2, '0')}`,
+          assignedTime: `${String(8 + (i % 8)).padStart(2, '0')}:00 - ${String(10 + (i % 8)).padStart(2, '0')}:00`,
+          assignedStaff: [
+            '李采样',
+            '王技术',
+            '张工程',
+            '陈专员',
+            '赵技术',
+            '刘采样'
+          ][i % 6],
+          status: i <= 12 ? 'today' : 'scheduled'
+        })
+      }
+
+      // 采样人员数据
+      const staffList = [
+        { id: 1, name: '李采样', status: '空闲', tasks: 2 },
+        { id: 2, name: '王技术', status: '工作中', tasks: 3 },
+        { id: 3, name: '张工程', status: '空闲', tasks: 1 },
+        { id: 4, name: '陈专员', status: '空闲', tasks: 0 },
+        { id: 5, name: '赵技术', status: '工作中', tasks: 4 },
+        { id: 6, name: '刘采样', status: '空闲', tasks: 2 }
+      ]
+
+      // 页面初始化
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('采样调度管理中心')
+        }
+
+        updateStats()
+        renderTasks()
+        initializeStaffSelect()
+
+        // 设置今天日期为默认值
+        const today = new Date().toISOString().split('T')[0]
+        document.getElementById('samplingDate').value = today
+        document.getElementById('adjustDate').value = today
+      })
+
+      // Tab切换
+      function switchTab(tab) {
+        currentTab = tab
+
+        // 更新Tab按钮状态
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.remove('active')
+        })
+        event.target.closest('.tab-btn').classList.add('active')
+
+        // 更新Tab内容显示
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active')
+        })
+        document.getElementById(`${tab}Tab`).classList.add('active')
+
+        renderTasks()
+      }
+
+      // 更新统计数据
+      function updateStats() {
+        const urgentPending = pendingTasks.filter(
+          t => t.priority === 'urgent'
+        ).length
+        const todayAssigned = assignedTasks.filter(
+          t => t.status === 'today'
+        ).length
+
+        document.getElementById('pendingCount').textContent =
+          pendingTasks.length
+        document.getElementById('assignedCount').textContent =
+          assignedTasks.length
+        document.getElementById('urgentCount').textContent = urgentPending
+        document.getElementById('todayCount').textContent = todayAssigned
+
+        document.getElementById('pendingBadge').textContent =
+          pendingTasks.length
+        document.getElementById('assignedBadge').textContent =
+          assignedTasks.length
+      }
+
+      // 渲染任务列表
+      function renderTasks() {
+        if (currentTab === 'pending') {
+          renderPendingTasks()
+        } else {
+          renderAssignedTasks()
+        }
+      }
+
+      // 渲染待分派任务
+      function renderPendingTasks() {
+        const container = document.getElementById('pendingTaskList')
+        const startIndex = (currentPendingPage - 1) * itemsPerPage
+        const endIndex = startIndex + itemsPerPage
+        const tasksToShow = pendingTasks.slice(startIndex, endIndex)
+
+        if (tasksToShow.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">暂无待分派任务</div>
+                        <div class="empty-message">所有任务都已分派完成</div>
+                    </div>
+                `
+        } else {
+          container.innerHTML = tasksToShow
+            .map(
+              task => `
+                    <div class="task-card ${task.priority === 'urgent' ? 'urgent' : ''}">
+                        <div class="task-main">
+                            <div class="task-header">
+                                <span class="task-number">${task.id}</span>
+                                <div class="task-badges">
+                                    <span class="badge ${task.priority}">${task.priority === 'urgent' ? '紧急' : '普通'}</span>
+                                </div>
+                            </div>
+                            <div class="task-info">
+                                <div class="info-item">
+                                    <span class="info-icon">🏢</span>
+                                    <span>${task.company}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📍</span>
+                                    <span>${task.address}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📊</span>
+                                    <span>${task.points}个采样点</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">🧪</span>
+                                    <span><span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${task.testType}</span></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📅</span>
+                                    <span>创建时间: ${task.createTime}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-secondary" onclick="viewTaskDetail('${task.id}')">查看详情</button>
+                            <button class="btn btn-primary" onclick="openAssignModal('${task.id}')">立即分派</button>
+                        </div>
+                    </div>
+                `
+            )
+            .join('')
+        }
+
+        renderPagination('pending', pendingTasks.length)
+      }
+
+      // 渲染已分派任务
+      function renderAssignedTasks() {
+        const container = document.getElementById('assignedTaskList')
+        const startIndex = (currentAssignedPage - 1) * itemsPerPage
+        const endIndex = startIndex + itemsPerPage
+        const tasksToShow = assignedTasks.slice(startIndex, endIndex)
+
+        if (tasksToShow.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">暂无已分派任务</div>
+                        <div class="empty-message">请先分派待处理的任务</div>
+                    </div>
+                `
+        } else {
+          container.innerHTML = tasksToShow
+            .map(
+              task => `
+                    <div class="task-card">
+                        <div class="task-main">
+                            <div class="task-header">
+                                <span class="task-number">${task.id}</span>
+                                <div class="task-badges">
+                                    <span class="badge ${task.priority}">${task.priority === 'urgent' ? '紧急' : '普通'}</span>
+                                    ${task.status === 'today' ? '<span class="badge completed">今日任务</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="task-info">
+                                <div class="info-item">
+                                    <span class="info-icon">🏢</span>
+                                    <span>${task.company}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📍</span>
+                                    <span>${task.address}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">👤</span>
+                                    <span>采样员: ${task.assignedStaff}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📅</span>
+                                    <span>${task.assignedDate}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">⏰</span>
+                                    <span>${task.assignedTime}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📊</span>
+                                    <span>${task.points}个采样点</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-warning" onclick="openAdjustModal('${task.id}')">重新调整</button>
+                            <button class="btn btn-secondary" onclick="viewTaskDetail('${task.id}')">查看详情</button>
+                        </div>
+                    </div>
+                `
+            )
+            .join('')
+        }
+
+        renderPagination('assigned', assignedTasks.length)
+      }
+
+      // 渲染分页控件
+      function renderPagination(type, totalItems) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage)
+        const currentPage =
+          type === 'pending' ? currentPendingPage : currentAssignedPage
+        const container = document.getElementById(`${type}Pagination`)
+
+        if (totalPages <= 1) {
+          container.innerHTML = ''
+          return
+        }
+
+        let html = ''
+
+        // 上一页按钮
+        html += `<button class="page-btn" onclick="changePage('${type}', ${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`
+
+        // 页码按钮
+        for (let i = 1; i <= totalPages; i++) {
+          if (
+            i === 1 ||
+            i === totalPages ||
+            (i >= currentPage - 2 && i <= currentPage + 2)
+          ) {
+            html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage('${type}', ${i})">${i}</button>`
+          } else if (i === currentPage - 3 || i === currentPage + 3) {
+            html += `<span class="page-info">...</span>`
+          }
+        }
+
+        // 下一页按钮
+        html += `<button class="page-btn" onclick="changePage('${type}', ${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`
+
+        // 页面信息
+        html += `<span class="page-info">共 ${totalPages} 页，${totalItems} 条记录</span>`
+
+        container.innerHTML = html
+      }
+
+      // 切换页面
+      function changePage(type, page) {
+        if (type === 'pending') {
+          currentPendingPage = page
+        } else {
+          currentAssignedPage = page
+        }
+        renderTasks()
+      }
+
+      // 初始化人员选择
+      function initializeStaffSelect() {
+        const assignGrid = document.getElementById('staffSelectGrid')
+        const adjustGrid = document.getElementById('adjustStaffGrid')
+
+        const staffHTML = staffList
+          .map(
+            staff => `
+                <div class="staff-option" onclick="toggleStaff(${staff.id}, '${staff.name}')">
+                    <div class="staff-avatar">${staff.name[0]}</div>
+                    <div class="staff-details">
+                        <div class="staff-name">${staff.name}</div>
+                        <div class="staff-status">状态: ${staff.status}</div>
+                    </div>
+                    <div class="staff-workload">今日${staff.tasks}个任务</div>
+                </div>
+            `
+          )
+          .join('')
+
+        assignGrid.innerHTML = staffHTML
+        adjustGrid.innerHTML = staffHTML.replace(
+          /toggleStaff/g,
+          'toggleAdjustStaff'
+        )
+      }
+
+      // 切换人员选择
+      function toggleStaff(id, name) {
+        const element = event.currentTarget
+        if (selectedStaff.has(id)) {
+          selectedStaff.delete(id)
+          element.classList.remove('selected')
+        } else {
+          selectedStaff.add(id)
+          element.classList.add('selected')
+        }
+      }
+
+      function toggleAdjustStaff(id, name) {
+        const element = event.currentTarget
+
+        // 清除其他选择（单选）
+        document
+          .querySelectorAll('#adjustStaffGrid .staff-option')
+          .forEach(opt => {
+            opt.classList.remove('selected')
+          })
+        selectedAdjustStaff.clear()
+
+        selectedAdjustStaff.add(name)
+        element.classList.add('selected')
+        updateNewDisplay()
+      }
+
+      // 打开分派模态框
+      function openAssignModal(taskId) {
+        document.getElementById('assignTaskNumber').textContent = taskId
+        document.getElementById('assignModal').classList.add('active')
+        selectedStaff.clear()
+        document
+          .querySelectorAll('#staffSelectGrid .staff-option')
+          .forEach(opt => {
+            opt.classList.remove('selected')
+          })
+      }
+
+      // 打开调整模态框
+      function openAdjustModal(taskId) {
+        const task = assignedTasks.find(t => t.id === taskId)
+        if (task) {
+          document.getElementById('adjustTaskNumber').textContent = taskId
+          document.getElementById('oldDate').textContent = task.assignedDate
+          document.getElementById('oldTime').textContent = task.assignedTime
+          document.getElementById('oldStaff').textContent = task.assignedStaff
+
+          // 重置新的显示
+          document.getElementById('newDateDisplay').textContent = '-'
+          document.getElementById('newTimeDisplay').textContent = '-'
+          document.getElementById('newStaffDisplay').textContent = '-'
+
+          document.getElementById('adjustModal').classList.add('active')
+          selectedAdjustStaff.clear()
+          document
+            .querySelectorAll('#adjustStaffGrid .staff-option')
+            .forEach(opt => {
+              opt.classList.remove('selected')
+            })
+        }
+      }
+
+      // 更新新的显示
+      function updateNewDisplay() {
+        const date = document.getElementById('adjustDate').value
+        const startTime = document.getElementById('adjustStartTime').value
+        const endTime = document.getElementById('adjustEndTime').value
+        const staff = Array.from(selectedAdjustStaff).join(', ')
+
+        document.getElementById('newDateDisplay').textContent = date || '-'
+        document.getElementById('newTimeDisplay').textContent =
+          startTime && endTime ? `${startTime} - ${endTime}` : '-'
+        document.getElementById('newStaffDisplay').textContent = staff || '-'
+      }
+
+      // 关闭模态框
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active')
+      }
+
+      // 确认分派
+      function confirmAssign() {
+        const date = document.getElementById('samplingDate').value
+        const startTime = document.getElementById('startTime').value
+        const endTime = document.getElementById('endTime').value
+
+        if (!date || !startTime || !endTime) {
+          alert('请填写完整的时间信息')
+          return
+        }
+
+        if (selectedStaff.size === 0) {
+          alert('请至少选择一名采样人员')
+          return
+        }
+
+        alert('分派成功！任务已添加到已分派列表。')
+        closeModal('assignModal')
+
+        // 模拟更新数据
+        const taskId = document.getElementById('assignTaskNumber').textContent
+        const taskIndex = pendingTasks.findIndex(t => t.id === taskId)
+        if (taskIndex !== -1) {
+          const task = pendingTasks.splice(taskIndex, 1)[0]
+          assignedTasks.unshift({
+            ...task,
+            assignedDate: date,
+            assignedTime: `${startTime} - ${endTime}`,
+            assignedStaff: Array.from(selectedStaff)
+              .map(id => staffList.find(s => s.id === parseInt(id))?.name)
+              .join(', '),
+            status: 'scheduled'
+          })
+          updateStats()
+          renderTasks()
+        }
+      }
+
+      // 确认调整
+      function confirmAdjust() {
+        const reason = document.getElementById('adjustReason').value
+
+        if (!reason.trim()) {
+          alert('请说明调整原因')
+          return
+        }
+
+        alert('调整成功！任务安排已更新。')
+        closeModal('adjustModal')
+      }
+
+      // 查看任务详情
+      function viewTaskDetail(taskId) {
+        // 跳转到详情页面，传递任务ID参数
+        window.location.href = `sampling-dispatch-detail.html?taskId=${taskId}`
+      }
+
+      // 搜索功能
+      document.getElementById('searchInput').addEventListener('input', e => {
+        const query = e.target.value.toLowerCase()
+        // 实际应用中应该过滤任务列表
+        console.log('搜索:', query)
+      })
+
+      // 重置筛选
+      function resetFilters() {
+        document.getElementById('searchInput').value = ''
+        document.getElementById('priorityFilter').value = ''
+        document.getElementById('dateFilter').value = ''
+        renderTasks()
+      }
+
+      // 点击模态框外部关闭
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', e => {
+          if (e.target === modal) {
+            modal.classList.remove('active')
+          }
+        })
+      })
+
+      // ESC键关闭模态框
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.modal.active').forEach(modal => {
+            modal.classList.remove('active')
+          })
+        }
+      })
+    </script>
+  </body>
+</html>

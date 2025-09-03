@@ -1,0 +1,1899 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>检测任务详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .project-number {
+        color: #667eea;
+      }
+
+      .task-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .task-status.pending {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
+      .task-status.assigned {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      .task-status.testing {
+        background: #e0e7ff;
+        color: #8b5cf6;
+      }
+
+      .task-status.completed {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      /* 分派表单样式 - 参考 sampling-dispatch-detail.html */
+      .assignment-form {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* 分派表单区 - 仿照 sampling-dispatch-detail.html */
+      .dispatch-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      .dispatch-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+      }
+
+      .dispatch-title {
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dispatch-body {
+        padding: 24px;
+      }
+
+      /* 人员选择样式 */
+      .staff-select-container {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #f9fafb;
+        max-height: 250px;
+        overflow-y: auto;
+      }
+
+      .staff-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 8px;
+      }
+
+      .staff-option:last-child {
+        margin-bottom: 0;
+      }
+
+      .staff-option:hover {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.05);
+      }
+
+      .staff-option.selected {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+      }
+
+      .staff-checkbox-new {
+        width: 20px;
+        height: 20px;
+        accent-color: #3b82f6;
+      }
+
+      .staff-info-new {
+        flex: 1;
+      }
+
+      .staff-name-new {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 2px;
+      }
+
+      .staff-status-new {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .staff-tasks {
+        padding: 4px 8px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #4b5563;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      /* 操作按钮 */
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .form-label .required {
+        color: #ef4444;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+      }
+
+      .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      /* 完成状态特有样式 */
+      .completion-section {
+        background: #f0f9ff;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 20px;
+        border: 2px solid #0ea5e9;
+      }
+
+      .data-access-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .data-btn {
+        padding: 16px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #374151;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .data-btn:hover {
+        border-color: #667eea;
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .data-btn-icon {
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+
+      .data-btn-title {
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .data-btn-desc {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .btn-warning {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-secondary:hover {
+        background: #e5e7eb;
+        transform: translateX(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 样品卡片 */
+      .sample-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .sample-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .sample-id {
+        font-size: 14px;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .sample-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .sample-status.good {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .sample-status.damaged {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      .sample-location {
+        font-size: 13px;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .sample-details {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 检测人员列表 */
+      .staff-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+      }
+
+      .staff-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        position: relative;
+      }
+
+      .staff-card.selected {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+
+      .staff-checkbox {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 18px;
+        height: 18px;
+      }
+
+      .staff-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .staff-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .staff-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .staff-role {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .staff-workload {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 分派按钮 */
+      .assign-btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 16px;
+      }
+
+      .assign-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .assign-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* 操作按钮区 */
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .action-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .action-btn.start-btn {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .action-btn.end-btn {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .action-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* 侧边栏 */
+      .side-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-indicator {
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .status-indicator.pending {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      }
+
+      .status-indicator.assigned {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      }
+
+      .status-indicator.testing {
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+      }
+
+      .status-indicator.completed {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      }
+
+      .status-text {
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .status-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-detail-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .status-detail-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sample-grid,
+        .staff-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .page-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="project-number">XW250903-100</span>
+            <span class="task-status pending">待分派</span>
+          </h2>
+        </div>
+        <div class="page-actions" id="page-actions">
+          <!-- 动态显示按钮，根据当前用户角色和任务状态 -->
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <!-- 左侧主信息区 -->
+        <div class="main-info">
+          <!-- 基本信息 -->
+          <div class="info-card">
+            <div class="card-header">基本信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value">广州环保科技有限公司</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value">广州环保科技总部</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样地址</span>
+                <span class="info-value">广州市天河区科技园A栋3楼</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">销售人员</span>
+                <span class="info-value">张三</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样人员</span>
+                <span class="info-value">赵六</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">样品管理员</span>
+                <span class="info-value">李七</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测信息 -->
+          <div class="info-card">
+            <div class="card-header">检测信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">检测类型</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 600"
+                  >50325-2020</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测内容</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 500"
+                  >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">样品数量</span>
+                <span class="info-value">12个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">完好样品</span>
+                <span class="info-value" style="color: #10b981">11个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">破损样品</span>
+                <span class="info-value" style="color: #ef4444">1个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">接收时间</span>
+                <span class="info-value">2025-09-04 17:30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 样品列表 -->
+          <div class="info-card">
+            <div class="card-header">样品列表</div>
+            <div class="sample-grid">
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-001</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">办公室A区域</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-002</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">会议室B区域</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-003</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">总经理办公室</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-004</span>
+                  <span class="sample-status damaged">破损</span>
+                </div>
+                <div class="sample-location">财务室</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <!-- 简化显示，实际应该显示所有12个样品 -->
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">...</span>
+                  <span class="sample-status good">更多样品</span>
+                </div>
+                <div class="sample-location">共计12个样品</div>
+                <div class="sample-details">点击查看全部</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测人员分派（仅管理员可见） -->
+          <div
+            class="info-card"
+            id="staff-assignment-section"
+            style="display: none"
+          >
+            <div class="card-header">检测人员分派</div>
+            <div class="staff-grid">
+              <div class="staff-card" onclick="toggleStaffSelection(this)">
+                <input
+                  type="checkbox"
+                  class="staff-checkbox"
+                  value="staff_001"
+                />
+                <div class="staff-info">
+                  <div class="staff-avatar">王</div>
+                  <div>
+                    <div class="staff-name">王八</div>
+                    <div class="staff-role">高级检测员</div>
+                  </div>
+                </div>
+                <div class="staff-workload">当前任务：2个</div>
+              </div>
+
+              <div class="staff-card" onclick="toggleStaffSelection(this)">
+                <input
+                  type="checkbox"
+                  class="staff-checkbox"
+                  value="staff_002"
+                />
+                <div class="staff-info">
+                  <div class="staff-avatar">孙</div>
+                  <div>
+                    <div class="staff-name">孙九</div>
+                    <div class="staff-role">检测员</div>
+                  </div>
+                </div>
+                <div class="staff-workload">当前任务：1个</div>
+              </div>
+
+              <div class="staff-card" onclick="toggleStaffSelection(this)">
+                <input
+                  type="checkbox"
+                  class="staff-checkbox"
+                  value="staff_003"
+                />
+                <div class="staff-info">
+                  <div class="staff-avatar">周</div>
+                  <div>
+                    <div class="staff-name">周十</div>
+                    <div class="staff-role">检测员</div>
+                  </div>
+                </div>
+                <div class="staff-workload">当前任务：3个</div>
+              </div>
+            </div>
+            <button class="assign-btn" onclick="assignStaff()">确认分派</button>
+          </div>
+
+          <!-- 检测操作（仅检测人员可见） -->
+          <div
+            class="info-card"
+            id="testing-actions-section"
+            style="display: none"
+          >
+            <div class="card-header">检测操作</div>
+            <div class="action-buttons">
+              <button class="action-btn start-btn" onclick="startTesting()">
+                开始检测
+              </button>
+              <button class="action-btn end-btn" onclick="endTesting()">
+                结束检测
+              </button>
+            </div>
+            <div
+              style="
+                margin-top: 16px;
+                padding: 12px;
+                background: #f0f9ff;
+                border-radius: 6px;
+                font-size: 13px;
+                color: #1e40af;
+              "
+            >
+              <strong>注意：</strong
+              >开始检测后将记录检测开始时间，结束检测后将记录检测结束时间，这些时间将显示在最终报告中。
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧状态区 -->
+        <div class="side-info">
+          <!-- 任务状态指示器 -->
+          <div class="status-card">
+            <div class="status-indicator pending" id="status-indicator">
+              <div class="status-text" id="status-text">待分派</div>
+            </div>
+            <div class="status-details" id="status-details">
+              <div class="status-detail-item">
+                <span class="status-detail-label">当前阶段</span>
+                <span class="status-detail-value" id="current-phase"
+                  >等待分派</span
+                >
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">优先级</span>
+                <span class="status-detail-value" style="color: #ef4444"
+                  >加急</span
+                >
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">分派时间</span>
+                <span class="status-detail-value" id="assign-time"
+                  >2025-09-04 18:00</span
+                >
+              </div>
+              <div class="status-detail-item" id="completion-time-row">
+                <span class="status-detail-label" id="completion-time-label"
+                  >预计完成</span
+                >
+                <span class="status-detail-value" id="expected-end"
+                  >2025-09-06</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- 动态内容区 -->
+          <div id="dynamic-content">
+            <!-- 根据状态动态显示不同内容 -->
+          </div>
+
+          <!-- 任务统计（待分派状态时隐藏） -->
+          <div class="status-card" id="task-statistics">
+            <div class="card-header">任务统计</div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+              "
+            >
+              <div
+                style="
+                  background: #f9fafb;
+                  padding: 16px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 24px; font-weight: bold; color: #667eea">
+                  5
+                </div>
+                <div style="font-size: 12px; color: #6b7280">检测项目</div>
+              </div>
+              <div
+                style="
+                  background: #f9fafb;
+                  padding: 16px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 24px; font-weight: bold; color: #10b981">
+                  12
+                </div>
+                <div style="font-size: 12px; color: #6b7280">检测样品</div>
+              </div>
+              <div
+                style="
+                  background: #f9fafb;
+                  padding: 16px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: bold; color: #f59e0b"
+                  id="assigned-staff-count"
+                >
+                  2
+                </div>
+                <div style="font-size: 12px; color: #6b7280">分派人员</div>
+              </div>
+              <div
+                style="
+                  background: #f9fafb;
+                  padding: 16px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 24px; font-weight: bold; color: #ef4444">
+                  1
+                </div>
+                <div style="font-size: 12px; color: #6b7280">破损样品</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 权限验证
+      function checkPermission() {
+        const role = sessionStorage.getItem('role')
+        const allowedRoles = ['lab-supervisor', 'admin']
+
+        if (!allowedRoles.includes(role)) {
+          alert('您没有权限访问此页面，即将跳转到您的工作台。')
+          // 根据角色跳转到相应页面
+          if (role === 'lab-technician') {
+            window.location.href = 'staff-tasks.html'
+          } else {
+            window.location.href = 'login.html'
+          }
+          return false
+        }
+        return true
+      }
+
+      // 模拟当前用户角色，实际应该从session获取
+      const currentUserRole = sessionStorage.getItem('role') || 'lab-supervisor'
+
+      // 调试信息：输出当前用户角色
+      console.log('当前用户角色:', currentUserRole)
+      console.log('sessionStorage中的角色:', sessionStorage.getItem('role'))
+
+      // 从URL参数获取任务状态
+      function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get(name)
+      }
+
+      let taskStatus = getUrlParameter('status') || 'pending' // pending, assigned, testing, processing, completed
+      const taskNumber = getUrlParameter('task') || 'XW250903-100'
+
+      // 跟踪表单变更状态
+      let hasUnsavedChanges = false
+      let originalData = {}
+
+      // 页面卸载前检查未保存的更改
+      window.addEventListener('beforeunload', function (e) {
+        if (hasUnsavedChanges) {
+          e.preventDefault()
+          e.returnValue = '您有未保存的更改，确定要离开此页面吗？'
+          return e.returnValue
+        }
+      })
+
+      // 监听导航栏返回按钮点击（覆盖默认行为）
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          const backButton = document.getElementById('back-to-workspace')
+          if (backButton) {
+            // 移除原有事件监听器并添加新的
+            const newButton = backButton.cloneNode(true)
+            backButton.parentNode.replaceChild(newButton, backButton)
+            newButton.addEventListener('click', handleBackToWorkspace)
+          }
+        }, 100)
+      })
+
+      // 处理返回工作台操作
+      function handleBackToWorkspace(e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        if (hasUnsavedChanges) {
+          const confirmLeave = confirm(
+            '您有未保存的更改，确定要返回工作台吗？未保存的更改将丢失。'
+          )
+          if (!confirmLeave) {
+            return
+          }
+        }
+
+        // 获取当前用户角色对应的工作台页面
+        const roleWorkspaceMap = {
+          'lab-supervisor': 'lab-dashboard.html',
+          'lab-technician': 'staff-tasks.html'
+        }
+
+        const workspacePage =
+          roleWorkspaceMap[currentUserRole] || 'lab-dashboard.html'
+
+        // 主要导航方法
+        try {
+          window.location.href = workspacePage
+        } catch (error) {
+          console.error('导航失败：', error)
+
+          // 备用导航方法1：使用 replace
+          try {
+            window.location.replace(workspacePage)
+          } catch (replaceError) {
+            console.error('replace 导航失败：', replaceError)
+
+            // 备用导航方法2：使用 assign
+            try {
+              window.location.assign(workspacePage)
+            } catch (assignError) {
+              console.error('assign 导航失败：', assignError)
+
+              // 最后的备用方法：刷新到根目录
+              alert('导航失败，请手动返回工作台页面')
+              window.location.href = '/'
+            }
+          }
+        }
+      }
+
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        // 首先检查权限
+        if (!checkPermission()) {
+          return
+        }
+
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('检测任务详情')
+        }
+        initializePage()
+      })
+
+      // 初始化页面
+      function initializePage() {
+        updateTaskInfo()
+        updatePageActions()
+        updateStatusDisplay()
+        renderDynamicContent()
+      }
+
+      // 更新任务信息
+      function updateTaskInfo() {
+        // 更新页面标题中的任务编号
+        document.querySelector('.project-number').textContent = taskNumber
+
+        // 根据状态更新任务状态标签
+        const statusElement = document.querySelector('.task-status')
+        const statusMap = {
+          pending: { class: 'pending', text: '待分派' },
+          assigned: { class: 'assigned', text: '已分派' },
+          testing: { class: 'testing', text: '检测中' },
+          processing: { class: 'testing', text: '检测中' },
+          completed: { class: 'completed', text: '已完成' }
+        }
+
+        const statusInfo = statusMap[taskStatus] || statusMap['assigned']
+        statusElement.className = `task-status ${statusInfo.class}`
+        statusElement.textContent = statusInfo.text
+      }
+
+      // 更新状态显示
+      function updateStatusDisplay() {
+        const statusIndicator = document.getElementById('status-indicator')
+        const statusText = document.getElementById('status-text')
+        const currentPhase = document.getElementById('current-phase')
+        const completionTimeLabel = document.getElementById(
+          'completion-time-label'
+        )
+        const expectedEnd = document.getElementById('expected-end')
+        const statusDetails = document.getElementById('status-details')
+        const assignTimeRow = statusDetails.querySelector(
+          '.status-detail-item:nth-child(3)'
+        )
+        const completionTimeRow = document.getElementById('completion-time-row')
+
+        const statusConfig = {
+          pending: {
+            class: 'pending',
+            text: '待分派',
+            phase: '等待分派'
+          },
+          assigned: {
+            class: 'assigned',
+            text: '已分派',
+            phase: '等待开始检测'
+          },
+          testing: {
+            class: 'testing',
+            text: '检测中',
+            phase: '正在检测'
+          },
+          processing: {
+            class: 'testing',
+            text: '检测中',
+            phase: '正在检测'
+          },
+          completed: {
+            class: 'completed',
+            text: '已完成',
+            phase: '检测完成'
+          }
+        }
+
+        const config = statusConfig[taskStatus] || statusConfig['assigned']
+        statusIndicator.className = `status-indicator ${config.class}`
+        statusText.textContent = config.text
+        currentPhase.textContent = config.phase
+
+        // 待分派状态：隐藏分派时间和预计完成字段
+        if (taskStatus === 'pending') {
+          if (assignTimeRow) assignTimeRow.style.display = 'none'
+          if (completionTimeRow) completionTimeRow.style.display = 'none'
+        } else {
+          if (assignTimeRow) assignTimeRow.style.display = 'flex'
+          if (completionTimeRow) completionTimeRow.style.display = 'flex'
+        }
+
+        // 根据状态隐藏/显示任务统计
+        const taskStatistics = document.getElementById('task-statistics')
+        if (taskStatistics) {
+          taskStatistics.style.display =
+            taskStatus === 'pending' ? 'none' : 'block'
+        }
+
+        // 根据状态更新时间显示
+        if (taskStatus === 'completed') {
+          // 已完成状态：显示实际完成时间
+          completionTimeLabel.textContent = '实际完成'
+          expectedEnd.textContent = '2025-09-06 16:45'
+        } else if (taskStatus === 'testing' || taskStatus === 'processing') {
+          // 检测中状态：显示预计完成，并添加实际开始时间
+          completionTimeLabel.textContent = '预计完成'
+          expectedEnd.textContent = '2025-09-07 17:00'
+
+          // 检查是否已存在实际开始时间行，如果没有则添加
+          if (!document.getElementById('actual-start-row')) {
+            const actualStartRow = document.createElement('div')
+            actualStartRow.className = 'status-detail-item'
+            actualStartRow.id = 'actual-start-row'
+            actualStartRow.innerHTML = `
+                        <span class="status-detail-label">实际开始</span>
+                        <span class="status-detail-value">2025-09-05 09:30</span>
+                    `
+
+            // 在分派时间后插入实际开始时间
+            const assignTimeRow = statusDetails.querySelector(
+              '.status-detail-item:nth-child(3)'
+            )
+            assignTimeRow.insertAdjacentElement('afterend', actualStartRow)
+          }
+        } else {
+          // 其他状态：显示预计完成
+          completionTimeLabel.textContent = '预计完成'
+          expectedEnd.textContent = '2025-09-06'
+
+          // 移除实际开始时间行（如果存在）
+          const actualStartRow = document.getElementById('actual-start-row')
+          if (actualStartRow) {
+            actualStartRow.remove()
+          }
+        }
+      }
+
+      // 渲染动态内容
+      function renderDynamicContent() {
+        const dynamicContent = document.getElementById('dynamic-content')
+
+        switch (taskStatus) {
+          case 'pending':
+            dynamicContent.innerHTML = renderPendingContent()
+            // 如果是待分派状态，初始化人员选择
+            console.log('准备初始化人员选择...')
+            // 使用更长的延迟确保DOM元素已创建，并添加重试机制
+            setTimeout(() => {
+              const container = document.getElementById('staffSelectContainer')
+              if (container) {
+                console.log('找到人员选择容器，开始初始化')
+                initializeStaffSelect()
+              } else {
+                console.log('未找到人员选择容器，3秒后重试')
+                setTimeout(() => initializeStaffSelect(), 3000)
+              }
+            }, 200)
+            break
+          case 'assigned':
+            dynamicContent.innerHTML = renderAssignedContent()
+            break
+          case 'testing':
+          case 'processing':
+            dynamicContent.innerHTML = renderTestingContent()
+            break
+          case 'completed':
+            dynamicContent.innerHTML = renderCompletedContent()
+            break
+          default:
+            dynamicContent.innerHTML = renderAssignedContent()
+        }
+      }
+
+      // 渲染待分派状态内容
+      function renderPendingContent() {
+        console.log('renderPendingContent - 当前用户角色:', currentUserRole)
+        // 移除角色判断，始终显示分派表单
+        console.log('显示分派表单')
+
+        return `
+                <div class="dispatch-section">
+                    <div class="dispatch-header">
+                        <div class="dispatch-title">
+                            <span>🧪</span>
+                            <span>检测任务分派</span>
+                        </div>
+                    </div>
+                    <div class="dispatch-body">
+                        <form id="dispatchForm">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    检测开始日期 <span class="required">*</span>
+                                </label>
+                                <input type="date" class="form-control" id="start-date" value="${new Date(Date.now() + 86400000).toISOString().split('T')[0]}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    检测结束日期 <span class="required">*</span>
+                                </label>
+                                <input type="date" class="form-control" id="end-date" value="${new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0]}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    检测人员 <span class="required">*</span>
+                                    <span style="font-size: 12px; color: #6b7280; font-weight: normal; margin-left: 8px;">可多选</span>
+                                </label>
+                                <div class="staff-select-container" id="staffSelectContainer">
+                                    <!-- 人员选项将通过JavaScript生成 -->
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">备注说明</label>
+                                <textarea class="form-control" id="dispatch-remarks" 
+                                          placeholder="请输入特殊要求或注意事项..." 
+                                          style="resize: vertical; min-height: 80px;"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="handleBackToWorkspace(event)">
+                                    <span>←</span>
+                                    <span>返回工作台</span>
+                                </button>
+                                <button type="submit" class="btn btn-primary" onclick="assignTask(event)">
+                                    <span>✓</span>
+                                    <span>立即分派</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `
+      }
+
+      // 渲染已分派状态内容
+      function renderAssignedContent() {
+        // 尝试从 sessionStorage 获取分派信息
+        const dispatchInfo = sessionStorage.getItem(`dispatch_${taskNumber}`)
+        let staffNames = '王八、孙九'
+        let startDate = '2025-09-05'
+        let endDate = '2025-09-07'
+        let remarks = ''
+
+        if (dispatchInfo) {
+          const info = JSON.parse(dispatchInfo)
+          staffNames = info.staff.join('、')
+          startDate = info.startDate
+          endDate = info.endDate
+          remarks = info.remarks || ''
+        }
+
+        return `
+                <div class="status-card">
+                    <div class="card-header">分派信息</div>
+                    <div class="status-details">
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">分派人员</span>
+                            <span class="status-detail-value">${staffNames}</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">开始日期</span>
+                            <span class="status-detail-value">${startDate}</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">结束日期</span>
+                            <span class="status-detail-value">${endDate}</span>
+                        </div>
+                        ${
+                          remarks
+                            ? `
+                        <div class="status-detail-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                            <span class="status-detail-label">备注说明</span>
+                            <span class="status-detail-value" style="font-size: 13px; line-height: 1.5;">${remarks}</span>
+                        </div>
+                        `
+                            : ''
+                        }
+                    </div>
+                    ${
+                      currentUserRole === 'lab-supervisor'
+                        ? '<button class="btn btn-warning" style="width: 100%; margin-top: 16px;" onclick="reassignTask()">重新分派</button>'
+                        : currentUserRole === 'lab-technician'
+                          ? '<button class="btn btn-success" style="width: 100%; margin-top: 16px;" onclick="startTesting()">开始检测</button>'
+                          : ''
+                    }
+                </div>
+            `
+      }
+
+      // 渲染检测中状态内容
+      function renderTestingContent() {
+        return `
+                <div class="status-card">
+                    <div class="card-header">检测进度</div>
+                    <div class="status-details">
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">实际开始</span>
+                            <span class="status-detail-value">2025-09-05 09:30</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">预计结束</span>
+                            <span class="status-detail-value">2025-09-07 17:00</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">进度</span>
+                            <span class="status-detail-value" style="color: #667eea; font-weight: 600;">65%</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">检测人员</span>
+                            <span class="status-detail-value">王八、孙九</span>
+                        </div>
+                    </div>
+                    ${
+                      currentUserRole === 'lab-technician'
+                        ? '<button class="btn btn-warning" style="width: 100%; margin-top: 16px;" onclick="endTesting()">结束检测</button>'
+                        : ''
+                    }
+                </div>
+            `
+      }
+
+      // 渲染已完成状态内容
+      function renderCompletedContent() {
+        return `
+                <div class="completion-section">
+                    <div class="card-header" style="color: #0ea5e9; border-bottom: 1px solid #0ea5e9; margin-bottom: 20px;">检测完成</div>
+                    <div class="status-details">
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">实际开始</span>
+                            <span class="status-detail-value">2025-09-05 09:30</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">实际完成</span>
+                            <span class="status-detail-value">2025-09-06 16:45</span>
+                        </div>
+                        <div class="status-detail-item">
+                            <span class="status-detail-label">实际天数</span>
+                            <span class="status-detail-value">1.5天</span>
+                        </div>
+                    </div>
+                    <div class="data-access-buttons">
+                        <a href="#" class="data-btn" onclick="viewTestReport()">
+                            <div class="data-btn-icon">📊</div>
+                            <div class="data-btn-title">查看检测报告</div>
+                            <div class="data-btn-desc">PDF格式报告</div>
+                        </a>
+                        <a href="#" class="data-btn" onclick="downloadData()">
+                            <div class="data-btn-icon">📥</div>
+                            <div class="data-btn-title">下载检测数据</div>
+                            <div class="data-btn-desc">Excel原始数据</div>
+                        </a>
+                        <a href="#" class="data-btn" onclick="viewCertificate()">
+                            <div class="data-btn-icon">🏆</div>
+                            <div class="data-btn-title">查看检测证书</div>
+                            <div class="data-btn-desc">官方认证文件</div>
+                        </a>
+                    </div>
+                </div>
+            `
+      }
+
+      // 更新页面操作按钮
+      function updatePageActions() {
+        const pageActions = document.getElementById('page-actions')
+        let actionsHTML =
+          '<button class="btn btn-secondary" onclick="exportTaskInfo()">导出任务信息</button>'
+
+        // 根据状态和用户角色显示不同按钮
+        if (currentUserRole === 'lab-supervisor') {
+          if (taskStatus === 'pending') {
+            actionsHTML +=
+              '<button class="btn btn-primary" onclick="scrollToAssignment()">分派任务</button>'
+          } else if (
+            taskStatus === 'assigned' ||
+            taskStatus === 'testing' ||
+            taskStatus === 'processing'
+          ) {
+            actionsHTML +=
+              '<button class="btn btn-warning" onclick="reassignTask()">重新分派</button>'
+          }
+        } else if (currentUserRole === 'lab-technician') {
+          if (taskStatus === 'assigned') {
+            actionsHTML +=
+              '<button class="btn btn-success" onclick="startTesting()">开始检测</button>'
+          } else if (taskStatus === 'testing' || taskStatus === 'processing') {
+            actionsHTML +=
+              '<button class="btn btn-warning" onclick="endTesting()">结束检测</button>'
+          }
+        }
+
+        if (taskStatus === 'completed') {
+          actionsHTML +=
+            '<button class="btn btn-primary" onclick="viewTestReport()">查看报告</button>'
+        }
+
+        pageActions.innerHTML = actionsHTML
+      }
+
+      // 新的操作函数
+
+      // 分派任务（新版本）
+      function assignTask(event) {
+        if (event) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        const startDate = document.getElementById('start-date')?.value
+        const endDate = document.getElementById('end-date')?.value
+        const remarks = document.getElementById('dispatch-remarks')?.value
+
+        // 验证表单数据
+        if (!startDate || !endDate) {
+          alert('请填写开始和结束日期')
+          return
+        }
+
+        if (selectedStaff.size === 0) {
+          alert('请至少选择一名检测人员')
+          return
+        }
+
+        // 验证日期逻辑
+        const startDateTime = new Date(startDate)
+        const endDateTime = new Date(endDate)
+
+        if (startDateTime >= endDateTime) {
+          alert('检测结束日期必须晚于开始日期')
+          return
+        }
+
+        // 获取选中人员名称
+        const selectedStaffNames = Array.from(selectedStaff)
+          .map(id => {
+            const staff = staffList.find(s => s.id === id)
+            return staff ? staff.name : ''
+          })
+          .filter(name => name)
+
+        // 显示确认对话框
+        let confirmMessage = `确认分派任务？\n\n`
+        confirmMessage += `分派人员：${selectedStaffNames.join('、')}\n`
+        confirmMessage += `开始日期：${startDate}\n`
+        confirmMessage += `结束日期：${endDate}`
+        if (remarks.trim()) {
+          confirmMessage += `\n备注：${remarks}`
+        }
+
+        if (confirm(confirmMessage)) {
+          // 保存分派信息（实际应用中应发送到后端）
+          const dispatchInfo = {
+            taskNumber: taskNumber,
+            staff: selectedStaffNames,
+            startDate: startDate,
+            endDate: endDate,
+            remarks: remarks,
+            dispatchTime: new Date().toISOString()
+          }
+
+          // 存储分派信息到 sessionStorage（模拟）
+          sessionStorage.setItem(
+            `dispatch_${taskNumber}`,
+            JSON.stringify(dispatchInfo)
+          )
+
+          // 更新任务状态
+          taskStatus = 'assigned'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=assigned`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updatePageActions()
+          renderDynamicContent()
+
+          // 清除未保存更改标记
+          clearUnsavedChanges()
+          selectedStaff.clear()
+
+          alert('任务分派成功！系统已通知相关检测人员。')
+        }
+      }
+
+      // 滚动到分派区域
+      function scrollToAssignment() {
+        const dynamicContent = document.getElementById('dynamic-content')
+        dynamicContent.scrollIntoView({ behavior: 'smooth' })
+      }
+
+      // 重新分派
+      function reassignTask() {
+        if (confirm('确定要重新分派此任务吗？这将清除当前的分派信息。')) {
+          // 更新任务状态
+          taskStatus = 'pending'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=pending`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updatePageActions()
+          renderDynamicContent()
+
+          alert('已切换为重新分派模式，请重新设置分派信息。')
+        }
+      }
+
+      // 导出任务信息
+      function exportTaskInfo() {
+        alert(`正在导出任务 ${taskNumber} 的详细信息...`)
+      }
+
+      // 查看检测报告
+      function viewTestReport() {
+        alert(`正在打开任务 ${taskNumber} 的检测报告...`)
+      }
+
+      // 下载检测数据
+      function downloadData() {
+        alert(`正在下载任务 ${taskNumber} 的检测数据...`)
+      }
+
+      // 查看检测证书
+      function viewCertificate() {
+        alert(`正在打开任务 ${taskNumber} 的检测证书...`)
+      }
+
+      // 更新的开始检测和结束检测函数
+
+      // 开始检测（更新版本）
+      function startTesting() {
+        if (confirm('确定开始检测吗？开始后将记录检测开始时间。')) {
+          // 更新任务状态
+          taskStatus = 'processing'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=processing`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updatePageActions()
+          renderDynamicContent()
+
+          // 清除未保存更改标记
+          clearUnsavedChanges()
+
+          alert('检测已开始！请按照检测标准进行操作。')
+        }
+      }
+
+      // 结束检测（更新版本）
+      function endTesting() {
+        if (
+          confirm(
+            '确定结束检测吗？结束后将记录检测结束时间，任务将进入完成状态。'
+          )
+        ) {
+          // 更新任务状态
+          taskStatus = 'completed'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=completed`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updatePageActions()
+          renderDynamicContent()
+
+          // 清除未保存更改标记
+          clearUnsavedChanges()
+
+          alert('检测任务已完成！系统将自动通知报告编制人员生成检测报告。')
+        }
+      }
+
+      // 标记数据变更
+      function markAsChanged(field, oldValue, newValue) {
+        if (oldValue !== newValue) {
+          hasUnsavedChanges = true
+          originalData[field] = oldValue
+        }
+      }
+
+      // 清除未保存更改标记
+      function clearUnsavedChanges() {
+        hasUnsavedChanges = false
+        originalData = {}
+      }
+
+      // 检查是否有未保存的更改
+      function checkUnsavedChanges() {
+        return hasUnsavedChanges
+      }
+
+      // 创建备用导航按钮（当主导航失败时显示）
+      function createFallbackNavigation() {
+        const fallbackNav = document.createElement('div')
+        fallbackNav.id = 'fallback-navigation'
+        fallbackNav.innerHTML = `
+                <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 14px;">
+                    <span>导航出错，请使用：</span>
+                    <button onclick="location.href='lab-dashboard.html'" style="margin-left: 8px; padding: 4px 8px; background: white; color: #ef4444; border: none; border-radius: 4px; cursor: pointer;">返回工作台</button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-left: 4px; background: transparent; color: white; border: 1px solid white; padding: 2px 6px; border-radius: 4px; cursor: pointer;">×</button>
+                </div>
+            `
+        document.body.appendChild(fallbackNav)
+
+        // 10秒后自动隐藏
+        setTimeout(() => {
+          if (document.getElementById('fallback-navigation')) {
+            document.getElementById('fallback-navigation').remove()
+          }
+        }, 10000)
+      }
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.info-card, .status-card')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+
+      // 监听页面错误，如导航失败
+      window.addEventListener('error', function (e) {
+        if (e.message && e.message.includes('navigation')) {
+          console.error('导航错误：', e)
+          createFallbackNavigation()
+        }
+      })
+
+      // 全局变量
+      let selectedStaff = new Set()
+
+      // 检测人员数据
+      const staffList = [
+        { id: 1, name: '王八', status: '空闲', tasks: 2 },
+        { id: 2, name: '孙九', status: '工作中', tasks: 3 },
+        { id: 3, name: '周十', status: '空闲', tasks: 1 },
+        { id: 4, name: '李四', status: '空闲', tasks: 0 },
+        { id: 5, name: '张三', status: '工作中', tasks: 4 }
+      ]
+
+      // 初始化人员选择（新版本，参考sampling-dispatch-detail.html）
+      function initializeStaffSelect() {
+        console.log('initializeStaffSelect - 开始初始化')
+        const container = document.getElementById('staffSelectContainer')
+        if (!container) {
+          console.log('initializeStaffSelect - 容器不存在')
+          return
+        }
+
+        console.log('initializeStaffSelect - 容器存在，生成人员选项')
+        container.innerHTML = staffList
+          .map(
+            staff => `
+                <div class="staff-option" data-id="${staff.id}" onclick="toggleStaff(${staff.id})">
+                    <input type="checkbox" class="staff-checkbox-new" id="staff-${staff.id}" 
+                           onchange="event.stopPropagation(); toggleStaff(${staff.id})">
+                    <label for="staff-${staff.id}" class="staff-info-new" onclick="event.preventDefault()">
+                        <div class="staff-name-new">${staff.name}</div>
+                        <div class="staff-status-new">状态: ${staff.status}</div>
+                    </label>
+                    <div class="staff-tasks">今日${staff.tasks}个任务</div>
+                </div>
+            `
+          )
+          .join('')
+
+        console.log('initializeStaffSelect - 人员选项生成完成')
+      }
+
+      // 切换人员选择（新版本）
+      function toggleStaff(id) {
+        const option = document.querySelector(`.staff-option[data-id="${id}"]`)
+        const checkbox = document.getElementById(`staff-${id}`)
+
+        if (!option || !checkbox) return
+
+        // 切换选中状态
+        checkbox.checked = !checkbox.checked
+
+        if (checkbox.checked) {
+          selectedStaff.add(id)
+          option.classList.add('selected')
+        } else {
+          selectedStaff.delete(id)
+          option.classList.remove('selected')
+        }
+
+        // 标记有变更
+        hasUnsavedChanges = true
+      }
+    </script>
+  </body>
+</html>

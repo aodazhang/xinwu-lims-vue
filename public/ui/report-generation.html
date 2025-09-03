@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>报告生成详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .project-number {
+        color: #667eea;
+      }
+
+      .urgent-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #ef4444;
+        color: white;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 表单样式 */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .form-input,
+      .form-textarea,
+      .form-select {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .form-input:focus,
+      .form-textarea:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .form-textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      /* 检测结果表格 */
+      .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .results-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #1f2937;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+      }
+
+      .results-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 13px;
+      }
+
+      .results-table tr:hover {
+        background: #f9fafb;
+      }
+
+      .location-cell {
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      .item-cell {
+        color: #6b7280;
+      }
+
+      .result-cell {
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .standard-cell {
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .judgement-cell {
+        font-weight: 500;
+      }
+
+      .judgement-pass {
+        color: #10b981;
+      }
+
+      .judgement-fail {
+        color: #ef4444;
+      }
+
+      /* 生成报告按钮 */
+      .generate-report-btn {
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 24px;
+        width: 100%;
+        transition: all 0.2s;
+      }
+
+      .generate-report-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      /* 状态标识 */
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .status-draft {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
+      .status-ready {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      /* 预览模式 */
+      .preview-mode {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .preview-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0c4a6e;
+      }
+
+      .preview-desc {
+        font-size: 13px;
+        color: #075985;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .results-table {
+          font-size: 12px;
+        }
+
+        .results-table th,
+        .results-table td {
+          padding: 8px 6px;
+        }
+
+        .page-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+
+      /* 表格滚动 */
+      .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="project-number">XW250903-100</span>
+            <span class="urgent-badge">加急</span>
+          </h2>
+          <div class="breadcrumb">
+            <a href="report-dashboard.html">报告编制工作台</a> / 报告生成详情
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="backToWorkspace()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style="margin-right: 6px"
+            >
+              <path
+                d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+              />
+            </svg>
+            返回工作台
+          </button>
+          <button class="btn btn-secondary">预览报告</button>
+          <button class="btn btn-primary">保存草稿</button>
+          <button class="btn btn-success" onclick="generateReport()">
+            生成报告
+          </button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <div class="main-info">
+          <!-- 预览模式提示 -->
+          <div class="preview-mode">
+            <div class="preview-header">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style="color: #0c4a6e"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                />
+              </svg>
+              <span class="preview-title">报告生成预览</span>
+            </div>
+            <div class="preview-desc">
+              当前为报告生成模式，请确认所有信息无误后点击"生成报告"按钮。生成的报告将自动提交到审核流程。
+            </div>
+          </div>
+
+          <!-- 检测报告基本信息 -->
+          <div class="info-card">
+            <div class="card-header">检测报告基本信息</div>
+            <div class="info-grid">
+              <div class="form-group">
+                <label class="info-label">受检单位</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="广州环保科技总部"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label class="info-label">受检地址</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="广州市天河区科技园A栋3楼"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label class="info-label">检测类别</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="委托检测（采样）"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label class="info-label">检测范围</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="GB 50325-2020 检测"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label class="info-label">采样日期</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="2025-09-04"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label class="info-label">检测日期</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  value="2025-09-05 至 2025-09-06"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="info-grid" style="margin-top: 16px">
+              <div class="form-group">
+                <label class="info-label">检测项目及检测依据</label>
+                <textarea
+                  class="form-textarea"
+                  placeholder="请输入检测项目及依据"
+                >
+三苯五项：甲醛、苯、甲苯、二甲苯、TVOC
+检测依据：GB 50325-2020《民用建筑工程室内环境污染控制标准》</textarea
+                >
+              </div>
+              <div class="form-group">
+                <label class="info-label">主要检测仪器</label>
+                <textarea
+                  class="form-textarea"
+                  placeholder="请输入主要检测仪器"
+                >
+气相色谱仪 GC-2030（岛津）
+分光光度计 UV-2600（岛津）
+空气采样器 QC-2A（青岛崂山）</textarea
+                >
+              </div>
+            </div>
+
+            <div class="info-grid" style="margin-top: 16px">
+              <div class="form-group">
+                <label class="info-label">评价依据</label>
+                <select class="form-select">
+                  <option value="GB 50325-2020" selected>
+                    GB 50325-2020《民用建筑工程室内环境污染控制标准》
+                  </option>
+                  <option value="GB/T 18883-2022">
+                    GB/T 18883-2022《室内空气质量标准》
+                  </option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="info-label">检测结论</label>
+                <select
+                  class="form-select"
+                  id="conclusion-select"
+                  onchange="updateConclusion()"
+                >
+                  <option value="">请选择检测结论</option>
+                  <option value="合格">检测结果符合标准要求</option>
+                  <option value="不合格">检测结果不符合标准要求</option>
+                  <option value="部分不合格">部分指标不符合标准要求</option>
+                  <option value="自定义">自定义结论</option>
+                </select>
+              </div>
+            </div>
+
+            <div
+              class="form-group"
+              id="custom-conclusion"
+              style="display: none; margin-top: 16px"
+            >
+              <label class="info-label">自定义检测结论</label>
+              <textarea
+                class="form-textarea"
+                id="custom-conclusion-text"
+                placeholder="请输入自定义检测结论"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- 检测结果 -->
+          <div class="info-card">
+            <div class="card-header">检测结果</div>
+            <div class="table-container">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>取样位置</th>
+                    <th>检测项目</th>
+                    <th>检测结果 (mg/m³)</th>
+                    <th>标准限值 (mg/m³)</th>
+                    <th>单项判定</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan="5" class="location-cell">
+                      办公室A区域<br /><small>XW250903-100-001</small>
+                    </td>
+                    <td class="item-cell">甲醛</td>
+                    <td class="result-cell">0.08</td>
+                    <td class="standard-cell">≤ 0.10</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">苯</td>
+                    <td class="result-cell">0.05</td>
+                    <td class="standard-cell">≤ 0.11</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">甲苯</td>
+                    <td class="result-cell">0.15</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">二甲苯</td>
+                    <td class="result-cell">0.12</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">TVOC</td>
+                    <td class="result-cell">0.55</td>
+                    <td class="standard-cell">≤ 0.60</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="5" class="location-cell">
+                      会议室B区域<br /><small>XW250903-100-002</small>
+                    </td>
+                    <td class="item-cell">甲醛</td>
+                    <td class="result-cell">0.12</td>
+                    <td class="standard-cell">≤ 0.10</td>
+                    <td class="judgement-cell judgement-fail">不合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">苯</td>
+                    <td class="result-cell">0.06</td>
+                    <td class="standard-cell">≤ 0.11</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">甲苯</td>
+                    <td class="result-cell">0.18</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">二甲苯</td>
+                    <td class="result-cell">0.16</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">TVOC</td>
+                    <td class="result-cell">0.45</td>
+                    <td class="standard-cell">≤ 0.60</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="5" class="location-cell">
+                      总经理办公室<br /><small>XW250903-100-003</small>
+                    </td>
+                    <td class="item-cell">甲醛</td>
+                    <td class="result-cell">0.09</td>
+                    <td class="standard-cell">≤ 0.10</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">苯</td>
+                    <td class="result-cell">0.04</td>
+                    <td class="standard-cell">≤ 0.11</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">甲苯</td>
+                    <td class="result-cell">0.10</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">二甲苯</td>
+                    <td class="result-cell">0.08</td>
+                    <td class="standard-cell">≤ 0.20</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+                  <tr>
+                    <td class="item-cell">TVOC</td>
+                    <td class="result-cell">0.38</td>
+                    <td class="standard-cell">≤ 0.60</td>
+                    <td class="judgement-cell judgement-pass">合格</td>
+                  </tr>
+
+                  <!-- 更多检测点数据... -->
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="
+                        text-align: center;
+                        color: #6b7280;
+                        font-style: italic;
+                        padding: 16px;
+                      "
+                    >
+                      ... 其他9个检测点数据 (共12个检测点) ...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 生成报告按钮 -->
+          <button class="generate-report-btn" onclick="generateReport()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style="margin-right: 8px"
+            >
+              <path
+                d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+              />
+            </svg>
+            确认生成检测报告
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('报告生成详情')
+        }
+      })
+
+      // 更新检测结论
+      function updateConclusion() {
+        const conclusionSelect = document.getElementById('conclusion-select')
+        const customConclusionDiv = document.getElementById('custom-conclusion')
+
+        if (conclusionSelect.value === '自定义') {
+          customConclusionDiv.style.display = 'block'
+        } else {
+          customConclusionDiv.style.display = 'none'
+        }
+      }
+
+      // 生成报告
+      function generateReport() {
+        // 验证必填信息
+        const conclusionSelect = document.getElementById('conclusion-select')
+        if (!conclusionSelect.value) {
+          alert('请选择检测结论')
+          conclusionSelect.focus()
+          return
+        }
+
+        if (conclusionSelect.value === '自定义') {
+          const customText = document
+            .getElementById('custom-conclusion-text')
+            .value.trim()
+          if (!customText) {
+            alert('请输入自定义检测结论')
+            document.getElementById('custom-conclusion-text').focus()
+            return
+          }
+        }
+
+        // 确认生成报告
+        if (
+          confirm(
+            '确定生成检测报告吗？\n\n生成后报告将自动提交到审核流程，无法再次修改基本信息。'
+          )
+        ) {
+          // 显示进度提示
+          const btn = event.target
+          const originalText = btn.innerHTML
+          btn.disabled = true
+          btn.innerHTML =
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; animation: spin 1s linear infinite;"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg>正在生成报告...'
+
+          // 模拟报告生成过程
+          setTimeout(() => {
+            // 收集报告数据
+            const reportData = {
+              projectNumber: 'XW250903-100',
+              conclusion:
+                conclusionSelect.value === '自定义'
+                  ? document.getElementById('custom-conclusion-text').value
+                  : conclusionSelect.value,
+              generatedTime: new Date().toLocaleString('zh-CN'),
+              status: 'generated'
+            }
+
+            console.log('生成报告数据:', reportData)
+
+            // 显示成功消息
+            alert(
+              '检测报告生成成功！\n\n报告已自动提交到审核流程，系统将通知审核人员进行审核。\n\n报告编号：XW250903-100-RPT-001'
+            )
+
+            // 跳转到报告编制工作台
+            window.location.href = 'report-dashboard.html'
+          }, 2000)
+        }
+      }
+
+      // 保存草稿
+      function saveDraft() {
+        alert('草稿已保存！您可以稍后继续编辑。')
+      }
+
+      // 预览报告
+      function previewReport() {
+        window.open('report-preview.html?id=XW250903-100', '_blank')
+      }
+
+      // 添加 CSS 动画
+      const style = document.createElement('style')
+      style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `
+      document.head.appendChild(style)
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.info-card, .preview-mode')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+
+      // 自动判定整体结论
+      function autoDetectConclusion() {
+        const failCells = document.querySelectorAll('.judgement-fail')
+        const conclusionSelect = document.getElementById('conclusion-select')
+
+        if (failCells.length > 0) {
+          conclusionSelect.value = '部分不合格'
+        } else {
+          conclusionSelect.value = '合格'
+        }
+      }
+
+      // 页面加载时自动检测结论
+      document.addEventListener('DOMContentLoaded', autoDetectConclusion)
+
+      // 返回工作台功能
+      function backToWorkspace() {
+        // 检查是否有未保存的更改
+        const conclusionSelect = document.getElementById('conclusion-select')
+        const customText = document
+          .getElementById('custom-conclusion-text')
+          .value.trim()
+
+        let hasChanges = false
+
+        // 检查检测结论是否已选择
+        if (conclusionSelect.value) {
+          hasChanges = true
+        }
+
+        // 检查自定义结论是否有内容
+        if (customText) {
+          hasChanges = true
+        }
+
+        // 如果有未保存的更改，提示用户
+        if (hasChanges) {
+          const confirmLeave = confirm(
+            '您有未保存的更改，确定要返回工作台吗？未保存的更改将丢失。'
+          )
+          if (!confirmLeave) {
+            return
+          }
+        }
+
+        // 跳转到报告编制工作台
+        window.location.href = 'report-dashboard.html'
+      }
+    </script>
+  </body>
+</html>

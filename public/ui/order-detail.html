@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>订单详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .order-number {
+        color: #667eea;
+      }
+
+      .urgent-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #ef4444;
+        color: white;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      /* 左侧主信息区 */
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .edit-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        background: transparent;
+        color: #667eea;
+        border: 1px solid #667eea;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .edit-btn:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 时间轴 */
+      .timeline {
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e5e7eb;
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 24px;
+      }
+
+      .timeline-point {
+        position: absolute;
+        left: -32px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border: 2px solid #667eea;
+        border-radius: 50%;
+      }
+
+      .timeline-item.completed .timeline-point {
+        background: #667eea;
+      }
+
+      .timeline-item.pending .timeline-point {
+        border-color: #9ca3af;
+      }
+
+      .timeline-content {
+        background: #f9fafb;
+        padding: 12px 16px;
+        border-radius: 8px;
+      }
+
+      .timeline-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .timeline-desc {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .timeline-time {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 4px;
+      }
+
+      /* 右侧辅助区 */
+      .side-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .status-indicator.approved {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      }
+
+      .status-indicator.sampling {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      }
+
+      .status-indicator.testing {
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+      }
+
+      .status-indicator.completed {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      }
+
+      .status-text {
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .status-details {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .status-detail-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+      }
+
+      .status-detail-label {
+        color: #6b7280;
+      }
+
+      .status-detail-value {
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 人员列表 */
+      .person-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .person-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        background: #f9fafb;
+        border-radius: 6px;
+      }
+
+      .person-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .person-info {
+        flex: 1;
+      }
+
+      .person-name {
+        font-size: 13px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      .person-role {
+        font-size: 11px;
+        color: #6b7280;
+      }
+
+      /* 附件列表 */
+      .attachment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .attachment-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f9fafb;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .attachment-item:hover {
+        background: #f3f4f6;
+      }
+
+      .attachment-icon {
+        width: 32px;
+        height: 32px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .attachment-info {
+        flex: 1;
+      }
+
+      .attachment-name {
+        font-size: 13px;
+        color: #1f2937;
+      }
+
+      .attachment-size {
+        font-size: 11px;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="order-number">XW250903-100</span>
+            <span class="urgent-badge">加急</span>
+          </h2>
+          <div class="breadcrumb">
+            <a href="sales-dashboard.html">销售工作台</a> / 订单详情
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary">导出PDF</button>
+          <button class="btn btn-primary">编辑订单</button>
+          <button class="btn-danger btn">取消订单</button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <!-- 左侧主信息区 -->
+        <div class="main-info">
+          <!-- 基本信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>基本信息</span>
+              <button class="edit-btn">编辑</button>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value">广州环保科技有限公司</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系人</span>
+                <span class="info-value">王经理</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系电话</span>
+                <span class="info-value">13800138001</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value">广州环保科技总部</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">项目金额</span>
+                <span class="info-value">¥8,600</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">实收金额</span>
+                <span class="info-value">¥5,000</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">创建时间</span>
+                <span class="info-value">2025-09-03 09:15</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">是否加急</span>
+                <span class="info-value" style="color: #ef4444">是</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>检测信息</span>
+              <button class="edit-btn">编辑</button>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">采样地址</span>
+                <span class="info-value">广州市天河区科技园A栋3楼</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测点数</span>
+                <span class="info-value">12</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测类型</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 600"
+                  >50325-2020</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测内容</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 500"
+                  >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">服务类型</span>
+                <span class="info-value">初测</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">订单类型</span>
+                <span class="info-value">委托检测（采样）</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px">
+              <span class="info-label">备注</span>
+              <div
+                style="
+                  margin-top: 8px;
+                  padding: 12px;
+                  background: #f9fafb;
+                  border-radius: 6px;
+                  font-size: 13px;
+                  color: #6b7280;
+                "
+              >
+                客户要求尽快出报告，需要优先处理。检测区域为新装修办公室，重点关注甲醛和TVOC指标。
+              </div>
+            </div>
+          </div>
+
+          <!-- 订单进度 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>订单进度</span>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">订单创建</div>
+                  <div class="timeline-desc">销售人员：张三</div>
+                  <div class="timeline-time">2025-09-03 09:15</div>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">订单审核通过</div>
+                  <div class="timeline-desc">审核人员：李四</div>
+                  <div class="timeline-time">2025-09-03 10:30</div>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">采样任务分派</div>
+                  <div class="timeline-desc">调度员：王五 | 采样员：赵六</div>
+                  <div class="timeline-time">2025-09-03 11:00</div>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">采样执行中</div>
+                  <div class="timeline-desc">
+                    预计完成时间：2025-09-04 15:00
+                  </div>
+                  <div class="timeline-time">进行中</div>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">样品接收</div>
+                  <div class="timeline-desc">等待采样完成</div>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">实验室检测</div>
+                  <div class="timeline-desc">等待样品接收</div>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">报告生成</div>
+                  <div class="timeline-desc">等待检测完成</div>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">报告交付</div>
+                  <div class="timeline-desc">等待报告审批</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧辅助区 -->
+        <div class="side-info">
+          <!-- 状态指示器 -->
+          <div class="status-card">
+            <div class="status-indicator sampling">
+              <span class="status-text">采样中</span>
+            </div>
+            <div class="status-details">
+              <div class="status-detail-item">
+                <span class="status-detail-label">当前阶段</span>
+                <span class="status-detail-value">采样执行</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">处理进度</span>
+                <span class="status-detail-value">37.5%</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">预计完成</span>
+                <span class="status-detail-value">2025-09-06</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 相关人员 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>相关人员</span>
+            </div>
+            <div class="person-list">
+              <div class="person-item">
+                <div class="person-avatar">张</div>
+                <div class="person-info">
+                  <div class="person-name">张三</div>
+                  <div class="person-role">销售人员</div>
+                </div>
+              </div>
+              <div class="person-item">
+                <div class="person-avatar">李</div>
+                <div class="person-info">
+                  <div class="person-name">李四</div>
+                  <div class="person-role">订单审核员</div>
+                </div>
+              </div>
+              <div class="person-item">
+                <div class="person-avatar">王</div>
+                <div class="person-info">
+                  <div class="person-name">王五</div>
+                  <div class="person-role">采样调度员</div>
+                </div>
+              </div>
+              <div class="person-item">
+                <div class="person-avatar">赵</div>
+                <div class="person-info">
+                  <div class="person-name">赵六</div>
+                  <div class="person-role">采样人员</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 相关附件 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>相关附件</span>
+            </div>
+            <div class="attachment-list">
+              <div class="attachment-item">
+                <div class="attachment-icon">PDF</div>
+                <div class="attachment-info">
+                  <div class="attachment-name">检测委托单.pdf</div>
+                  <div class="attachment-size">1.2 MB</div>
+                </div>
+              </div>
+              <div class="attachment-item">
+                <div class="attachment-icon">IMG</div>
+                <div class="attachment-info">
+                  <div class="attachment-name">现场照片.jpg</div>
+                  <div class="attachment-size">2.5 MB</div>
+                </div>
+              </div>
+              <div class="attachment-item">
+                <div class="attachment-icon">DOC</div>
+                <div class="attachment-info">
+                  <div class="attachment-name">客户要求说明.docx</div>
+                  <div class="attachment-size">56 KB</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('订单详情')
+        }
+      })
+
+      // 页面加载时的动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.info-card, .status-card')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+    </script>
+  </body>
+</html>

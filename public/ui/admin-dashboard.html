@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>系统管理仪表盘 - LIMS-XW系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .date-selector {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .date-selector:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .user-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      /* 统计卡片 */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+      }
+
+      .stat-card.primary::before {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      .stat-card.success::before {
+        background: linear-gradient(135deg, #51cf66, #12b886);
+      }
+
+      .stat-card.warning::before {
+        background: linear-gradient(135deg, #ffd43b, #ff9800);
+      }
+
+      .stat-card.info::before {
+        background: linear-gradient(135deg, #48dbfb, #0abde3);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .stat-card.primary .stat-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .stat-card.success .stat-icon {
+        background: linear-gradient(135deg, #51cf66, #12b886);
+        color: white;
+      }
+
+      .stat-card.warning .stat-icon {
+        background: linear-gradient(135deg, #ffd43b, #ff9800);
+        color: white;
+      }
+
+      .stat-card.info .stat-icon {
+        background: linear-gradient(135deg, #48dbfb, #0abde3);
+        color: white;
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+      }
+
+      .stat-change.positive {
+        color: #51cf66;
+      }
+
+      .stat-change.negative {
+        color: #ff6b6b;
+      }
+
+      /* 图表区域 */
+      .charts-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .chart-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .chart-header {
+        padding: 20px;
+        border-bottom: 1px solid #e8ecf4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chart-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .chart-options {
+        display: flex;
+        gap: 10px;
+      }
+
+      .chart-option {
+        padding: 6px 12px;
+        background: #f5f7fa;
+        border: none;
+        border-radius: 6px;
+        color: #666;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+      }
+
+      .chart-option.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .chart-body {
+        padding: 20px;
+      }
+
+      /* 柱状图 */
+      .bar-chart {
+        height: 300px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        padding: 20px;
+      }
+
+      .bar-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        max-width: 60px;
+      }
+
+      .bar {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .bar:hover {
+        transform: scaleY(1.05);
+        box-shadow: 0 -5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .bar-value {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .bar-label {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+      }
+
+      /* 饼图 */
+      .pie-chart {
+        width: 200px;
+        height: 200px;
+        margin: 20px auto;
+        position: relative;
+      }
+
+      .pie {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(
+          #667eea 0deg 108deg,
+          #764ba2 108deg 180deg,
+          #51cf66 180deg 252deg,
+          #ffd43b 252deg 324deg,
+          #48dbfb 324deg 360deg
+        );
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .pie-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .pie-total {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .pie-label {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .legend {
+        padding: 20px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+      }
+
+      .legend-text {
+        flex: 1;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .legend-value {
+        font-weight: 600;
+        color: #333;
+      }
+
+      /* 排行榜 */
+      .ranking-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .ranking-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .ranking-header {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .ranking-list {
+        padding: 20px;
+      }
+
+      .ranking-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f5f7fa;
+        transition: all 0.3s ease;
+      }
+
+      .ranking-item:hover {
+        background: #f5f7fa;
+        margin: 0 -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .ranking-item:last-child {
+        border-bottom: none;
+      }
+
+      .ranking-number {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .ranking-item:nth-child(1) .ranking-number {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #333;
+      }
+
+      .ranking-item:nth-child(2) .ranking-number {
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+        color: #333;
+      }
+
+      .ranking-item:nth-child(3) .ranking-number {
+        background: linear-gradient(135deg, #cd7f32, #e6a157);
+        color: white;
+      }
+
+      .ranking-item:nth-child(n + 4) .ranking-number {
+        background: #f5f7fa;
+        color: #666;
+      }
+
+      .ranking-info {
+        flex: 1;
+      }
+
+      .ranking-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+      }
+
+      .ranking-detail {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .ranking-value {
+        font-size: 16px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* 管理入口 */
+      .admin-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+      }
+
+      .admin-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px;
+      }
+
+      .admin-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px;
+        background: #f5f7fa;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .admin-item:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .admin-item:hover .admin-icon {
+        background: white;
+        color: #667eea;
+      }
+
+      .admin-item:hover .admin-label {
+        color: white;
+      }
+
+      .admin-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .admin-label {
+        font-size: 13px;
+        color: #666;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      @media (max-width: 1200px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .charts-row {
+          grid-template-columns: 1fr;
+        }
+
+        .ranking-row {
+          grid-template-columns: 1fr;
+        }
+
+        .admin-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+          align-items: start;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .admin-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+    <div class="container">
+      <!-- 业绩统计卡片 -->
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">¥892,650</div>
+          <div class="stat-label">本月营收</div>
+          <div class="stat-change positive">
+            <span>↑ 15.2%</span>
+            <span>较上月</span>
+          </div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="stat-icon">📋</div>
+          <div class="stat-value">326</div>
+          <div class="stat-label">本月订单</div>
+          <div class="stat-change positive">
+            <span>↑ 8.5%</span>
+            <span>较上月</span>
+          </div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-icon">🏢</div>
+          <div class="stat-value">89</div>
+          <div class="stat-label">新增客户</div>
+          <div class="stat-change negative">
+            <span>↓ 3.2%</span>
+            <span>较上月</span>
+          </div>
+        </div>
+
+        <div class="stat-card info">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value">98.5%</div>
+          <div class="stat-label">按时交付率</div>
+          <div class="stat-change positive">
+            <span>↑ 2.1%</span>
+            <span>较上月</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区域 -->
+      <div class="charts-row">
+        <!-- 订单来源柱状图 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">订单来源分析</div>
+            <div class="chart-options">
+              <button
+                class="chart-option active"
+                onclick="switchChart('month')"
+              >
+                本月
+              </button>
+              <button class="chart-option" onclick="switchChart('quarter')">
+                本季度
+              </button>
+              <button class="chart-option" onclick="switchChart('year')">
+                本年
+              </button>
+            </div>
+          </div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-group">
+                <div class="bar" style="height: 180px">
+                  <span class="bar-value">85</span>
+                </div>
+                <div class="bar-label">直接客户</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 140px">
+                  <span class="bar-value">65</span>
+                </div>
+                <div class="bar-label">代理商</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 120px">
+                  <span class="bar-value">56</span>
+                </div>
+                <div class="bar-label">政府项目</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 160px">
+                  <span class="bar-value">75</span>
+                </div>
+                <div class="bar-label">长期合作</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 100px">
+                  <span class="bar-value">45</span>
+                </div>
+                <div class="bar-label">临时委托</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 业务结构饼图 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">业务结构</div>
+          </div>
+          <div class="chart-body">
+            <div class="pie-chart">
+              <div class="pie"></div>
+              <div class="pie-center">
+                <div class="pie-total">326</div>
+                <div class="pie-label">总订单</div>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background: #667eea"></div>
+                <div class="legend-text">生活饮用水</div>
+                <div class="legend-value">30%</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #764ba2"></div>
+                <div class="legend-text">二次供水</div>
+                <div class="legend-value">20%</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #51cf66"></div>
+                <div class="legend-text">游泳池水</div>
+                <div class="legend-value">20%</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #ffd43b"></div>
+                <div class="legend-text">工业用水</div>
+                <div class="legend-value">20%</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #48dbfb"></div>
+                <div class="legend-text">其他</div>
+                <div class="legend-value">10%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 排行榜 -->
+      <div class="ranking-row">
+        <!-- 业绩排行榜 -->
+        <div class="ranking-card">
+          <div class="ranking-header">🏆 本月业绩排行榜</div>
+          <div class="ranking-list">
+            <div class="ranking-item">
+              <div class="ranking-number">1</div>
+              <div class="ranking-info">
+                <div class="ranking-name">张业务</div>
+                <div class="ranking-detail">完成订单：45个</div>
+              </div>
+              <div class="ranking-value">¥186,500</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">2</div>
+              <div class="ranking-info">
+                <div class="ranking-name">李销售</div>
+                <div class="ranking-detail">完成订单：38个</div>
+              </div>
+              <div class="ranking-value">¥156,200</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">3</div>
+              <div class="ranking-info">
+                <div class="ranking-name">王经理</div>
+                <div class="ranking-detail">完成订单：35个</div>
+              </div>
+              <div class="ranking-value">¥142,800</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">4</div>
+              <div class="ranking-info">
+                <div class="ranking-name">陈业务</div>
+                <div class="ranking-detail">完成订单：32个</div>
+              </div>
+              <div class="ranking-value">¥128,600</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">5</div>
+              <div class="ranking-info">
+                <div class="ranking-name">赵销售</div>
+                <div class="ranking-detail">完成订单：28个</div>
+              </div>
+              <div class="ranking-value">¥115,300</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 收款排行榜 -->
+        <div class="ranking-card">
+          <div class="ranking-header">💵 本月收款排行榜</div>
+          <div class="ranking-list">
+            <div class="ranking-item">
+              <div class="ranking-number">1</div>
+              <div class="ranking-info">
+                <div class="ranking-name">张业务</div>
+                <div class="ranking-detail">收款率：96.5%</div>
+              </div>
+              <div class="ranking-value">¥180,000</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">2</div>
+              <div class="ranking-info">
+                <div class="ranking-name">王经理</div>
+                <div class="ranking-detail">收款率：94.2%</div>
+              </div>
+              <div class="ranking-value">¥134,500</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">3</div>
+              <div class="ranking-info">
+                <div class="ranking-name">李销售</div>
+                <div class="ranking-detail">收款率：88.6%</div>
+              </div>
+              <div class="ranking-value">¥138,400</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">4</div>
+              <div class="ranking-info">
+                <div class="ranking-name">赵销售</div>
+                <div class="ranking-detail">收款率：92.3%</div>
+              </div>
+              <div class="ranking-value">¥106,300</div>
+            </div>
+            <div class="ranking-item">
+              <div class="ranking-number">5</div>
+              <div class="ranking-info">
+                <div class="ranking-name">陈业务</div>
+                <div class="ranking-detail">收款率：85.7%</div>
+              </div>
+              <div class="ranking-value">¥110,200</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统管理入口 -->
+      <div class="admin-section">
+        <div class="admin-title">系统管理</div>
+        <div class="admin-grid">
+          <div class="admin-item" onclick="goToAdmin('dict')">
+            <div class="admin-icon">📚</div>
+            <div class="admin-label">字典管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('employee')">
+            <div class="admin-icon">👥</div>
+            <div class="admin-label">员工管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('role')">
+            <div class="admin-icon">🔐</div>
+            <div class="admin-label">角色权限</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('customer')">
+            <div class="admin-icon">🏢</div>
+            <div class="admin-label">客户管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('template')">
+            <div class="admin-icon">📄</div>
+            <div class="admin-label">模板管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('standard')">
+            <div class="admin-icon">📏</div>
+            <div class="admin-label">标准管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('equipment')">
+            <div class="admin-icon">🔬</div>
+            <div class="admin-label">设备管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('material')">
+            <div class="admin-icon">🧪</div>
+            <div class="admin-label">耗材管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('price')">
+            <div class="admin-icon">💰</div>
+            <div class="admin-label">价格管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('log')">
+            <div class="admin-icon">📊</div>
+            <div class="admin-label">日志管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('backup')">
+            <div class="admin-icon">💾</div>
+            <div class="admin-label">备份管理</div>
+          </div>
+          <div class="admin-item" onclick="goToAdmin('settings')">
+            <div class="admin-icon">⚙️</div>
+            <div class="admin-label">系统设置</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('系统管理仪表盘')
+        }
+      })
+
+      // 选择日期范围
+      function selectDateRange() {
+        alert('选择日期范围功能')
+      }
+
+      // 切换图表
+      function switchChart(period) {
+        // 更新按钮状态
+        document.querySelectorAll('.chart-option').forEach(btn => {
+          btn.classList.remove('active')
+        })
+        event.target.classList.add('active')
+
+        // 根据周期更新图表数据
+        console.log(`切换到${period}数据`)
+        // 实际应用中这里应该重新加载数据并更新图表
+      }
+
+      // 进入管理页面
+      function goToAdmin(module) {
+        console.log(`进入${module}管理`)
+        // 实际应用中这里应该跳转到对应的管理页面
+        switch (module) {
+          case 'dict':
+            window.location.href = 'admin-dict.html'
+            break
+          case 'employee':
+            window.location.href = 'admin-employee.html'
+            break
+          case 'role':
+            window.location.href = 'admin-role.html'
+            break
+          case 'customer':
+            window.location.href = 'admin-customer.html'
+            break
+          case 'template':
+            window.location.href = 'admin-template.html'
+            break
+          case 'standard':
+            window.location.href = 'admin-standard.html'
+            break
+          case 'equipment':
+            window.location.href = 'admin-equipment.html'
+            break
+          case 'material':
+            window.location.href = 'admin-material.html'
+            break
+          case 'price':
+            window.location.href = 'admin-price.html'
+            break
+          case 'log':
+            window.location.href = 'admin-log.html'
+            break
+          case 'backup':
+            window.location.href = 'admin-backup.html'
+            break
+          case 'settings':
+            window.location.href = 'admin-settings.html'
+            break
+          default:
+            alert(`${module}管理功能开发中...`)
+        }
+      }
+
+      // 动画效果
+      window.addEventListener('load', function () {
+        // 统计卡片动画
+        const statCards = document.querySelectorAll('.stat-card')
+        statCards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.5s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+
+        // 柱状图动画
+        const bars = document.querySelectorAll('.bar')
+        bars.forEach((bar, index) => {
+          const height = bar.style.height
+          bar.style.height = '0'
+          setTimeout(
+            () => {
+              bar.style.transition = 'height 0.8s ease'
+              bar.style.height = height
+            },
+            500 + index * 100
+          )
+        })
+      })
+    </script>
+  </body>
+</html>

@@ -11,6 +11,11 @@ const router = createRouter({
   history: createWebHashHistory('/'),
   routes: [
     {
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/common/login.vue')
+    },
+    {
       path: '/',
       component: Layout,
       redirect: '/network-node',

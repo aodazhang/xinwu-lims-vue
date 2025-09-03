@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>检测任务详情 - LIMS-XW系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .project-number {
+        color: #667eea;
+      }
+
+      .task-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .task-status.pending {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      .task-status.testing {
+        background: #e0e7ff;
+        color: #8b5cf6;
+      }
+
+      .task-status.completed {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+      }
+
+      .btn-secondary:hover {
+        background: #e5e7eb;
+      }
+
+      .btn-warning {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+      }
+
+      .btn-warning:hover {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      }
+
+      .btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 样品卡片 */
+      .sample-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .sample-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .sample-id {
+        font-size: 14px;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .sample-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .sample-status.good {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .sample-status.damaged {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      .sample-location {
+        font-size: 13px;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .sample-details {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 侧边栏 */
+      .side-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-indicator {
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .status-indicator.pending {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      }
+
+      .status-indicator.testing {
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+      }
+
+      .status-indicator.completed {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      }
+
+      .status-text {
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .status-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-detail-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .status-detail-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      /* 操作按钮区 */
+      .action-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .action-btn {
+        padding: 16px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .action-btn.start-btn {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .action-btn.start-btn:hover {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+      }
+
+      .action-btn.complete-btn {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+      }
+
+      .action-btn.complete-btn:hover {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+      }
+
+      .action-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .action-note {
+        margin-top: 16px;
+        padding: 12px;
+        background: #f0f9ff;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #1e40af;
+      }
+
+      /* 进度条 */
+      .progress-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .progress-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .progress-percentage {
+        font-size: 18px;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .progress-details {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .progress-item {
+        text-align: center;
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 6px;
+      }
+
+      .progress-item-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #1f2937;
+      }
+
+      .progress-item-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+
+      /* 完成状态特有样式 */
+      .completion-section {
+        background: #f0f9ff;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 20px;
+        border: 2px solid #0ea5e9;
+      }
+
+      .data-access-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .data-btn {
+        padding: 16px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #374151;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .data-btn:hover {
+        border-color: #667eea;
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .data-btn-icon {
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+
+      .data-btn-title {
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .data-btn-desc {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sample-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .page-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <div class="breadcrumb">
+            <a href="staff-tasks.html">我的任务</a> / 任务详情
+          </div>
+          <h2 class="page-title">
+            <span class="project-number">XW250903-100</span>
+            <span class="task-status pending">待检测</span>
+          </h2>
+        </div>
+        <div class="page-actions" id="page-actions">
+          <button class="btn btn-secondary" onclick="exportTaskInfo()">
+            导出信息
+          </button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <!-- 左侧主信息区 -->
+        <div class="main-info">
+          <!-- 基本信息 -->
+          <div class="info-card">
+            <div class="card-header">基本信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value">广州环保科技有限公司</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value">广州环保科技总部</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样地址</span>
+                <span class="info-value">广州市天河区科技园A栋3楼</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">销售人员</span>
+                <span class="info-value">张三</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样人员</span>
+                <span class="info-value">赵六</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">样品管理员</span>
+                <span class="info-value">李七</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测信息 -->
+          <div class="info-card">
+            <div class="card-header">检测信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">检测类型</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 600"
+                  >50325-2020</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测内容</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 500"
+                  >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">样品数量</span>
+                <span class="info-value">12个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">完好样品</span>
+                <span class="info-value" style="color: #10b981">11个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">破损样品</span>
+                <span class="info-value" style="color: #ef4444">1个</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">接收时间</span>
+                <span class="info-value">2025-09-04 17:30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 样品列表 -->
+          <div class="info-card">
+            <div class="card-header">样品列表</div>
+            <div class="sample-grid">
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-001</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">办公室A区域</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-002</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">会议室B区域</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-003</span>
+                  <span class="sample-status good">完好</span>
+                </div>
+                <div class="sample-location">总经理办公室</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">XW250903-100-004</span>
+                  <span class="sample-status damaged">破损</span>
+                </div>
+                <div class="sample-location">财务室</div>
+                <div class="sample-details">接收时间：2025-09-04 17:30</div>
+              </div>
+
+              <!-- 简化显示，实际应该显示所有12个样品 -->
+              <div class="sample-card">
+                <div class="sample-header">
+                  <span class="sample-id">...</span>
+                  <span class="sample-status good">更多样品</span>
+                </div>
+                <div class="sample-location">共计12个样品</div>
+                <div class="sample-details">点击查看全部</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧状态区 -->
+        <div class="side-info">
+          <!-- 任务状态指示器 -->
+          <div class="status-card">
+            <div class="status-indicator pending" id="status-indicator">
+              <div class="status-text" id="status-text">待检测</div>
+            </div>
+            <div class="status-details" id="status-details">
+              <div class="status-detail-item">
+                <span class="status-detail-label">当前阶段</span>
+                <span class="status-detail-value" id="current-phase"
+                  >等待开始检测</span
+                >
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">优先级</span>
+                <span class="status-detail-value" style="color: #ef4444"
+                  >加急</span
+                >
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">分派时间</span>
+                <span class="status-detail-value">2025-09-04 18:00</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">预计完成</span>
+                <span class="status-detail-value" id="expected-end"
+                  >2025-09-06</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮区 -->
+          <div class="action-section" id="action-section">
+            <div class="card-header">检测操作</div>
+            <div class="action-buttons" id="action-buttons">
+              <!-- 根据状态动态生成按钮 -->
+            </div>
+            <div class="action-note">
+              <strong>注意：</strong
+              >开始检测后将记录检测开始时间，完成检测后将记录检测结束时间，这些时间将显示在最终报告中。
+            </div>
+          </div>
+
+          <!-- 检测进度（检测中状态显示） -->
+          <div
+            class="progress-section"
+            id="progress-section"
+            style="display: none"
+          >
+            <div class="progress-header">
+              <div class="progress-title">检测进度</div>
+              <div class="progress-percentage" id="progress-percentage">
+                65%
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                id="progress-fill"
+                style="width: 65%"
+              ></div>
+            </div>
+            <div class="progress-details">
+              <div class="progress-item">
+                <div class="progress-item-value">5</div>
+                <div class="progress-item-label">检测项目</div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-item-value">12</div>
+                <div class="progress-item-label">检测样品</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 完成状态的数据访问区 -->
+          <div
+            class="completion-section"
+            id="completion-section"
+            style="display: none"
+          >
+            <div
+              class="card-header"
+              style="
+                color: #0ea5e9;
+                border-bottom: 1px solid #0ea5e9;
+                margin-bottom: 20px;
+              "
+            >
+              检测完成
+            </div>
+            <div class="status-details">
+              <div class="status-detail-item">
+                <span class="status-detail-label">实际开始</span>
+                <span class="status-detail-value">2025-09-05 09:30</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">实际完成</span>
+                <span class="status-detail-value">2025-09-06 16:45</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">实际用时</span>
+                <span class="status-detail-value">1.5天</span>
+              </div>
+            </div>
+            <div class="data-access-buttons">
+              <a href="#" class="data-btn" onclick="viewTestReport()">
+                <div class="data-btn-icon">📊</div>
+                <div class="data-btn-title">查看检测报告</div>
+                <div class="data-btn-desc">PDF格式报告</div>
+              </a>
+              <a href="#" class="data-btn" onclick="downloadData()">
+                <div class="data-btn-icon">📥</div>
+                <div class="data-btn-title">下载检测数据</div>
+                <div class="data-btn-desc">Excel原始数据</div>
+              </a>
+              <a href="#" class="data-btn" onclick="viewCertificate()">
+                <div class="data-btn-icon">🏆</div>
+                <div class="data-btn-title">查看检测证书</div>
+                <div class="data-btn-desc">官方认证文件</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 获取URL参数
+      function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get(name)
+      }
+
+      let taskStatus = getUrlParameter('status') || 'pending' // pending, processing/testing, completed
+      const taskNumber = getUrlParameter('task') || 'XW250903-100'
+
+      // 从sessionStorage读取任务状态历史记录
+      function checkTaskHistory() {
+        try {
+          const taskHistory = JSON.parse(
+            sessionStorage.getItem('taskHistory') || '{}'
+          )
+          if (taskHistory[taskNumber] && !getUrlParameter('status')) {
+            taskStatus = taskHistory[taskNumber]
+            // 更新URL以反映正确的状态
+            const newUrl = `${window.location.pathname}?task=${taskNumber}&status=${taskStatus}`
+            window.history.replaceState({}, '', newUrl)
+          }
+        } catch (e) {
+          console.log('无法读取任务历史记录')
+        }
+      }
+
+      // 权限验证
+      function checkPermission() {
+        const role = sessionStorage.getItem('role')
+        const allowedRoles = ['lab-technician']
+
+        if (!allowedRoles.includes(role)) {
+          alert('您没有权限访问此页面，即将跳转到登录页面。')
+          window.location.href = 'login.html'
+          return false
+        }
+        return true
+      }
+
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        // 首先检查权限
+        if (!checkPermission()) {
+          return
+        }
+
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('检测任务详情')
+        }
+        initializePage()
+      })
+
+      // 初始化页面
+      function initializePage() {
+        checkTaskHistory() // 检查任务状态历史
+        updateTaskInfo()
+        updateStatusDisplay()
+        updateActionButtons()
+      }
+
+      // 更新任务信息
+      function updateTaskInfo() {
+        // 更新页面标题中的任务编号
+        document.querySelector('.project-number').textContent = taskNumber
+
+        // 根据状态更新任务状态标签
+        const statusElement = document.querySelector('.task-status')
+        const statusMap = {
+          pending: { class: 'pending', text: '待检测' },
+          testing: { class: 'testing', text: '检测中' },
+          processing: { class: 'testing', text: '检测中' },
+          completed: { class: 'completed', text: '已完成' }
+        }
+
+        const statusInfo = statusMap[taskStatus] || statusMap['pending']
+        statusElement.className = `task-status ${statusInfo.class}`
+        statusElement.textContent = statusInfo.text
+      }
+
+      // 更新状态显示
+      function updateStatusDisplay() {
+        const statusIndicator = document.getElementById('status-indicator')
+        const statusText = document.getElementById('status-text')
+        const currentPhase = document.getElementById('current-phase')
+        const expectedEnd = document.getElementById('expected-end')
+        const progressSection = document.getElementById('progress-section')
+        const completionSection = document.getElementById('completion-section')
+
+        const statusConfig = {
+          pending: {
+            class: 'pending',
+            text: '待检测',
+            phase: '等待开始检测'
+          },
+          testing: {
+            class: 'testing',
+            text: '检测中',
+            phase: '正在检测'
+          },
+          processing: {
+            class: 'testing',
+            text: '检测中',
+            phase: '正在检测'
+          },
+          completed: {
+            class: 'completed',
+            text: '已完成',
+            phase: '检测完成'
+          }
+        }
+
+        const config = statusConfig[taskStatus] || statusConfig['pending']
+        statusIndicator.className = `status-indicator ${config.class}`
+        statusText.textContent = config.text
+        currentPhase.textContent = config.phase
+
+        // 根据状态显示/隐藏不同组件
+        if (taskStatus === 'testing' || taskStatus === 'processing') {
+          progressSection.style.display = 'block'
+          completionSection.style.display = 'none'
+          expectedEnd.textContent = '2025-09-07 17:00'
+
+          // 添加实际开始时间
+          const statusDetails = document.getElementById('status-details')
+          if (!document.getElementById('actual-start-row')) {
+            const actualStartRow = document.createElement('div')
+            actualStartRow.className = 'status-detail-item'
+            actualStartRow.id = 'actual-start-row'
+            actualStartRow.innerHTML = `
+                        <span class="status-detail-label">实际开始</span>
+                        <span class="status-detail-value">2025-09-05 09:30</span>
+                    `
+            statusDetails.insertBefore(
+              actualStartRow,
+              statusDetails.lastElementChild
+            )
+          }
+        } else if (taskStatus === 'completed') {
+          progressSection.style.display = 'none'
+          completionSection.style.display = 'block'
+          expectedEnd.textContent = '2025-09-06 16:45'
+
+          // 添加实际开始时间
+          const statusDetails = document.getElementById('status-details')
+          if (!document.getElementById('actual-start-row')) {
+            const actualStartRow = document.createElement('div')
+            actualStartRow.className = 'status-detail-item'
+            actualStartRow.id = 'actual-start-row'
+            actualStartRow.innerHTML = `
+                        <span class="status-detail-label">实际开始</span>
+                        <span class="status-detail-value">2025-09-05 09:30</span>
+                    `
+            statusDetails.insertBefore(
+              actualStartRow,
+              statusDetails.lastElementChild
+            )
+          }
+        } else {
+          progressSection.style.display = 'none'
+          completionSection.style.display = 'none'
+          expectedEnd.textContent = '2025-09-06'
+
+          // 移除实际开始时间行
+          const actualStartRow = document.getElementById('actual-start-row')
+          if (actualStartRow) {
+            actualStartRow.remove()
+          }
+        }
+      }
+
+      // 更新操作按钮
+      function updateActionButtons() {
+        const actionButtons = document.getElementById('action-buttons')
+        let buttonsHTML = ''
+
+        switch (taskStatus) {
+          case 'pending':
+            buttonsHTML = `
+                        <button class="action-btn start-btn" onclick="startTesting()">
+                            <span>🚀</span>
+                            <span>开始检测</span>
+                        </button>
+                    `
+            break
+          case 'testing':
+          case 'processing':
+            buttonsHTML = `
+                        <button class="action-btn complete-btn" onclick="completeTesting()">
+                            <span>✅</span>
+                            <span>完成检测</span>
+                        </button>
+                    `
+            break
+          case 'completed':
+            buttonsHTML = `
+                        <div style="text-align: center; padding: 20px; color: #10b981;">
+                            <span style="font-size: 48px;">✅</span>
+                            <div style="margin-top: 12px; font-size: 16px; font-weight: 600;">检测任务已完成</div>
+                        </div>
+                    `
+            break
+        }
+
+        actionButtons.innerHTML = buttonsHTML
+      }
+
+      // 开始检测
+      function startTesting() {
+        if (confirm('确定开始检测任务吗？开始后将记录检测开始时间。')) {
+          // 更新任务状态
+          taskStatus = 'processing'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=processing`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updateActionButtons()
+
+          alert('检测任务已开始！请按照检测标准进行操作。')
+
+          // 通知任务列表页面更新（如果在同一个会话中）
+          if (window.opener && !window.opener.closed) {
+            try {
+              if (typeof window.opener.updateTaskStatus === 'function') {
+                window.opener.updateTaskStatus(taskNumber, 'processing')
+              }
+            } catch (e) {
+              console.log('无法通知任务列表页面更新')
+            }
+          }
+
+          // 如果从历史记录访问，更新sessionStorage
+          try {
+            const taskHistory = JSON.parse(
+              sessionStorage.getItem('taskHistory') || '{}'
+            )
+            taskHistory[taskNumber] = 'processing'
+            sessionStorage.setItem('taskHistory', JSON.stringify(taskHistory))
+          } catch (e) {
+            console.log('无法更新任务历史记录')
+          }
+        }
+      }
+
+      // 完成检测
+      function completeTesting() {
+        if (
+          confirm(
+            '确定完成检测任务吗？完成后将记录检测结束时间，任务将进入完成状态。'
+          )
+        ) {
+          // 更新任务状态
+          taskStatus = 'completed'
+
+          // 更新URL
+          const newUrl = `${window.location.pathname}?task=${taskNumber}&status=completed`
+          window.history.pushState({}, '', newUrl)
+
+          // 重新渲染页面
+          updateTaskInfo()
+          updateStatusDisplay()
+          updateActionButtons()
+
+          alert('检测任务已完成！系统将自动通知报告编制人员生成检测报告。')
+
+          // 通知任务列表页面更新（如果在同一个会话中）
+          if (window.opener && !window.opener.closed) {
+            try {
+              if (typeof window.opener.updateTaskStatus === 'function') {
+                window.opener.updateTaskStatus(taskNumber, 'completed')
+              }
+            } catch (e) {
+              console.log('无法通知任务列表页面更新')
+            }
+          }
+
+          // 如果从历史记录访问，更新sessionStorage
+          try {
+            const taskHistory = JSON.parse(
+              sessionStorage.getItem('taskHistory') || '{}'
+            )
+            taskHistory[taskNumber] = 'completed'
+            sessionStorage.setItem('taskHistory', JSON.stringify(taskHistory))
+          } catch (e) {
+            console.log('无法更新任务历史记录')
+          }
+        }
+      }
+
+      // 导出任务信息
+      function exportTaskInfo() {
+        alert(`正在导出任务 ${taskNumber} 的详细信息...`)
+      }
+
+      // 查看检测报告
+      function viewTestReport() {
+        alert(`正在打开任务 ${taskNumber} 的检测报告...`)
+      }
+
+      // 下载检测数据
+      function downloadData() {
+        alert(`正在下载任务 ${taskNumber} 的检测数据...`)
+      }
+
+      // 查看检测证书
+      function viewCertificate() {
+        alert(`正在打开任务 ${taskNumber} 的检测证书...`)
+      }
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll(
+          '.info-card, .status-card, .action-section'
+        )
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+    </script>
+  </body>
+</html>

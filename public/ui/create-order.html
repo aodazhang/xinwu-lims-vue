@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>创建订单 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      /* 表单容器 */
+      .form-container {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 表单分组 */
+      .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin-right: 12px;
+        border-radius: 2px;
+      }
+
+      /* 表单行 */
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        font-size: 14px;
+        color: #374151;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      label .required {
+        color: #ef4444;
+        margin-left: 4px;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+
+      select:disabled {
+        background-color: #f9fafb;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      /* 字段提示文本 */
+      .field-hint {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+        opacity: 0;
+        animation: fadeIn 0.3s forwards;
+      }
+
+      /* 选项组标题样式 */
+      .option-group-title {
+        font-weight: 600;
+        color: #374151;
+        background: #f9fafb;
+        padding: 4px 8px;
+        font-size: 12px;
+      }
+
+      /* 加载动画 */
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #e5e7eb;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin-left: 8px;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      /* 单选框组 */
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        padding: 10px 0;
+      }
+
+      .radio-item {
+        display: flex;
+        align-items: center;
+      }
+
+      .radio-item input[type='radio'] {
+        margin-right: 6px;
+      }
+
+      .radio-item label {
+        margin-bottom: 0;
+        font-weight: normal;
+      }
+
+      /* 复选框 */
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+      }
+
+      .checkbox-group input[type='checkbox'] {
+        margin-right: 8px;
+      }
+
+      /* 文件上传 */
+      .file-upload {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .file-upload input[type='file'] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        border: 2px dashed #e5e7eb;
+        border-radius: 6px;
+        background: #f9fafb;
+        transition: all 0.2s;
+      }
+
+      .file-upload:hover .file-upload-label {
+        border-color: #667eea;
+        background: #f3f4f6;
+      }
+
+      .file-upload-text {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      /* 按钮组 */
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      .btn-secondary:hover {
+        background: #f3f4f6;
+      }
+
+      /* 客户选择弹窗 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow: hidden;
+        animation: slideUp 0.3s;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .modal-body {
+        padding: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .customer-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .customer-item {
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .customer-item:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+      }
+
+      .customer-name {
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .customer-info {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <h2 class="page-title">创建订单</h2>
+        <div class="breadcrumb">
+          <a href="sales-dashboard.html">销售工作台</a> / 创建订单
+        </div>
+      </div>
+
+      <!-- 表单容器 -->
+      <div class="form-container">
+        <form id="orderForm">
+          <!-- 基本信息 -->
+          <div class="form-section">
+            <h3 class="section-title">基本信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>订单类型 <span class="required">*</span></label>
+                <select name="orderType" required>
+                  <option value="">请选择</option>
+                  <option value="sampling">委托检测（采样）</option>
+                  <option value="delivery">委托检测（送样）</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>是否加急</label>
+                <div class="radio-group">
+                  <div class="radio-item">
+                    <input
+                      type="radio"
+                      id="urgent-yes"
+                      name="urgent"
+                      value="yes"
+                    />
+                    <label for="urgent-yes">是</label>
+                  </div>
+                  <div class="radio-item">
+                    <input
+                      type="radio"
+                      id="urgent-no"
+                      name="urgent"
+                      value="no"
+                      checked
+                    />
+                    <label for="urgent-no">否</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 客户信息 -->
+          <div class="form-section">
+            <h3 class="section-title">客户信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>客户 <span class="required">*</span></label>
+                <div style="display: flex; gap: 8px">
+                  <input
+                    type="text"
+                    id="customerName"
+                    placeholder="点击选择客户"
+                    readonly
+                    required
+                    style="flex: 1; cursor: pointer"
+                    onclick="showCustomerModal()"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    style="padding: 10px 16px"
+                    onclick="showCustomerModal()"
+                  >
+                    选择
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>受检单位 <span class="required">*</span></label>
+                <input
+                  type="text"
+                  name="inspectionUnit"
+                  placeholder="请输入受检单位"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测信息 -->
+          <div class="form-section">
+            <h3 class="section-title">检测信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>采样地址 <span class="required">*</span></label>
+                <input
+                  type="text"
+                  name="samplingAddress"
+                  placeholder="请输入采样地址"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>检测类型 <span class="required">*</span></label>
+                <select
+                  name="testType"
+                  required
+                  onchange="updateTestItems()"
+                  id="testType"
+                >
+                  <option value="">请选择</option>
+                  <option value="50325-2020">50325-2020</option>
+                  <option value="18883-2022">18883-2022</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>检测内容 <span class="required">*</span></label>
+                <select name="testContent" required id="testContent" disabled>
+                  <option value="">请先选择检测类型</option>
+                </select>
+                <div
+                  class="field-hint"
+                  id="testContentHint"
+                  style="display: none"
+                >
+                  选择检测类型后自动更新可选项
+                </div>
+              </div>
+              <div class="form-group">
+                <label>服务类型 <span class="required">*</span></label>
+                <select name="serviceType" required>
+                  <option value="">请选择</option>
+                  <option value="initial">初测</option>
+                  <option value="retest">复测</option>
+                  <option value="actual">实测</option>
+                  <option value="yl3">YL3</option>
+                  <option value="yl5">YL5</option>
+                  <option value="yl8">YL8</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>检测点数 <span class="required">*</span></label>
+                <input
+                  type="number"
+                  name="testPoints"
+                  placeholder="请输入检测点数"
+                  min="1"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 财务信息 -->
+          <div class="form-section">
+            <h3 class="section-title">财务信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>项目金额 <span class="required">*</span></label>
+                <input
+                  type="number"
+                  name="projectAmount"
+                  placeholder="请输入项目金额"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>实收金额</label>
+                <input
+                  type="number"
+                  name="receivedAmount"
+                  placeholder="请输入实收金额"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 备注信息 -->
+          <div class="form-section">
+            <h3 class="section-title">备注信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>销售备注</label>
+                <textarea
+                  name="salesRemark"
+                  placeholder="请输入备注信息"
+                ></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>附件上传</label>
+                <div class="file-upload">
+                  <input
+                    type="file"
+                    id="attachment"
+                    name="attachment"
+                    multiple
+                  />
+                  <div class="file-upload-label">
+                    <div class="file-upload-text">
+                      点击或拖拽文件到此处上传<br />
+                      <small>支持多个文件，单个文件不超过10MB</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 按钮组 -->
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="window.location.href='sales-dashboard.html'"
+            >
+              取消
+            </button>
+            <button type="submit" class="btn btn-primary">提交订单</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 客户选择弹窗 -->
+    <div class="modal" id="customerModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">选择客户</h3>
+        </div>
+        <div class="modal-body">
+          <div class="customer-list">
+            <div
+              class="customer-item"
+              onclick="selectCustomer('广州环保科技有限公司')"
+            >
+              <div class="customer-name">广州环保科技有限公司</div>
+              <div class="customer-info">
+                联系人：王经理 | 电话：13800138001
+              </div>
+            </div>
+            <div
+              class="customer-item"
+              onclick="selectCustomer('深圳创新工业园')"
+            >
+              <div class="customer-name">深圳创新工业园</div>
+              <div class="customer-info">
+                联系人：李主任 | 电话：13800138002
+              </div>
+            </div>
+            <div class="customer-item" onclick="selectCustomer('佛山制造企业')">
+              <div class="customer-name">佛山制造企业</div>
+              <div class="customer-info">联系人：张总 | 电话：13800138003</div>
+            </div>
+            <div class="customer-item" onclick="selectCustomer('东莞电子厂')">
+              <div class="customer-name">东莞电子厂</div>
+              <div class="customer-info">
+                联系人：刘经理 | 电话：13800138004
+              </div>
+            </div>
+            <div class="customer-item" onclick="selectCustomer('惠州化工园区')">
+              <div class="customer-name">惠州化工园区</div>
+              <div class="customer-info">
+                联系人：陈主管 | 电话：13800138005
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeCustomerModal()">
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('创建订单')
+        }
+
+        // 初始化表单增强功能
+        initFormEnhancements()
+      })
+
+      // 表单增强功能
+      function initFormEnhancements() {
+        // 为所有必填字段添加视觉提示
+        const requiredFields = document.querySelectorAll('[required]')
+        requiredFields.forEach(field => {
+          field.addEventListener('blur', function () {
+            if (!this.value) {
+              this.style.borderColor = '#ef4444'
+            } else {
+              this.style.borderColor = '#10b981'
+            }
+          })
+
+          field.addEventListener('focus', function () {
+            this.style.borderColor = '#667eea'
+          })
+        })
+
+        // 添加平滑滚动到错误字段
+        const form = document.getElementById('orderForm')
+        form.addEventListener(
+          'invalid',
+          function (e) {
+            e.preventDefault()
+            const firstInvalidField = form.querySelector(':invalid')
+            if (firstInvalidField) {
+              firstInvalidField.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+              })
+              firstInvalidField.focus()
+
+              // 添加震动效果提示
+              firstInvalidField.style.animation = 'shake 0.5s'
+              setTimeout(() => {
+                firstInvalidField.style.animation = ''
+              }, 500)
+            }
+          },
+          true
+        )
+      }
+
+      // 显示客户选择弹窗
+      function showCustomerModal() {
+        document.getElementById('customerModal').classList.add('active')
+      }
+
+      // 关闭客户选择弹窗
+      function closeCustomerModal() {
+        document.getElementById('customerModal').classList.remove('active')
+      }
+
+      // 选择客户
+      function selectCustomer(customerName) {
+        document.getElementById('customerName').value = customerName
+        closeCustomerModal()
+      }
+
+      // 检测内容配置
+      const testContentConfig = {
+        '50325-2020': [
+          { value: 'three-items', label: '三项', detail: '甲醛、苯、TVOC' },
+          {
+            value: 'three-benzene-five',
+            label: '三苯五项',
+            detail: '甲醛、苯、甲苯、二甲苯、TVOC'
+          },
+          {
+            value: 'five-items',
+            label: '五项',
+            detail: '甲醛、苯、TVOC、氨、氡'
+          },
+          {
+            value: 'seven-items',
+            label: '七项',
+            detail: '甲醛、苯、甲苯、二甲苯、TVOC、氨、氡'
+          },
+          {
+            value: 'six-items',
+            label: '六项',
+            detail: '甲醛、苯、TVOC、甲苯、二甲苯、氨'
+          }
+        ],
+        '18883-2022': [
+          { value: 'three-items', label: '三项', detail: '甲醛、苯、TVOC' },
+          {
+            value: 'three-benzene-five',
+            label: '三苯五项',
+            detail: '甲醛、苯、甲苯、二甲苯、TVOC'
+          },
+          {
+            value: 'five-items',
+            label: '五项',
+            detail: '甲醛、苯、TVOC、氨、氡'
+          },
+          { value: '50325-radon', label: '50325标准测18883氡', detail: '氡' },
+          {
+            value: 'full-items',
+            label: '全项',
+            detail:
+              '甲醛、苯、甲苯、二甲苯、TVOC、氨、氡、温度、相对湿度、风速、新风量、臭氧、二氧化碳、一氧化碳、二氧化氮、二氧化硫、三氯乙烯、四氯乙烯、细菌总数、(苯并芘、PM10、PM2.5)'
+          },
+          {
+            value: 'seven-items',
+            label: '七项',
+            detail: '甲醛、苯、甲苯、二甲苯、TVOC、氨、氡'
+          },
+          {
+            value: 'six-items',
+            label: '六项',
+            detail: '甲醛、苯、TVOC、甲苯、二甲苯、氨'
+          },
+          { value: 'single-formaldehyde', label: '单项：甲醛', detail: '甲醛' },
+          {
+            value: 'single-formaldehyde-direct',
+            label: '单项甲醛（直读）',
+            detail: '甲醛（直读）'
+          }
+        ]
+      }
+
+      // 更新检测内容选项
+      function updateTestItems() {
+        const testType = document.getElementById('testType').value
+        const testContent = document.getElementById('testContent')
+        const testContentHint = document.getElementById('testContentHint')
+
+        // 清空现有选项
+        testContent.innerHTML = ''
+
+        if (!testType) {
+          // 未选择检测类型时
+          testContent.innerHTML = '<option value="">请先选择检测类型</option>'
+          testContent.disabled = true
+          testContentHint.style.display = 'none'
+          return
+        }
+
+        // 显示加载状态
+        testContent.innerHTML = '<option value="">正在加载...</option>'
+        testContent.disabled = true
+
+        // 模拟异步加载效果，提升用户体验
+        setTimeout(() => {
+          // 启用下拉框
+          testContent.disabled = false
+          testContentHint.style.display = 'block'
+
+          // 添加默认选项
+          testContent.innerHTML = '<option value="">请选择检测内容</option>'
+
+          // 获取对应的检测内容配置
+          const contentOptions = testContentConfig[testType]
+
+          if (contentOptions && contentOptions.length > 0) {
+            // 根据不同类型添加分组标题
+            if (testType === '50325-2020') {
+              testContent.innerHTML +=
+                '<option disabled class="option-group-title">—— GB 50325-2020 标准检测项目 ——</option>'
+            } else if (testType === '18883-2022') {
+              testContent.innerHTML +=
+                '<option disabled class="option-group-title">—— GB/T 18883-2022 标准检测项目 ——</option>'
+            }
+
+            // 添加具体选项
+            contentOptions.forEach(option => {
+              const optionElement = document.createElement('option')
+              optionElement.value = option.value
+              optionElement.textContent = option.label
+              optionElement.title = option.detail // 添加悬停提示
+              optionElement.setAttribute('data-detail', option.detail)
+              testContent.appendChild(optionElement)
+            })
+
+            // 更新提示文本
+            testContentHint.textContent = `共 ${contentOptions.length} 个可选项`
+
+            // 添加选项变化监听，显示详细内容
+            testContent.addEventListener('change', showTestContentDetail)
+          }
+        }, 200) // 200ms的延迟，提供更流畅的交互体验
+      }
+
+      // 显示检测内容详情
+      function showTestContentDetail() {
+        const testContent = document.getElementById('testContent')
+        const testContentHint = document.getElementById('testContentHint')
+        const selectedOption = testContent.options[testContent.selectedIndex]
+
+        if (selectedOption && selectedOption.value) {
+          const detail = selectedOption.getAttribute('data-detail')
+          if (detail) {
+            testContentHint.textContent = `包含项目：${detail}`
+            testContentHint.style.color = '#059669' // 绿色提示
+          }
+        } else {
+          const testType = document.getElementById('testType').value
+          if (testType) {
+            const contentOptions = testContentConfig[testType]
+            testContentHint.textContent = `共 ${contentOptions.length} 个可选项`
+            testContentHint.style.color = '#6b7280' // 恢复默认颜色
+          }
+        }
+      }
+
+      // 页面加载时设置默认检测类型和内容
+      window.addEventListener('DOMContentLoaded', function () {
+        // 设置默认检测类型为50325-2020
+        const testTypeSelect = document.getElementById('testType')
+        if (testTypeSelect) {
+          testTypeSelect.value = '50325-2020'
+          updateTestItems()
+
+          // 设置默认检测内容为三苯五项
+          setTimeout(() => {
+            const testContentSelect = document.getElementById('testContent')
+            if (testContentSelect) {
+              testContentSelect.value = 'three-benzene-five'
+              showTestContentDetail()
+            }
+          }, 100)
+        }
+      })
+
+      // 表单提交
+      document
+        .getElementById('orderForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault()
+
+          // 模拟提交成功
+          alert('订单创建成功！')
+          window.location.href = 'sales-dashboard.html'
+        })
+
+      // 点击弹窗外部关闭
+      document
+        .getElementById('customerModal')
+        .addEventListener('click', function (e) {
+          if (e.target === this) {
+            closeCustomerModal()
+          }
+        })
+    </script>
+  </body>
+</html>

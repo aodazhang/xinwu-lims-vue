@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>采样任务详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .task-id {
+        color: #667eea;
+      }
+
+      .urgent-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #ef4444;
+        color: white;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 委托单卡片 */
+      .delegation-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .delegation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .delegation-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px auto;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+
+      .delegation-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .delegation-desc {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      /* 采样位置列表 */
+      .sampling-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .sampling-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+      }
+
+      .sampling-info {
+        flex: 1;
+      }
+
+      .sampling-location {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .sampling-id {
+        font-size: 12px;
+        color: #667eea;
+      }
+
+      .remove-btn {
+        padding: 6px 12px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .add-sampling-btn {
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      /* 现场检测数据 */
+      .field-data {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+
+      .field-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field-input {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .field-input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .unit {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 完成按钮 */
+      .complete-task-btn {
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 24px;
+        width: 100%;
+      }
+
+      .complete-task-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      /* 弹窗样式 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 500px;
+        width: 90%;
+      }
+
+      .modal-header {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+
+      .modal-body {
+        margin-bottom: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      .modal-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      /* 委托单弹窗 */
+      .delegation-modal .modal-content {
+        max-width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+      }
+
+      .delegation-document {
+        padding: 40px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: 'SimSun', serif;
+        line-height: 1.8;
+      }
+
+      .document-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 30px;
+      }
+
+      .document-content {
+        font-size: 14px;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .field-data {
+          grid-template-columns: 1fr;
+        }
+
+        .page-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="task-id">XW250903-100</span>
+            <span class="urgent-badge">加急</span>
+          </h2>
+          <div class="breadcrumb">
+            <a href="sampling-task.html">采样工作台</a> / 采样任务详情
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary">联系客户</button>
+          <button class="btn btn-primary" onclick="startSamplingTask()">
+            开始采样任务
+          </button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <div class="main-info">
+          <!-- 任务基本信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>任务基本信息</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value">广州环保科技有限公司</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系人</span>
+                <span class="info-value">王经理</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系电话</span>
+                <span class="info-value">13800138001</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value">广州环保科技总部</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样地址</span>
+                <span class="info-value">广州市天河区科技园A栋3楼</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">预计采样时间</span>
+                <span class="info-value">2025-09-04 15:00 - 16:00</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样人员</span>
+                <span class="info-value">赵六</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">是否加急</span>
+                <span class="info-value" style="color: #ef4444">是</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 检测信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>检测信息</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">检测类型</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 600"
+                  >50325-2020</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测内容</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 500"
+                  >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样点数</span>
+                <span class="info-value">12</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">服务类型</span>
+                <span class="info-value">初测</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 客户检测委托单 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>客户检测委托单</span>
+            </div>
+            <div class="delegation-card" onclick="showDelegationDocument()">
+              <div class="delegation-icon">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                  />
+                </svg>
+              </div>
+              <div class="delegation-title">检测委托单</div>
+              <div class="delegation-desc">点击查看详细内容</div>
+            </div>
+          </div>
+
+          <!-- 采样位置和样品列表 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>采样位置和样品列表</span>
+            </div>
+            <div class="sampling-list" id="sampling-list">
+              <div class="sampling-item">
+                <div class="sampling-info">
+                  <div class="sampling-location">办公室A区域</div>
+                  <div class="sampling-id">样品编号：XW250903-100-001</div>
+                </div>
+                <button
+                  class="remove-btn"
+                  onclick="removeSamplingLocation(this)"
+                >
+                  删除
+                </button>
+              </div>
+              <div class="sampling-item">
+                <div class="sampling-info">
+                  <div class="sampling-location">会议室B区域</div>
+                  <div class="sampling-id">样品编号：XW250903-100-002</div>
+                </div>
+                <button
+                  class="remove-btn"
+                  onclick="removeSamplingLocation(this)"
+                >
+                  删除
+                </button>
+              </div>
+            </div>
+            <button class="add-sampling-btn" onclick="showAddSamplingModal()">
+              添加采样位置
+            </button>
+          </div>
+
+          <!-- 现场检测数据 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>现场检测数据</span>
+            </div>
+            <div class="field-data">
+              <div class="field-input-group">
+                <label class="info-label"
+                  >游离氯 <span class="unit">(mg/L)</span></label
+                >
+                <input
+                  type="number"
+                  class="field-input"
+                  step="0.01"
+                  placeholder="请输入测定值"
+                />
+              </div>
+              <div class="field-input-group">
+                <label class="info-label"
+                  >总氯 <span class="unit">(mg/L)</span></label
+                >
+                <input
+                  type="number"
+                  class="field-input"
+                  step="0.01"
+                  placeholder="请输入测定值"
+                />
+              </div>
+              <div class="field-input-group">
+                <label class="info-label"
+                  >温度 <span class="unit">(°C)</span></label
+                >
+                <input
+                  type="number"
+                  class="field-input"
+                  step="0.1"
+                  placeholder="请输入测定值"
+                />
+              </div>
+              <div class="field-input-group">
+                <label class="info-label"
+                  >湿度 <span class="unit">(%)</span></label
+                >
+                <input
+                  type="number"
+                  class="field-input"
+                  step="1"
+                  placeholder="请输入测定值"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 确认完成按钮 -->
+          <button class="complete-task-btn" onclick="completeSamplingTask()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style="margin-right: 8px"
+            >
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+            确认采样任务完成
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加采样位置弹窗 -->
+    <div id="add-sampling-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">添加采样位置</div>
+        <div class="modal-body">
+          <label class="info-label">采样位置</label>
+          <input
+            type="text"
+            id="sampling-location-input"
+            class="modal-input"
+            placeholder="请输入采样位置"
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="hideAddSamplingModal()">
+            取消
+          </button>
+          <button class="btn btn-primary" onclick="addSamplingLocation()">
+            确认
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 检测委托单弹窗 -->
+    <div id="delegation-modal" class="delegation-modal modal">
+      <div class="modal-content">
+        <div class="modal-header">检测委托单</div>
+        <div class="modal-body">
+          <div class="delegation-document">
+            <div class="document-title">GB 50325-2020 检测委托单</div>
+            <div class="document-content">
+              <p><strong>委托单号：</strong>XW250903-100</p>
+              <p><strong>委托单位：</strong>广州环保科技有限公司</p>
+              <p><strong>联系人：</strong>王经理</p>
+              <p><strong>联系电话：</strong>13800138001</p>
+              <p><strong>受检单位：</strong>广州环保科技总部</p>
+              <p><strong>受检地址：</strong>广州市天河区科技园A栋3楼</p>
+              <p>
+                <strong>检测内容：</strong
+                >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC
+              </p>
+              <p><strong>检测点数：</strong>12点</p>
+              <p>
+                <strong>检测标准：</strong>GB
+                50325-2020《民用建筑工程室内环境污染控制标准》
+              </p>
+              <p>
+                <strong>特殊要求：</strong
+                >新装修办公室，重点关注甲醛和TVOC指标，需要加急处理。
+              </p>
+              <p><strong>委托日期：</strong>2025年9月3日</p>
+              <br />
+              <p>委托单位签章：_______________</p>
+              <p>日期：2025年9月3日</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="hideDelegationModal()">
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let samplingCounter = 2
+
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('采样任务详情')
+        }
+      })
+
+      // 显示添加采样位置弹窗
+      function showAddSamplingModal() {
+        document.getElementById('add-sampling-modal').style.display = 'block'
+      }
+
+      // 隐藏添加采样位置弹窗
+      function hideAddSamplingModal() {
+        document.getElementById('add-sampling-modal').style.display = 'none'
+        document.getElementById('sampling-location-input').value = ''
+      }
+
+      // 添加采样位置
+      function addSamplingLocation() {
+        const location = document
+          .getElementById('sampling-location-input')
+          .value.trim()
+        if (!location) {
+          alert('请输入采样位置')
+          return
+        }
+
+        samplingCounter++
+        const samplingId = `XW250903-100-${samplingCounter.toString().padStart(3, '0')}`
+
+        const samplingList = document.getElementById('sampling-list')
+        const samplingItem = document.createElement('div')
+        samplingItem.className = 'sampling-item'
+        samplingItem.innerHTML = `
+                <div class="sampling-info">
+                    <div class="sampling-location">${location}</div>
+                    <div class="sampling-id">样品编号：${samplingId}</div>
+                </div>
+                <button class="remove-btn" onclick="removeSamplingLocation(this)">删除</button>
+            `
+
+        samplingList.appendChild(samplingItem)
+        hideAddSamplingModal()
+      }
+
+      // 删除采样位置
+      function removeSamplingLocation(button) {
+        if (confirm('确定要删除这个采样位置吗？')) {
+          button.parentElement.remove()
+        }
+      }
+
+      // 显示委托单文档
+      function showDelegationDocument() {
+        document.getElementById('delegation-modal').style.display = 'block'
+      }
+
+      // 隐藏委托单文档
+      function hideDelegationModal() {
+        document.getElementById('delegation-modal').style.display = 'none'
+      }
+
+      // 开始采样任务
+      function startSamplingTask() {
+        if (confirm('确定开始采样任务吗？')) {
+          alert('采样任务已开始！请按照委托单要求进行采样操作。')
+          // 这里可以添加实际的开始逻辑，比如更新任务状态
+          // 可以考虑禁用开始按钮，启用其他功能
+        }
+      }
+
+      // 完成采样任务
+      function completeSamplingTask() {
+        // 验证采样位置数量
+        const samplingItems = document.querySelectorAll('.sampling-item')
+        if (samplingItems.length === 0) {
+          alert('请至少添加一个采样位置')
+          return
+        }
+
+        if (confirm('确定完成采样任务吗？完成后将不能再修改采样信息。')) {
+          alert('采样任务已完成！系统将自动通知样品管理员进行样品接收。')
+          // 这里可以添加实际的提交逻辑
+          window.location.href = 'sampling-task.html'
+        }
+      }
+
+      // 点击弹窗外部关闭
+      window.addEventListener('click', function (event) {
+        if (event.target.classList.contains('modal')) {
+          event.target.style.display = 'none'
+        }
+      })
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.info-card')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+    </script>
+  </body>
+</html>

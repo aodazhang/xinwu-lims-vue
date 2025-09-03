@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>采样工作台 - LIMS-XW系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+      }
+
+      .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* 欢迎区域 */
+      .welcome-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 24px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+      }
+
+      .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .welcome-text h2 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .welcome-text p {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+
+      .current-time {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      /* 统计卡片区域 */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(
+          180deg,
+          var(--card-color) 0%,
+          transparent 100%
+        );
+      }
+
+      .stat-card.today {
+        --card-color: #667eea;
+      }
+
+      .stat-card.pending {
+        --card-color: #f59e0b;
+      }
+
+      .stat-card.total {
+        --card-color: #10b981;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .stat-card.today .stat-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .stat-card.pending .stat-icon {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      .stat-card.total .stat-icon {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .stat-change {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: #f0fdf4;
+        color: #10b981;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 12px;
+      }
+
+      .stat-change.negative {
+        background: #fef2f2;
+        color: #ef4444;
+      }
+
+      /* 任务筛选栏 */
+      .filter-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        flex-wrap: wrap;
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .filter-tab {
+        padding: 8px 16px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .filter-tab:hover {
+        background: #f3f4f6;
+      }
+
+      .filter-tab.active {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.08);
+      }
+
+      .filter-tab .badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #ef4444;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+
+      .sort-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sort-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .sort-select {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #374151;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .sort-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      /* 任务列表 */
+      .task-list {
+        display: grid;
+        gap: 16px;
+      }
+
+      .task-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .task-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--status-color);
+        transition: width 0.3s ease;
+      }
+
+      .task-card:hover::before {
+        width: 6px;
+      }
+
+      .task-card.status-pending {
+        --status-color: #f59e0b;
+      }
+
+      .task-card.status-ongoing {
+        --status-color: #667eea;
+      }
+
+      .task-card.status-completed {
+        --status-color: #10b981;
+      }
+
+      .task-card.urgent {
+        background: linear-gradient(90deg, #fef3c7 0%, #ffffff 100%);
+      }
+
+      .task-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      .task-number {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .task-badges {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .task-status {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+      }
+
+      .status-ongoing {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+      }
+
+      .status-completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+      }
+
+      .urgent-badge {
+        background: #fef3c7;
+        color: #b45309;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .task-content {
+        margin-bottom: 16px;
+      }
+
+      .task-company {
+        font-size: 15px;
+        color: #374151;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .task-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .task-info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .task-info-icon {
+        width: 16px;
+        height: 16px;
+        color: #9ca3af;
+      }
+
+      .task-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+        border-top: 1px solid #f3f4f6;
+      }
+
+      .task-time {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .task-time.urgent {
+        color: #dc2626;
+        font-weight: 600;
+      }
+
+      .task-action {
+        padding: 6px 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .task-action:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      /* 空状态 */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 24px;
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+      }
+
+      .empty-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+      }
+
+      .empty-desc {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .main-container {
+          padding: 12px;
+        }
+
+        .welcome-section {
+          padding: 20px;
+        }
+
+        .welcome-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+
+        .welcome-text h2 {
+          font-size: 24px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .filter-bar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .filter-tabs {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .task-header {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      /* 加载动画 */
+      @keyframes shimmer {
+        0% {
+          background-position: -468px 0;
+        }
+        100% {
+          background-position: 468px 0;
+        }
+      }
+
+      .skeleton {
+        animation: shimmer 1.5s infinite;
+        background: linear-gradient(
+          to right,
+          #f6f7f8 0%,
+          #edeef1 20%,
+          #f6f7f8 40%,
+          #f6f7f8 100%
+        );
+        background-size: 468px 104px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <div class="main-container">
+      <!-- 欢迎区域 -->
+      <div class="welcome-section">
+        <div class="welcome-header">
+          <div class="welcome-text">
+            <h2>👋 欢迎回来，<span id="userName">采样员</span></h2>
+            <p>今天也要加油工作哦！让我们开始今天的采样任务吧</p>
+          </div>
+          <div class="current-time" id="currentTime">
+            2024年3月15日 星期五 09:30
+          </div>
+        </div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div class="stats-grid">
+        <div class="stat-card today">
+          <div class="stat-header">
+            <div>
+              <div class="stat-value" id="todayTasks">3</div>
+              <div class="stat-label">今日任务</div>
+            </div>
+            <div class="stat-icon">📋</div>
+          </div>
+          <div class="stat-change"><span>↑</span> 较昨日 +2</div>
+        </div>
+
+        <div class="stat-card pending">
+          <div class="stat-header">
+            <div>
+              <div class="stat-value" id="pendingTasks">5</div>
+              <div class="stat-label">未完成任务</div>
+            </div>
+            <div class="stat-icon">⏳</div>
+          </div>
+          <div class="stat-change negative"><span>↑</span> 需要尽快处理</div>
+        </div>
+
+        <div class="stat-card total">
+          <div class="stat-header">
+            <div>
+              <div class="stat-value" id="totalTasks">28</div>
+              <div class="stat-label">本月总任务</div>
+            </div>
+            <div class="stat-icon">✅</div>
+          </div>
+          <div class="stat-change"><span>↑</span> 完成率 82%</div>
+        </div>
+      </div>
+
+      <!-- 任务筛选栏 -->
+      <div class="filter-bar">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-status="all">全部任务</button>
+          <button class="filter-tab" data-status="pending">
+            待处理
+            <span class="badge">5</span>
+          </button>
+          <button class="filter-tab" data-status="ongoing">进行中</button>
+          <button class="filter-tab" data-status="completed">已完成</button>
+        </div>
+
+        <div class="sort-dropdown">
+          <span class="sort-label">排序：</span>
+          <select class="sort-select" id="sortSelect">
+            <option value="urgent">紧急程度</option>
+            <option value="time">计划时间</option>
+            <option value="created">创建时间</option>
+            <option value="status">任务状态</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 任务列表 -->
+      <div class="task-list" id="taskList">
+        <!-- 紧急任务 -->
+        <div
+          class="task-card status-pending urgent"
+          onclick="openTaskDetail('XW2024031501')"
+        >
+          <div class="task-header">
+            <div class="task-number">XW2024031501</div>
+            <div class="task-badges">
+              <span class="urgent-badge">紧急</span>
+              <span class="task-status status-pending">待处理</span>
+            </div>
+          </div>
+
+          <div class="task-content">
+            <div class="task-company">深圳市某某自来水公司</div>
+            <div class="task-info">
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                深圳市南山区科技园南路123号
+              </div>
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  ></path>
+                </svg>
+                生活饮用水常规检测 - 8个采样点
+              </div>
+            </div>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-time urgent">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              今天 09:00-11:00
+            </div>
+            <button class="task-action">查看详情</button>
+          </div>
+        </div>
+
+        <!-- 进行中任务 -->
+        <div
+          class="task-card status-ongoing"
+          onclick="openTaskDetail('XW2024031502')"
+        >
+          <div class="task-header">
+            <div class="task-number">XW2024031502</div>
+            <div class="task-badges">
+              <span class="task-status status-ongoing">进行中</span>
+            </div>
+          </div>
+
+          <div class="task-content">
+            <div class="task-company">广州市环保科技有限公司</div>
+            <div class="task-info">
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                广州市天河区体育西路88号
+              </div>
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  ></path>
+                </svg>
+                工业废水检测 - 5个采样点
+              </div>
+            </div>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-time">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              今天 14:00-16:00
+            </div>
+            <button class="task-action">查看详情</button>
+          </div>
+        </div>
+
+        <!-- 待处理任务 -->
+        <div
+          class="task-card status-pending"
+          onclick="openTaskDetail('XW2024031503')"
+        >
+          <div class="task-header">
+            <div class="task-number">XW2024031503</div>
+            <div class="task-badges">
+              <span class="task-status status-pending">待处理</span>
+            </div>
+          </div>
+
+          <div class="task-content">
+            <div class="task-company">东莞市制造工业园</div>
+            <div class="task-info">
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                东莞市长安镇工业大道268号
+              </div>
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  ></path>
+                </svg>
+                环境空气质量检测 - 12个采样点
+              </div>
+            </div>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-time">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              明天 09:00-12:00
+            </div>
+            <button class="task-action">查看详情</button>
+          </div>
+        </div>
+
+        <!-- 已完成任务 -->
+        <div
+          class="task-card status-completed"
+          onclick="openTaskDetail('XW2024031504')"
+        >
+          <div class="task-header">
+            <div class="task-number">XW2024031504</div>
+            <div class="task-badges">
+              <span class="task-status status-completed">已完成</span>
+            </div>
+          </div>
+
+          <div class="task-content">
+            <div class="task-company">佛山市食品加工厂</div>
+            <div class="task-info">
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                佛山市顺德区北滘镇美食街18号
+              </div>
+              <div class="task-info-item">
+                <svg
+                  class="task-info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  ></path>
+                </svg>
+                食品安全检测 - 6个采样点
+              </div>
+            </div>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-time">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              昨天已完成
+            </div>
+            <button class="task-action">查看详情</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空状态（当没有任务时显示） -->
+      <div class="empty-state" id="emptyState" style="display: none">
+        <div class="empty-icon">🎉</div>
+        <div class="empty-title">暂无任务</div>
+        <div class="empty-desc">当前没有需要处理的采样任务，休息一下吧~</div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('采样工作台')
+        }
+
+        // 获取用户信息
+        const username = sessionStorage.getItem('username') || '采样员'
+        document.getElementById('userName').textContent = username
+
+        // 更新当前时间
+        updateCurrentTime()
+        setInterval(updateCurrentTime, 60000) // 每分钟更新一次
+
+        // 初始化筛选和排序
+        initializeFilters()
+
+        // 加载任务数据
+        loadTasks()
+      })
+
+      // 更新当前时间
+      function updateCurrentTime() {
+        const now = new Date()
+        const options = {
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric',
+          weekday: 'long',
+          hour: '2-digit',
+          minute: '2-digit'
+        }
+        const timeString = now.toLocaleString('zh-CN', options)
+        document.getElementById('currentTime').textContent = timeString
+      }
+
+      // 初始化筛选器
+      function initializeFilters() {
+        // 状态筛选
+        const filterTabs = document.querySelectorAll('.filter-tab')
+        filterTabs.forEach(tab => {
+          tab.addEventListener('click', function () {
+            // 移除所有active类
+            filterTabs.forEach(t => t.classList.remove('active'))
+            // 添加active类到当前tab
+            this.classList.add('active')
+
+            // 筛选任务
+            const status = this.dataset.status
+            filterTasks(status)
+          })
+        })
+
+        // 排序选择
+        document
+          .getElementById('sortSelect')
+          .addEventListener('change', function () {
+            sortTasks(this.value)
+          })
+      }
+
+      // 筛选任务
+      function filterTasks(status) {
+        const tasks = document.querySelectorAll('.task-card')
+        let hasVisibleTasks = false
+
+        tasks.forEach(task => {
+          if (status === 'all') {
+            task.style.display = 'block'
+            hasVisibleTasks = true
+          } else {
+            const taskStatus = task.classList.contains(`status-${status}`)
+            task.style.display = taskStatus ? 'block' : 'none'
+            if (taskStatus) hasVisibleTasks = true
+          }
+        })
+
+        // 显示或隐藏空状态
+        document.getElementById('emptyState').style.display = hasVisibleTasks
+          ? 'none'
+          : 'block'
+      }
+
+      // 排序任务
+      function sortTasks(sortBy) {
+        const taskList = document.getElementById('taskList')
+        const tasks = Array.from(taskList.querySelectorAll('.task-card'))
+
+        tasks.sort((a, b) => {
+          switch (sortBy) {
+            case 'urgent':
+              // 紧急任务优先
+              const aUrgent = a.classList.contains('urgent') ? 0 : 1
+              const bUrgent = b.classList.contains('urgent') ? 0 : 1
+              return aUrgent - bUrgent
+            case 'time':
+              // 按时间排序（这里需要实际的时间数据）
+              return 0
+            case 'status':
+              // 按状态排序：待处理 > 进行中 > 已完成
+              const statusOrder = { pending: 0, ongoing: 1, completed: 2 }
+              const aStatus = a.classList.contains('status-pending')
+                ? 'pending'
+                : a.classList.contains('status-ongoing')
+                  ? 'ongoing'
+                  : 'completed'
+              const bStatus = b.classList.contains('status-pending')
+                ? 'pending'
+                : b.classList.contains('status-ongoing')
+                  ? 'ongoing'
+                  : 'completed'
+              return statusOrder[aStatus] - statusOrder[bStatus]
+            default:
+              return 0
+          }
+        })
+
+        // 重新排列任务
+        tasks.forEach(task => taskList.appendChild(task))
+      }
+
+      // 加载任务数据
+      function loadTasks() {
+        // 这里应该从后端API获取数据
+        // 现在使用模拟数据
+        updateStatistics()
+      }
+
+      // 更新统计数据
+      function updateStatistics() {
+        // 模拟数据，实际应从后端获取
+        const stats = {
+          today: 3,
+          pending: 5,
+          total: 28
+        }
+
+        document.getElementById('todayTasks').textContent = stats.today
+        document.getElementById('pendingTasks').textContent = stats.pending
+        document.getElementById('totalTasks').textContent = stats.total
+      }
+
+      // 打开任务详情
+      function openTaskDetail(taskId) {
+        // 保存任务ID到sessionStorage
+        sessionStorage.setItem('currentTaskId', taskId)
+        // 跳转到任务详情页
+        window.location.href = 'sampling-task-detail.html'
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1426 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LIMS-XW 系统登录</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .main-container {
+        display: flex;
+        gap: 30px;
+        max-width: 1200px;
+        width: 100%;
+        align-items: flex-start;
+      }
+
+      .login-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        width: 420px;
+        padding: 40px;
+        animation: slideIn 0.5s ease-out;
+        flex-shrink: 0;
+      }
+
+      .demo-panel {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+        animation: slideIn 0.6s ease-out 0.1s both;
+        flex: 1;
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+
+      .demo-panel::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .demo-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      .demo-panel::-webkit-scrollbar-thumb {
+        background: #c4c4c4;
+        border-radius: 10px;
+      }
+
+      .demo-panel::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .logo h1 {
+        color: #667eea;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .logo p {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .role-select {
+        margin-bottom: 25px;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
+      }
+
+      .login-btn:active {
+        transform: translateY(0);
+      }
+
+      /* 演示账号面板样式 */
+      .demo-panel h3 {
+        color: #1f2937;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .demo-panel h3::before {
+        content: '🔐';
+        font-size: 20px;
+      }
+
+      .demo-panel > p {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+
+      .role-categories {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .role-category {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .category-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .category-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+      }
+
+      /* 不同类别的颜色 */
+      .category-admin .category-icon {
+        background: #ef4444;
+        color: white;
+      }
+
+      .category-business .category-icon {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .category-field .category-icon {
+        background: #10b981;
+        color: white;
+      }
+
+      .category-lab .category-icon {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .category-report .category-icon {
+        background: #8b5cf6;
+        color: white;
+      }
+
+      .demo-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .demo-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        transition: width 0.3s;
+      }
+
+      .category-admin .demo-card::before {
+        background: #ef4444;
+      }
+
+      .category-business .demo-card::before {
+        background: #3b82f6;
+      }
+
+      .category-field .demo-card::before {
+        background: #10b981;
+      }
+
+      .category-lab .demo-card::before {
+        background: #f59e0b;
+      }
+
+      .category-report .demo-card::before {
+        background: #8b5cf6;
+      }
+
+      .demo-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: #d1d5db;
+      }
+
+      .demo-card:hover::before {
+        width: 100%;
+        opacity: 0.1;
+      }
+
+      .demo-card-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 6px;
+      }
+
+      .demo-card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .demo-card-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .demo-card-row .label {
+        color: #9ca3af;
+        flex-shrink: 0;
+      }
+
+      .demo-card-row .value {
+        font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+        color: #374151;
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      .quick-login-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: all 0.2s;
+      }
+
+      .demo-card:hover .quick-login-btn {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .quick-login-btn:hover {
+        background: #5a67d8;
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 8px;
+        display: none;
+      }
+
+      /* 响应式布局 */
+      @media (max-width: 1024px) {
+        .main-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .demo-panel {
+          width: 100%;
+          max-width: 600px;
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 10px;
+        }
+
+        .login-container {
+          width: 100%;
+          padding: 30px 20px;
+        }
+
+        .demo-panel {
+          padding: 20px;
+        }
+
+        .demo-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-login-btn {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 加载动画 */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .loading {
+        animation: pulse 1.5s infinite;
+      }
+
+      /* 成功提示 */
+      .success-tip {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        animation: slideInRight 0.3s ease-out;
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* 自动登录提示 */
+      .auto-login-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      .auto-login-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+        animation: modalSlideIn 0.3s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .auto-login-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        animation: pulse 1.5s infinite;
+      }
+
+      .auto-login-icon::after {
+        content: '✓';
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .auto-login-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+      }
+
+      .auto-login-desc {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 20px;
+      }
+
+      .auto-login-cancel {
+        background: #f3f4f6;
+        color: #374151;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .auto-login-cancel:hover {
+        background: #e5e7eb;
+      }
+
+      /* 填充动画 */
+      @keyframes fillAnimation {
+        0% {
+          background-color: transparent;
+          transform: scale(1);
+        }
+
+        50% {
+          background-color: #f0f9ff;
+          transform: scale(1.02);
+        }
+
+        100% {
+          background-color: transparent;
+          transform: scale(1);
+        }
+      }
+
+      .filling-animation {
+        animation: fillAnimation 0.6s ease-out;
+      }
+
+      /* Shift键提示 */
+      .shift-tip {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(31, 41, 55, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        display: none;
+        animation: slideUp 0.3s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-container">
+      <!-- 登录表单容器 -->
+      <div class="login-container">
+        <div class="logo">
+          <h1>LIMS-XW</h1>
+          <p>环境检测实验室信息管理系统</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="请输入用户名"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="请输入密码"
+              required
+            />
+          </div>
+
+          <div class="form-group role-select">
+            <label for="role">角色选择</label>
+            <select id="role" name="role" required>
+              <option value="">请选择角色</option>
+              <option value="admin">系统管理员</option>
+              <option value="sales">销售人员</option>
+              <option value="reviewer">审核员</option>
+              <option value="sampling-dispatcher">采样任务调度员</option>
+              <option value="sampler">采样人员</option>
+              <option value="sample-manager">样品管理员</option>
+              <option value="lab-supervisor">实验室主管</option>
+              <option value="lab-technician">检测员</option>
+              <option value="report-editor">报告编制员</option>
+              <option value="report-reviewer">报告审核员</option>
+              <option value="report-approver">报告批准人</option>
+            </select>
+          </div>
+
+          <button type="submit" class="login-btn">登录系统</button>
+
+          <div class="error-message" id="errorMessage">
+            用户名或密码错误，请重新输入
+          </div>
+        </form>
+      </div>
+
+      <!-- 演示账号面板 -->
+      <div class="demo-panel">
+        <h3>快速登录演示账号</h3>
+        <p>点击任意卡片即可一键填充登录信息，所有演示账号密码均为：123456</p>
+
+        <div class="role-categories">
+          <!-- 系统管理 -->
+          <div class="role-category category-admin">
+            <div class="category-title">
+              <span class="category-icon">⚙</span>
+              系统管理
+            </div>
+            <div class="demo-cards">
+              <div
+                class="demo-card"
+                onclick="quickLogin('admin', 'admin', '系统管理员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('admin', 'admin', '系统管理员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">系统管理员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">admin</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 业务管理 -->
+          <div class="role-category category-business">
+            <div class="category-title">
+              <span class="category-icon">💼</span>
+              业务管理
+            </div>
+            <div class="demo-cards">
+              <div
+                class="demo-card"
+                onclick="quickLogin('sales', 'xiaoshou', '销售人员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('sales', 'xiaoshou', '销售人员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">销售人员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">xiaoshou</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('reviewer', 'shenhe', '审核员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('reviewer', 'shenhe', '审核员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">审核员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">shenhe</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 现场作业 -->
+          <div class="role-category category-field">
+            <div class="category-title">
+              <span class="category-icon">🚗</span>
+              现场作业
+            </div>
+            <div class="demo-cards">
+              <div
+                class="demo-card"
+                onclick="quickLogin('sampling-dispatcher', 'diaodu', '采样任务调度员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('sampling-dispatcher', 'diaodu', '采样任务调度员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">采样任务调度员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">diaodu</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('sampler', 'caiyang', '采样人员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('sampler', 'caiyang', '采样人员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">采样人员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">caiyang</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('sample-manager', 'yangpin', '样品管理员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('sample-manager', 'yangpin', '样品管理员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">样品管理员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">yangpin</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 实验室检测 -->
+          <div class="role-category category-lab">
+            <div class="category-title">
+              <span class="category-icon">🧪</span>
+              实验室检测
+            </div>
+            <div class="demo-cards">
+              <div
+                class="demo-card"
+                onclick="quickLogin('lab-supervisor', 'zhuguan', '实验室主管', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('lab-supervisor', 'zhuguan', '实验室主管', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">实验室主管</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">zhuguan</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('lab-technician', 'jiance', '检测员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('lab-technician', 'jiance', '检测员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">检测员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">jiance</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 报告管理 -->
+          <div class="role-category category-report">
+            <div class="category-title">
+              <span class="category-icon">📋</span>
+              报告管理
+            </div>
+            <div class="demo-cards">
+              <div
+                class="demo-card"
+                onclick="quickLogin('report-editor', 'bianzhi', '报告编制员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('report-editor', 'bianzhi', '报告编制员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">报告编制员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">bianzhi</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('report-reviewer', 'baogaoshenhe', '报告审核员', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('report-reviewer', 'baogaoshenhe', '报告审核员', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">报告审核员</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">baogaoshenhe</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="demo-card"
+                onclick="quickLogin('report-approver', 'pizhun', '报告批准人', event)"
+              >
+                <button
+                  class="quick-login-btn"
+                  onclick="event.stopPropagation(); quickLogin('report-approver', 'pizhun', '报告批准人', event)"
+                >
+                  快速登录
+                </button>
+                <div class="demo-card-title">报告批准人</div>
+                <div class="demo-card-info">
+                  <div class="demo-card-row">
+                    <span class="label">账号:</span>
+                    <span class="value">pizhun</span>
+                  </div>
+                  <div class="demo-card-row">
+                    <span class="label">密码:</span>
+                    <span class="value">123456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="success-tip" id="successTip">登录信息已填充</div>
+
+    <!-- 自动登录提示 -->
+    <div class="auto-login-overlay" id="autoLoginOverlay">
+      <div class="auto-login-modal">
+        <div class="auto-login-icon"></div>
+        <div class="auto-login-title" id="autoLoginTitle">正在自动登录</div>
+        <div class="auto-login-desc" id="autoLoginDesc">
+          正在为您登录系统，请稍候...
+        </div>
+        <button class="auto-login-cancel" id="autoLoginCancel">取消登录</button>
+      </div>
+    </div>
+
+    <!-- Shift键提示 -->
+    <div class="shift-tip" id="shiftTip">
+      按住 Shift 键点击可仅填充表单，不自动登录
+    </div>
+
+    <script>
+      // 演示账号数据
+      const demoAccounts = {
+        admin: {
+          username: 'admin',
+          password: '123456',
+          role: 'admin',
+          name: '系统管理员'
+        },
+        sales: {
+          username: 'xiaoshou',
+          password: '123456',
+          role: 'sales',
+          name: '销售人员'
+        },
+        reviewer: {
+          username: 'shenhe',
+          password: '123456',
+          role: 'reviewer',
+          name: '审核员'
+        },
+        'sampling-dispatcher': {
+          username: 'diaodu',
+          password: '123456',
+          role: 'sampling-dispatcher',
+          name: '采样任务调度员'
+        },
+        sampler: {
+          username: 'caiyang',
+          password: '123456',
+          role: 'sampler',
+          name: '采样人员'
+        },
+        'sample-manager': {
+          username: 'yangpin',
+          password: '123456',
+          role: 'sample-manager',
+          name: '样品管理员'
+        },
+        'lab-supervisor': {
+          username: 'zhuguan',
+          password: '123456',
+          role: 'lab-supervisor',
+          name: '实验室主管'
+        },
+        'lab-technician': {
+          username: 'jiance',
+          password: '123456',
+          role: 'lab-technician',
+          name: '检测员'
+        },
+        'report-editor': {
+          username: 'bianzhi',
+          password: '123456',
+          role: 'report-editor',
+          name: '报告编制员'
+        },
+        'report-reviewer': {
+          username: 'baogaoshenhe',
+          password: '123456',
+          role: 'report-reviewer',
+          name: '报告审核员'
+        },
+        'report-approver': {
+          username: 'pizhun',
+          password: '123456',
+          role: 'report-approver',
+          name: '报告批准人'
+        }
+      }
+
+      // 全局变量控制自动登录
+      let autoLoginTimeout = null
+      let isAutoLoginCanceled = false
+
+      // 快速登录函数
+      function quickLogin(roleKey, username, roleName, event) {
+        // 检查是否按住Shift键
+        const isShiftPressed = event && event.shiftKey
+
+        // 清除之前的自动登录计时器
+        if (autoLoginTimeout) {
+          clearTimeout(autoLoginTimeout)
+          autoLoginTimeout = null
+        }
+
+        // 重置取消标志
+        isAutoLoginCanceled = false
+
+        // 填充表单动画
+        animateFillForm(username, '123456', roleKey)
+
+        // 如果按住Shift键，只填充不登录
+        if (isShiftPressed) {
+          showSuccessTip(`已填充 ${roleName} 登录信息（仅填充模式）`)
+          // 聚焦到登录按钮
+          setTimeout(() => {
+            document.querySelector('.login-btn').focus()
+          }, 500)
+          return
+        }
+
+        // 显示自动登录提示
+        showAutoLoginModal(roleName)
+
+        // 延迟后自动触发登录
+        autoLoginTimeout = setTimeout(() => {
+          if (!isAutoLoginCanceled) {
+            // 触发自动登录
+            performAutoLogin(roleKey, username, roleName)
+          }
+        }, 800)
+      }
+
+      // 表单填充动画
+      function animateFillForm(username, password, role) {
+        const usernameInput = document.getElementById('username')
+        const passwordInput = document.getElementById('password')
+        const roleSelect = document.getElementById('role')
+
+        // 清空表单
+        usernameInput.value = ''
+        passwordInput.value = ''
+        roleSelect.value = ''
+
+        // 逐个填充并添加动画
+        setTimeout(() => {
+          usernameInput.value = username
+          usernameInput.classList.add('filling-animation')
+          setTimeout(
+            () => usernameInput.classList.remove('filling-animation'),
+            600
+          )
+        }, 100)
+
+        setTimeout(() => {
+          passwordInput.value = password
+          passwordInput.classList.add('filling-animation')
+          setTimeout(
+            () => passwordInput.classList.remove('filling-animation'),
+            600
+          )
+        }, 300)
+
+        setTimeout(() => {
+          roleSelect.value = role
+          roleSelect.classList.add('filling-animation')
+          setTimeout(
+            () => roleSelect.classList.remove('filling-animation'),
+            600
+          )
+        }, 500)
+      }
+
+      // 显示自动登录模态框
+      function showAutoLoginModal(roleName) {
+        const overlay = document.getElementById('autoLoginOverlay')
+        const title = document.getElementById('autoLoginTitle')
+        const desc = document.getElementById('autoLoginDesc')
+
+        title.textContent = `正在登录：${roleName}`
+        desc.textContent = '正在为您自动登录系统，请稍候...'
+
+        overlay.style.display = 'flex'
+      }
+
+      // 隐藏自动登录模态框
+      function hideAutoLoginModal() {
+        const overlay = document.getElementById('autoLoginOverlay')
+        overlay.style.display = 'none'
+      }
+
+      // 执行自动登录
+      function performAutoLogin(roleKey, username, roleName) {
+        const loginBtn = document.querySelector('.login-btn')
+        const desc = document.getElementById('autoLoginDesc')
+
+        // 更新提示文字
+        desc.textContent = '正在验证登录信息...'
+
+        // 模拟登录过程
+        setTimeout(() => {
+          // 验证账号
+          let isValidAccount = false
+          for (let key in demoAccounts) {
+            const account = demoAccounts[key]
+            if (
+              account.username === username &&
+              account.password === '123456' &&
+              account.role === roleKey
+            ) {
+              isValidAccount = true
+              break
+            }
+          }
+
+          if (!isValidAccount || isAutoLoginCanceled) {
+            hideAutoLoginModal()
+            if (!isAutoLoginCanceled) {
+              showErrorMessage('自动登录失败，请手动重试')
+            }
+            return
+          }
+
+          // 更新提示为成功
+          const icon = document.querySelector('.auto-login-icon')
+          desc.textContent = '登录成功，正在跳转...'
+
+          // 存储登录信息
+          sessionStorage.setItem('username', username)
+          sessionStorage.setItem('role', roleKey)
+          sessionStorage.setItem('loginTime', new Date().toISOString())
+
+          // 获取目标页面
+          const rolePages = {
+            admin: 'admin-dashboard.html',
+            sales: 'sales-dashboard.html',
+            reviewer: 'review-dashboard.html',
+            'sampling-dispatcher': 'sampling-dispatch.html',
+            sampler: 'sampler-workbench.html',
+            'sample-manager': 'sample-management.html',
+            'lab-supervisor': 'lab-dashboard.html',
+            'lab-technician': 'staff-tasks.html', // 检测员跳转到专用页面
+            'report-editor': 'report-dashboard.html',
+            'report-reviewer': 'review-workspace.html',
+            'report-approver': 'approval-workspace.html'
+          }
+
+          // 跳转页面
+          setTimeout(() => {
+            const targetPage = rolePages[roleKey] || 'dashboard.html'
+            window.location.href = targetPage
+          }, 500)
+        }, 600)
+      }
+
+      // 取消自动登录
+      document
+        .getElementById('autoLoginCancel')
+        .addEventListener('click', function () {
+          isAutoLoginCanceled = true
+          if (autoLoginTimeout) {
+            clearTimeout(autoLoginTimeout)
+            autoLoginTimeout = null
+          }
+          hideAutoLoginModal()
+          showSuccessTip('已取消自动登录')
+        })
+
+      // ESC键取消自动登录
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          const overlay = document.getElementById('autoLoginOverlay')
+          if (overlay.style.display === 'flex') {
+            isAutoLoginCanceled = true
+            if (autoLoginTimeout) {
+              clearTimeout(autoLoginTimeout)
+              autoLoginTimeout = null
+            }
+            hideAutoLoginModal()
+            showSuccessTip('已取消自动登录')
+          }
+        }
+      })
+
+      // 显示错误信息
+      function showErrorMessage(message) {
+        const errorEl = document.getElementById('errorMessage')
+        errorEl.textContent = message
+        errorEl.style.display = 'block'
+
+        // 5秒后自动隐藏
+        setTimeout(() => {
+          errorEl.style.display = 'none'
+        }, 5000)
+      }
+
+      // 显示成功提示
+      function showSuccessTip(message) {
+        const tip = document.getElementById('successTip')
+        tip.textContent = message
+        tip.style.display = 'block'
+
+        // 3秒后自动隐藏
+        setTimeout(() => {
+          tip.style.display = 'none'
+        }, 3000)
+      }
+
+      // 表单提交处理
+      document
+        .getElementById('loginForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault()
+
+          const role = document.getElementById('role').value
+          const username = document.getElementById('username').value
+          const password = document.getElementById('password').value
+
+          // 基本验证
+          if (!role || !username || !password) {
+            document.getElementById('errorMessage').textContent =
+              '请填写完整的登录信息'
+            document.getElementById('errorMessage').style.display = 'block'
+            return
+          }
+
+          // 隐藏错误提示
+          document.getElementById('errorMessage').style.display = 'none'
+
+          // 添加登录中的动画效果
+          const loginBtn = document.querySelector('.login-btn')
+          loginBtn.classList.add('loading')
+          loginBtn.textContent = '登录中...'
+          loginBtn.disabled = true
+
+          // 模拟登录过程
+          setTimeout(() => {
+            // 验证演示账号
+            let isValidAccount = false
+            for (let key in demoAccounts) {
+              const account = demoAccounts[key]
+              if (
+                account.username === username &&
+                account.password === password &&
+                account.role === role
+              ) {
+                isValidAccount = true
+                break
+              }
+            }
+
+            if (!isValidAccount) {
+              // 显示错误提示
+              document.getElementById('errorMessage').textContent =
+                '用户名、密码或角色不匹配'
+              document.getElementById('errorMessage').style.display = 'block'
+              loginBtn.classList.remove('loading')
+              loginBtn.textContent = '登录系统'
+              loginBtn.disabled = false
+              return
+            }
+
+            // 角色对应的页面路由
+            const rolePages = {
+              admin: 'admin-dashboard.html',
+              sales: 'sales-dashboard.html',
+              reviewer: 'review-dashboard.html',
+              'sampling-dispatcher': 'sampling-dispatch.html',
+              sampler: 'sampler-workbench.html',
+              'sample-manager': 'sample-management.html',
+              'lab-supervisor': 'lab-dashboard.html',
+              'lab-technician': 'staff-tasks.html', // 检测员跳转到专用页面
+              'report-editor': 'report-dashboard.html',
+              'report-reviewer': 'review-workspace.html',
+              'report-approver': 'approval-workspace.html'
+            }
+
+            // 存储登录信息
+            sessionStorage.setItem('username', username)
+            sessionStorage.setItem('role', role)
+            sessionStorage.setItem('loginTime', new Date().toISOString())
+
+            // 显示登录成功提示
+            showSuccessTip('登录成功，正在跳转...')
+
+            // 跳转到对应页面
+            setTimeout(() => {
+              const targetPage = rolePages[role] || 'dashboard.html'
+              window.location.href = targetPage
+            }, 1000)
+          }, 800)
+        })
+
+      // 输入框获得焦点时清除错误提示
+      const formInputs = document.querySelectorAll(
+        '#loginForm input, #loginForm select'
+      )
+      formInputs.forEach(input => {
+        input.addEventListener('focus', function () {
+          document.getElementById('errorMessage').style.display = 'none'
+        })
+      })
+
+      // 键盘快捷键支持
+      document.addEventListener('keydown', function (e) {
+        // Alt + 1-9 快速选择角色
+        if (e.altKey && e.key >= '1' && e.key <= '9') {
+          e.preventDefault()
+          const roleOptions = document.querySelectorAll(
+            '#role option:not([value=""])'
+          )
+          const index = parseInt(e.key) - 1
+          if (index < roleOptions.length) {
+            document.getElementById('role').value = roleOptions[index].value
+            showSuccessTip(`已选择：${roleOptions[index].textContent}`)
+          }
+        }
+
+        // Ctrl + Enter 快速提交
+        if (e.ctrlKey && e.key === 'Enter') {
+          e.preventDefault()
+          document
+            .getElementById('loginForm')
+            .dispatchEvent(new Event('submit'))
+        }
+
+        // Shift键按下时显示提示
+        if (e.key === 'Shift' && !e.repeat) {
+          const shiftTip = document.getElementById('shiftTip')
+          shiftTip.style.display = 'block'
+        }
+      })
+
+      // Shift键释放时隐藏提示
+      document.addEventListener('keyup', function (e) {
+        if (e.key === 'Shift') {
+          const shiftTip = document.getElementById('shiftTip')
+          shiftTip.style.display = 'none'
+        }
+      })
+
+      // 自适应面板高度
+      function adjustPanelHeight() {
+        const demoPanel = document.querySelector('.demo-panel')
+        const windowHeight = window.innerHeight
+        const maxHeight = Math.min(windowHeight * 0.85, 800)
+        demoPanel.style.maxHeight = maxHeight + 'px'
+      }
+
+      // 初始化和窗口大小改变时调整
+      adjustPanelHeight()
+      window.addEventListener('resize', adjustPanelHeight)
+
+      // 页面加载动画增强
+      window.addEventListener('load', function () {
+        // 添加渐入效果
+        const cards = document.querySelectorAll('.demo-card')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(
+            () => {
+              card.style.transition = 'opacity 0.3s, transform 0.3s'
+              card.style.opacity = '1'
+              card.style.transform = 'translateY(0)'
+            },
+            100 + index * 50
+          )
+        })
+      })
+    </script>
+  </body>
+</html>

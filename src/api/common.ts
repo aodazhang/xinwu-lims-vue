@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
 import { ContentType } from '@/utils/enum'
+import Message from '@/utils/message'
 // import { isArray, isString } from '@/utils/is'
 
 const instance = axios.create({
@@ -16,7 +16,7 @@ const instance = axios.create({
 instance.interceptors.response.use(
   response => response.data,
   error => {
-    ElMessage.error('服务器异常，请稍后重试')
+    Message.error('服务器异常，请稍后重试')
     return Promise.reject(error)
   }
 )

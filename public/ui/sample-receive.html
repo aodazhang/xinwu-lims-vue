@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>样品接收详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .project-number {
+        color: #667eea;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      .btn-secondary:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      .highlight-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      /* 样品列表 */
+      .sample-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .sample-item {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .sample-location {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .sample-id {
+        font-size: 14px;
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .sample-status-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .status-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .status-option input[type='radio'] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .status-option label {
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .status-good {
+        color: #10b981;
+      }
+
+      .status-damaged {
+        color: #ef4444;
+      }
+
+      /* 侧边栏 */
+      .side-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-indicator {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .status-text {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .status-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-detail-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .status-detail-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      /* 完成接收按钮 */
+      .complete-receive-btn {
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 24px;
+        width: 100%;
+        transition: all 0.2s;
+      }
+
+      .complete-receive-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .complete-receive-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* 人员信息 */
+      .person-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .person-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .person-details {
+        flex: 1;
+      }
+
+      .person-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .person-role {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* 接收统计 */
+      .receive-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-item {
+        background: #f9fafb;
+        padding: 16px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1f2937;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sample-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .sample-status-group {
+          width: 100%;
+          justify-content: flex-start;
+        }
+
+        .page-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="project-number">XW250903-100</span>
+            样品接收
+          </h2>
+          <div class="breadcrumb">
+            <a href="sample-management.html">样品管理工作台</a> / 样品接收详情
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="returnToWorkbench()">
+            返回工作台
+          </button>
+          <button class="btn btn-secondary">打印标签</button>
+          <button
+            class="btn btn-success"
+            id="confirm-receive-btn"
+            onclick="confirmReceive()"
+          >
+            确认接收
+          </button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <!-- 左侧主信息区 -->
+        <div class="main-info">
+          <!-- 检测基本信息 -->
+          <div class="info-card">
+            <div class="card-header">检测基本信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value">广州环保科技总部</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样点数</span>
+                <span class="info-value">12</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测类型</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 600"
+                  >50325-2020</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">检测内容</span>
+                <span
+                  class="info-value"
+                  style="color: #059669; font-weight: 500"
+                  >三苯五项：甲醛、苯、甲苯、二甲苯、TVOC</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value">广州环保科技有限公司</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">订单类型</span>
+                <span class="info-value">委托检测（采样）</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 采样基本信息 -->
+          <div class="info-card">
+            <div class="card-header">采样基本信息</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">采样人员名称</span>
+                <span class="info-value">赵六</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样地址</span>
+                <span class="info-value">广州市天河区科技园A栋3楼</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">采样完成时间</span>
+                <span class="info-value">2025-09-04 16:30</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">样品数量</span>
+                <span class="info-value highlight-value">12个</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 样品列表 -->
+          <div class="info-card">
+            <div class="card-header">样品列表和状态确认</div>
+            <div class="sample-list">
+              <div class="sample-item">
+                <div class="sample-header">
+                  <div>
+                    <div class="sample-location">办公室A区域</div>
+                    <div class="sample-id">XW250903-100-001</div>
+                  </div>
+                  <div class="sample-status-group">
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_001"
+                        value="good"
+                        id="sample_001_good"
+                        checked
+                      />
+                      <label for="sample_001_good" class="status-good"
+                        >完好</label
+                      >
+                    </div>
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_001"
+                        value="damaged"
+                        id="sample_001_damaged"
+                      />
+                      <label for="sample_001_damaged" class="status-damaged"
+                        >破损</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sample-item">
+                <div class="sample-header">
+                  <div>
+                    <div class="sample-location">会议室B区域</div>
+                    <div class="sample-id">XW250903-100-002</div>
+                  </div>
+                  <div class="sample-status-group">
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_002"
+                        value="good"
+                        id="sample_002_good"
+                        checked
+                      />
+                      <label for="sample_002_good" class="status-good"
+                        >完好</label
+                      >
+                    </div>
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_002"
+                        value="damaged"
+                        id="sample_002_damaged"
+                      />
+                      <label for="sample_002_damaged" class="status-damaged"
+                        >破损</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sample-item">
+                <div class="sample-header">
+                  <div>
+                    <div class="sample-location">总经理办公室</div>
+                    <div class="sample-id">XW250903-100-003</div>
+                  </div>
+                  <div class="sample-status-group">
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_003"
+                        value="good"
+                        id="sample_003_good"
+                        checked
+                      />
+                      <label for="sample_003_good" class="status-good"
+                        >完好</label
+                      >
+                    </div>
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_003"
+                        value="damaged"
+                        id="sample_003_damaged"
+                      />
+                      <label for="sample_003_damaged" class="status-damaged"
+                        >破损</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sample-item">
+                <div class="sample-header">
+                  <div>
+                    <div class="sample-location">财务室</div>
+                    <div class="sample-id">XW250903-100-004</div>
+                  </div>
+                  <div class="sample-status-group">
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_004"
+                        value="good"
+                        id="sample_004_good"
+                      />
+                      <label for="sample_004_good" class="status-good"
+                        >完好</label
+                      >
+                    </div>
+                    <div class="status-option">
+                      <input
+                        type="radio"
+                        name="sample_004"
+                        value="damaged"
+                        id="sample_004_damaged"
+                        checked
+                      />
+                      <label for="sample_004_damaged" class="status-damaged"
+                        >破损</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 更多样品项... 为了演示简化 -->
+            </div>
+          </div>
+
+          <!-- 确认接收按钮 -->
+          <button class="complete-receive-btn" onclick="confirmReceive()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style="margin-right: 8px"
+            >
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+            确认样品接收
+          </button>
+        </div>
+
+        <!-- 右侧状态区 -->
+        <div class="side-info">
+          <!-- 接收统计 -->
+          <div class="status-card">
+            <div class="status-indicator">
+              <div class="status-text">待接收样品</div>
+            </div>
+            <div class="receive-stats">
+              <div class="stat-item">
+                <div class="stat-number" id="total-samples">12</div>
+                <div class="stat-label">样品总数</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="good-samples">11</div>
+                <div class="stat-label">完好样品</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="damaged-samples">1</div>
+                <div class="stat-label">破损样品</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="completion-rate">100%</div>
+                <div class="stat-label">检查完成率</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 任务状态 -->
+          <div class="status-card">
+            <div class="card-header">任务状态</div>
+            <div class="status-details">
+              <div class="status-detail-item">
+                <span class="status-detail-label">当前阶段</span>
+                <span class="status-detail-value">样品接收</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">优先级</span>
+                <span class="status-detail-value" style="color: #ef4444"
+                  >加急</span
+                >
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">采样日期</span>
+                <span class="status-detail-value">2025-09-04</span>
+              </div>
+              <div class="status-detail-item">
+                <span class="status-detail-label">预计检测开始</span>
+                <span class="status-detail-value">2025-09-05</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 相关人员 -->
+          <div class="status-card">
+            <div class="card-header">相关人员</div>
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="person-info">
+                <div class="person-avatar">张</div>
+                <div class="person-details">
+                  <div class="person-name">张三</div>
+                  <div class="person-role">销售人员</div>
+                </div>
+              </div>
+              <div class="person-info">
+                <div class="person-avatar">赵</div>
+                <div class="person-details">
+                  <div class="person-name">赵六</div>
+                  <div class="person-role">采样人员</div>
+                </div>
+              </div>
+              <div class="person-info">
+                <div class="person-avatar">李</div>
+                <div class="person-details">
+                  <div class="person-name">李七</div>
+                  <div class="person-role">样品管理员</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('样品接收详情')
+        }
+        updateStats()
+      })
+
+      // 更新统计数据
+      function updateStats() {
+        const radioButtons = document.querySelectorAll(
+          'input[type="radio"]:checked'
+        )
+        let goodCount = 0
+        let damagedCount = 0
+
+        radioButtons.forEach(radio => {
+          if (radio.value === 'good') {
+            goodCount++
+          } else if (radio.value === 'damaged') {
+            damagedCount++
+          }
+        })
+
+        const totalSamples = radioButtons.length
+        const completionRate = Math.round(
+          ((goodCount + damagedCount) / totalSamples) * 100
+        )
+
+        document.getElementById('total-samples').textContent = totalSamples
+        document.getElementById('good-samples').textContent = goodCount
+        document.getElementById('damaged-samples').textContent = damagedCount
+        document.getElementById('completion-rate').textContent =
+          completionRate + '%'
+      }
+
+      // 监听单选框变化
+      document.addEventListener('change', function (e) {
+        if (e.target.type === 'radio') {
+          updateStats()
+        }
+      })
+
+      // 确认接收
+      function confirmReceive() {
+        // 收集样品状态数据
+        const samples = []
+        const sampleGroups = [
+          'sample_001',
+          'sample_002',
+          'sample_003',
+          'sample_004'
+        ]
+
+        sampleGroups.forEach(groupName => {
+          const checkedRadio = document.querySelector(
+            `input[name="${groupName}"]:checked`
+          )
+          if (checkedRadio) {
+            const sampleId = groupName.replace('sample_', 'XW250903-100-')
+            samples.push({
+              id: sampleId,
+              status: checkedRadio.value
+            })
+          }
+        })
+
+        // 检查是否有破损样品
+        const damagedSamples = samples.filter(
+          sample => sample.status === 'damaged'
+        )
+        let confirmMessage = '确认接收所有样品吗？'
+
+        if (damagedSamples.length > 0) {
+          confirmMessage = `检测到 ${damagedSamples.length} 个破损样品，确认接收吗？\n破损样品可能影响检测结果的准确性。`
+        }
+
+        if (confirm(confirmMessage)) {
+          // 模拟提交数据
+          console.log('提交样品接收数据:', samples)
+
+          alert(
+            `样品接收已确认！\n完好样品：${samples.filter(s => s.status === 'good').length} 个\n破损样品：${damagedSamples.length} 个\n\n系统将自动通知实验室管理员安排检测任务。`
+          )
+
+          // 返回到样品管理工作台
+          window.location.href = 'sample-management.html'
+        }
+      }
+
+      // 返回工作台
+      function returnToWorkbench() {
+        try {
+          // 检查是否有未保存的更改
+          const hasUnsavedChanges = checkForUnsavedChanges()
+
+          if (hasUnsavedChanges) {
+            if (confirm('当前页面有未保存的更改，确认离开？')) {
+              navigateToWorkbench()
+            }
+          } else {
+            navigateToWorkbench()
+          }
+        } catch (error) {
+          console.error('返回工作台时发生错误:', error)
+          // 即使出错也尝试导航
+          navigateToWorkbench()
+        }
+      }
+
+      // 检查未保存更改
+      function checkForUnsavedChanges() {
+        // 这里可以检查表单或状态是否有未保存的更改
+        // 目前假设没有未保存的更改
+        return false
+      }
+
+      // 导航到工作台
+      function navigateToWorkbench() {
+        try {
+          // 尝试使用 window.location.href
+          window.location.href = 'sample-management.html'
+        } catch (error) {
+          console.error('导航失败:', error)
+          // 备用方法
+          try {
+            window.location.replace('sample-management.html')
+          } catch (fallbackError) {
+            console.error('备用导航也失败:', fallbackError)
+            alert('导航失败，请手动返回样品管理工作台')
+          }
+        }
+      }
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.info-card, .status-card')
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+    </script>
+  </body>
+</html>

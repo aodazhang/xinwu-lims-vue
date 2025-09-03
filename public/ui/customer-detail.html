@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>客户详情 - LIMS-XW</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* 页面标题 */
+      .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title-section {
+        flex: 1;
+      }
+
+      .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .customer-id {
+        color: #667eea;
+      }
+
+      .breadcrumb {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      /* 内容布局 */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      /* 左侧主信息区 */
+      .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .edit-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        background: transparent;
+        color: #667eea;
+        border: 1px solid #667eea;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .edit-btn:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      /* 统计卡片 */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        margin: 0 auto 12px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+      }
+
+      .stat-icon.orders {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      }
+
+      .stat-icon.amount {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* 订单列表 */
+      .order-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .order-item {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .order-item:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+      }
+
+      .order-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .order-number {
+        font-size: 14px;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .order-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .order-status.pending {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
+      .order-status.sampling {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      .order-status.testing {
+        background: #e0e7ff;
+        color: #8b5cf6;
+      }
+
+      .order-status.completed {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .order-item-content {
+        display: grid;
+        grid-template-columns: 1fr 100px 80px;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .order-unit {
+        font-size: 13px;
+        color: #1f2937;
+      }
+
+      .order-type {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .order-points {
+        font-size: 13px;
+        color: #1f2937;
+        text-align: center;
+      }
+
+      .order-arrow {
+        text-align: center;
+        color: #9ca3af;
+      }
+
+      /* 右侧统计区 */
+      .side-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-indicators {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+      }
+
+      .status-label {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .status-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* 弹窗样式 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: slideUp 0.3s;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: white;
+      }
+
+      .modal-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        font-size: 24px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: background 0.2s;
+      }
+
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .modal-body {
+        padding: 20px;
+        max-height: calc(90vh - 140px);
+        overflow-y: auto;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 14px;
+        color: #374151;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      .form-group label .required {
+        color: #ef4444;
+        margin-left: 4px;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: #f9fafb;
+      }
+
+      .btn-modal {
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-cancel {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+
+      .btn-cancel:hover {
+        background: #f3f4f6;
+      }
+
+      .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      /* 成功提示 */
+      .success-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow:
+          0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+      }
+
+      .success-toast.show {
+        transform: translateX(0);
+      }
+
+      .success-icon {
+        width: 24px;
+        height: 24px;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="navigation.js"></script>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h2 class="page-title">
+            <span class="customer-id" id="pageCustomerId">KH202504231001</span>
+            <span id="pageCustomerName">广州环保科技有限公司</span>
+          </h2>
+          <div class="breadcrumb">
+            <a href="customer-management.html">客户管理</a> / 客户详情
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="exportCustomerInfo()">
+            导出客户信息
+          </button>
+          <button class="btn btn-primary" onclick="showEditModal()">
+            编辑客户
+          </button>
+        </div>
+      </div>
+
+      <!-- 内容布局 -->
+      <div class="content-layout">
+        <!-- 左侧主信息区 -->
+        <div class="main-info">
+          <!-- 客户基本信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>客户基本信息</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户编号</span>
+                <span class="info-value" id="customerId">KH202504231001</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value" id="customerName"
+                  >广州环保科技有限公司</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系人</span>
+                <span class="info-value" id="contactName">王经理</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户联系电话</span>
+                <span class="info-value" id="contactPhone">13800138001</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户地址</span>
+                <span class="info-value" id="customerAddress"
+                  >广州市天河区科技园A栋3楼</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户分类</span>
+                <span class="info-value" id="customerCategory">渠道</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户来源</span>
+                <span class="info-value" id="customerSource">自己开发</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">客户状态</span>
+                <span
+                  class="info-value"
+                  id="customerStatus"
+                  style="color: #10b981"
+                  >已成交</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">所属行业</span>
+                <span class="info-value" id="customerIndustry">室内净化</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">创建时间</span>
+                <span class="info-value">2025-08-15 10:30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 客户订单列表 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>订单历史</span>
+              <button class="btn btn-secondary" onclick="showCreateOrder()">
+                新建订单
+              </button>
+            </div>
+            <div class="order-list">
+              <div class="order-item" onclick="goToOrderDetail('XW250903-100')">
+                <div class="order-item-header">
+                  <span class="order-number">XW250903-100</span>
+                  <span class="order-status sampling">采样中</span>
+                </div>
+                <div class="order-item-content">
+                  <div>
+                    <div class="order-unit">广州环保科技总部</div>
+                    <div class="order-type">
+                      室内空气质量 | 委托检测（采样）
+                    </div>
+                  </div>
+                  <div class="order-points">12点</div>
+                  <div class="order-arrow">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                    >
+                      <path d="M6 3l4 4-4 4v-8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-item" onclick="goToOrderDetail('XW250820-089')">
+                <div class="order-item-header">
+                  <span class="order-number">XW250820-089</span>
+                  <span class="order-status completed">已完成</span>
+                </div>
+                <div class="order-item-content">
+                  <div>
+                    <div class="order-unit">广州环保科技分部</div>
+                    <div class="order-type">
+                      室内空气质量 | 委托检测（采样）
+                    </div>
+                  </div>
+                  <div class="order-points">8点</div>
+                  <div class="order-arrow">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                    >
+                      <path d="M6 3l4 4-4 4v-8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-item" onclick="goToOrderDetail('XW250815-067')">
+                <div class="order-item-header">
+                  <span class="order-number">XW250815-067</span>
+                  <span class="order-status completed">已完成</span>
+                </div>
+                <div class="order-item-content">
+                  <div>
+                    <div class="order-unit">广州环保科技办公楼</div>
+                    <div class="order-type">
+                      生活饮用水水质检测 | 委托检测（送样）
+                    </div>
+                  </div>
+                  <div class="order-points">6点</div>
+                  <div class="order-arrow">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                    >
+                      <path d="M6 3l4 4-4 4v-8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧统计区 -->
+        <div class="side-info">
+          <!-- 统计卡片 -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon orders">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                  />
+                </svg>
+              </div>
+              <div class="stat-number">15</div>
+              <div class="stat-label">订单数量</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon amount">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
+                  />
+                </svg>
+              </div>
+              <div class="stat-number">¥128,900</div>
+              <div class="stat-label">订单金额</div>
+            </div>
+          </div>
+
+          <!-- 客户状态详情 -->
+          <div class="status-card">
+            <div class="card-header">
+              <span>客户状态详情</span>
+            </div>
+            <div class="status-indicators">
+              <div class="status-item">
+                <span class="status-label">首次下单时间</span>
+                <span class="status-value">2024-06-15</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">最近下单时间</span>
+                <span class="status-value">2025-09-03</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">平均订单金额</span>
+                <span class="status-value">¥8,593</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">订单完成率</span>
+                <span class="status-value">93.3%</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">已收款金额</span>
+                <span class="status-value">¥115,670</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">待收款金额</span>
+                <span class="status-value">¥13,230</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 销售人员 -->
+          <div class="info-card">
+            <div class="card-header">
+              <span>负责销售</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: 16px;
+                  font-weight: bold;
+                "
+              >
+                张
+              </div>
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: #1f2937">
+                  张三
+                </div>
+                <div style="font-size: 12px; color: #6b7280">销售人员</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 编辑客户弹窗 -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">编辑客户信息</h3>
+          <button class="modal-close" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="editCustomerForm">
+            <div class="form-group">
+              <label>客户编号</label>
+              <input
+                type="text"
+                name="customerId"
+                id="editCustomerId"
+                readonly
+                style="background: #f3f4f6; cursor: not-allowed"
+              />
+            </div>
+            <div class="form-group">
+              <label>客户名称 <span class="required">*</span></label>
+              <input
+                type="text"
+                name="customerName"
+                id="editCustomerName"
+                required
+                placeholder="请输入客户名称"
+              />
+            </div>
+            <div class="form-group">
+              <label>客户联系人 <span class="required">*</span></label>
+              <input
+                type="text"
+                name="contactName"
+                id="editContactName"
+                required
+                placeholder="请输入联系人姓名"
+              />
+            </div>
+            <div class="form-group">
+              <label>客户联系电话 <span class="required">*</span></label>
+              <input
+                type="tel"
+                name="contactPhone"
+                id="editContactPhone"
+                required
+                placeholder="请输入联系电话"
+              />
+            </div>
+            <div class="form-group">
+              <label>客户地址</label>
+              <input
+                type="text"
+                name="address"
+                id="editAddress"
+                placeholder="请输入客户地址"
+              />
+            </div>
+            <div class="form-group">
+              <label>客户分类 <span class="required">*</span></label>
+              <select name="category" id="editCategory" required>
+                <option value="">请选择</option>
+                <option value="个体户">个体户</option>
+                <option value="渠道">渠道</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>客户来源 <span class="required">*</span></label>
+              <select name="source" id="editSource" required>
+                <option value="">请选择</option>
+                <option value="自己开发">自己开发</option>
+                <option value="渠道">渠道</option>
+                <option value="转介绍">转介绍</option>
+                <option value="老客户">老客户</option>
+                <option value="美团点评">美团点评</option>
+                <option value="天猫">天猫</option>
+                <option value="百度">百度</option>
+                <option value="抖音">抖音</option>
+                <option value="腾讯地图">腾讯地图</option>
+                <option value="代理商">代理商</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>客户状态 <span class="required">*</span></label>
+              <select name="status" id="editStatus" required>
+                <option value="">请选择</option>
+                <option value="已成交">已成交</option>
+                <option value="公海">公海</option>
+                <option value="跟进中">跟进中</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>所属行业</label>
+              <select name="industry" id="editIndustry">
+                <option value="">请选择</option>
+                <option value="室内净化">室内净化</option>
+                <option value="空调清洗">空调清洗</option>
+                <option value="检测行业">检测行业</option>
+                <option value="环保设备">环保设备</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal btn-cancel" onclick="closeEditModal()">
+            取消
+          </button>
+          <button class="btn-modal btn-save" onclick="saveCustomer()">
+            保存修改
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="success-toast" id="successToast">
+      <div class="success-icon">✓</div>
+      <div>客户信息更新成功</div>
+    </div>
+
+    <script>
+      // 客户数据（模拟从后端获取）
+      let customerData = {
+        id: 'KH202504231001',
+        name: '广州环保科技有限公司',
+        contactName: '王经理',
+        contactPhone: '13800138001',
+        address: '广州市天河区科技园A栋3楼',
+        category: '渠道',
+        source: '自己开发',
+        status: '已成交',
+        industry: '室内净化'
+      }
+
+      // 设置页面标题
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('客户详情')
+        }
+
+        // 从URL获取客户ID
+        const urlParams = new URLSearchParams(window.location.search)
+        const customerId = urlParams.get('id')
+
+        if (customerId) {
+          // 实际应该从后端API获取客户数据
+          loadCustomerData(customerId)
+        }
+      })
+
+      // 加载客户数据
+      function loadCustomerData(customerId) {
+        // 模拟从后端获取数据
+        // 实际应该调用API: fetch(`/api/customer/${customerId}`)
+
+        // 更新页面显示的客户ID
+        document.getElementById('pageCustomerId').textContent = customerId
+        document.getElementById('customerId').textContent = customerId
+
+        // 如果是不同的客户ID，更新customerData
+        if (customerId !== 'KH202504231001') {
+          // 这里模拟不同客户的数据
+          const customerMap = {
+            KH202504231002: {
+              id: 'KH202504231002',
+              name: '深圳创新工业园',
+              contactName: '李主任',
+              contactPhone: '13800138002',
+              address: '深圳市南山区科技园B区',
+              category: '渠道',
+              source: '渠道',
+              status: '已成交',
+              industry: '检测行业'
+            },
+            KH202504251003: {
+              id: 'KH202504251003',
+              name: '佛山制造企业',
+              contactName: '张总',
+              contactPhone: '13800138003',
+              address: '佛山市顺德区工业园',
+              category: '个体户',
+              source: '转介绍',
+              status: '跟进中',
+              industry: '环保设备'
+            }
+            // 其他客户数据...
+          }
+
+          if (customerMap[customerId]) {
+            customerData = customerMap[customerId]
+            updatePageData(customerData)
+          }
+        }
+      }
+
+      // 更新页面数据
+      function updatePageData(data) {
+        document.getElementById('pageCustomerId').textContent = data.id
+        document.getElementById('pageCustomerName').textContent = data.name
+        document.getElementById('customerId').textContent = data.id
+        document.getElementById('customerName').textContent = data.name
+        document.getElementById('contactName').textContent = data.contactName
+        document.getElementById('contactPhone').textContent = data.contactPhone
+        document.getElementById('customerAddress').textContent = data.address
+        document.getElementById('customerCategory').textContent = data.category
+        document.getElementById('customerSource').textContent = data.source
+        document.getElementById('customerStatus').textContent = data.status
+        document.getElementById('customerIndustry').textContent = data.industry
+
+        // 更新状态颜色
+        const statusElement = document.getElementById('customerStatus')
+        statusElement.style.color =
+          data.status === '已成交'
+            ? '#10b981'
+            : data.status === '公海'
+              ? '#3b82f6'
+              : '#f59e0b'
+      }
+
+      // 显示编辑弹窗
+      function showEditModal() {
+        // 预填充表单数据
+        document.getElementById('editCustomerId').value = customerData.id
+        document.getElementById('editCustomerName').value = customerData.name
+        document.getElementById('editContactName').value =
+          customerData.contactName
+        document.getElementById('editContactPhone').value =
+          customerData.contactPhone
+        document.getElementById('editAddress').value = customerData.address
+        document.getElementById('editCategory').value = customerData.category
+        document.getElementById('editSource').value = customerData.source
+        document.getElementById('editStatus').value = customerData.status
+        document.getElementById('editIndustry').value = customerData.industry
+
+        // 显示弹窗
+        document.getElementById('editModal').classList.add('active')
+      }
+
+      // 关闭编辑弹窗
+      function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active')
+        document.getElementById('editCustomerForm').reset()
+      }
+
+      // 保存客户信息
+      function saveCustomer() {
+        const form = document.getElementById('editCustomerForm')
+
+        if (form.checkValidity()) {
+          // 收集表单数据
+          const formData = {
+            id: document.getElementById('editCustomerId').value,
+            name: document.getElementById('editCustomerName').value,
+            contactName: document.getElementById('editContactName').value,
+            contactPhone: document.getElementById('editContactPhone').value,
+            address: document.getElementById('editAddress').value,
+            category: document.getElementById('editCategory').value,
+            source: document.getElementById('editSource').value,
+            status: document.getElementById('editStatus').value,
+            industry: document.getElementById('editIndustry').value
+          }
+
+          // 更新本地数据
+          customerData = formData
+
+          // 实际应该调用后端API保存数据
+          // fetch('/api/customer/update', { method: 'POST', body: JSON.stringify(formData) })
+
+          // 更新页面显示
+          updatePageData(formData)
+
+          // 关闭弹窗
+          closeEditModal()
+
+          // 显示成功提示
+          showSuccessToast()
+        } else {
+          // 触发HTML5验证提示
+          form.reportValidity()
+        }
+      }
+
+      // 显示成功提示
+      function showSuccessToast() {
+        const toast = document.getElementById('successToast')
+        toast.classList.add('show')
+
+        setTimeout(() => {
+          toast.classList.remove('show')
+        }, 3000)
+      }
+
+      // 导出客户信息
+      function exportCustomerInfo() {
+        // 实际应该调用后端API生成导出文件
+        // window.location.href = `/api/customer/export?id=${customerData.id}`;
+        alert(`导出客户 ${customerData.name} 的信息`)
+      }
+
+      // 跳转到订单详情
+      function goToOrderDetail(orderNumber) {
+        window.location.href = `order-detail.html?id=${orderNumber}`
+      }
+
+      // 显示新建订单
+      function showCreateOrder() {
+        window.location.href = `create-order.html?customer=${customerData.id}`
+      }
+
+      // 点击弹窗外部关闭
+      document
+        .getElementById('editModal')
+        .addEventListener('click', function (e) {
+          if (e.target === this) {
+            closeEditModal()
+          }
+        })
+
+      // ESC键关闭弹窗
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeEditModal()
+        }
+      })
+
+      // 页面加载动画
+      window.addEventListener('load', function () {
+        const cards = document.querySelectorAll(
+          '.info-card, .status-card, .stat-card'
+        )
+        cards.forEach((card, index) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(20px)'
+          setTimeout(() => {
+            card.style.transition = 'all 0.3s ease'
+            card.style.opacity = '1'
+            card.style.transform = 'translateY(0)'
+          }, index * 100)
+        })
+      })
+    </script>
+  </body>
+</html>

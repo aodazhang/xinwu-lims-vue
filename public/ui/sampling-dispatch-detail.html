@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>采样任务详情 - LIMS-XW系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      /* 面包屑导航 */
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .breadcrumb a {
+        color: #3b82f6;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .breadcrumb a:hover {
+        color: #2563eb;
+        text-decoration: underline;
+      }
+
+      .breadcrumb-separator {
+        color: #9ca3af;
+      }
+
+      /* 主要内容区 */
+      .content-wrapper {
+        display: grid;
+        grid-template-columns: 60% 40%;
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* 左侧信息展示区 */
+      .info-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      /* 项目编号区域 */
+      .project-header {
+        padding: 24px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .project-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 50%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.05);
+        transform: rotate(35deg);
+      }
+
+      .project-number {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .status-badge {
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+      }
+
+      .urgent-badge {
+        background: #ef4444;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .project-meta {
+        display: flex;
+        gap: 24px;
+        font-size: 14px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 信息卡片 */
+      .info-card {
+        padding: 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-card:last-child {
+        border-bottom: none;
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .info-value {
+        font-size: 15px;
+        color: #1a202c;
+        font-weight: 600;
+      }
+
+      /* 检测内容卡片 */
+      .test-content-card {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+
+      .test-type {
+        display: inline-block;
+        background: #10b981;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .test-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .test-item {
+        background: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #4b5563;
+      }
+
+      /* 右侧分派表单区 */
+      .dispatch-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        position: sticky;
+        top: 24px;
+      }
+
+      .dispatch-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+      }
+
+      .dispatch-title {
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dispatch-body {
+        padding: 24px;
+      }
+
+      /* 表单样式 */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .form-label .required {
+        color: #ef4444;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      /* 人员选择 */
+      .staff-select-container {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #f9fafb;
+        max-height: 250px;
+        overflow-y: auto;
+      }
+
+      .staff-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 8px;
+      }
+
+      .staff-option:last-child {
+        margin-bottom: 0;
+      }
+
+      .staff-option:hover {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.05);
+      }
+
+      .staff-option.selected {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+      }
+
+      .staff-checkbox {
+        width: 20px;
+        height: 20px;
+        accent-color: #3b82f6;
+      }
+
+      .staff-info {
+        flex: 1;
+      }
+
+      .staff-name {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 2px;
+      }
+
+      .staff-status {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .staff-tasks {
+        padding: 4px 8px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #4b5563;
+        font-weight: 600;
+      }
+
+      /* 操作按钮 */
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+      }
+
+      .btn-secondary:hover {
+        background: #e5e7eb;
+        transform: translateX(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 特殊要求说明 */
+      .special-notice {
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 12px;
+      }
+
+      .special-notice-title {
+        font-weight: 600;
+        color: #92400e;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      .special-notice-content {
+        color: #78350f;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* 成功提示 */
+      .success-toast {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        background: #10b981;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        display: none;
+        align-items: center;
+        gap: 12px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .success-toast.show {
+        display: flex;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 1024px) {
+        .content-wrapper {
+          grid-template-columns: 1fr;
+        }
+
+        .dispatch-section {
+          position: static;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 16px;
+        }
+
+        .project-number {
+          font-size: 24px;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 统一导航栏组件 -->
+    <script src="navigation.js"></script>
+
+    <div class="container">
+      <!-- 面包屑导航 -->
+      <div class="breadcrumb">
+        <a href="sampling-dispatch.html" id="breadcrumbLink">采样调度工作台</a>
+        <span class="breadcrumb-separator">›</span>
+        <span>任务详情</span>
+      </div>
+
+      <!-- 主要内容区 -->
+      <div class="content-wrapper">
+        <!-- 左侧信息展示区 -->
+        <div class="info-section">
+          <!-- 项目编号区域 -->
+          <div class="project-header">
+            <div class="project-number">
+              <span id="projectNumber">XW2024030001</span>
+              <span class="status-badge">待分派</span>
+              <span class="urgent-badge" id="urgentBadge" style="display: none"
+                >加急</span
+              >
+            </div>
+            <div class="project-meta">
+              <span
+                >创建时间: <span id="createTime">2024-03-15 09:00</span></span
+              >
+              <span>截止时间: <span id="deadline">2024-03-18 18:00</span></span>
+            </div>
+          </div>
+
+          <!-- 客户基本信息 -->
+          <div class="info-card">
+            <div class="card-title">
+              <div class="card-icon">🏢</div>
+              <span>客户基本信息</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">客户名称</span>
+                <span class="info-value" id="customerName"
+                  >深圳市某某自来水公司</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">联系人</span>
+                <span class="info-value" id="contactPerson">张经理</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">联系电话</span>
+                <span class="info-value" id="contactPhone">138-1234-5678</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">受检单位</span>
+                <span class="info-value" id="inspectionUnit"
+                  >深圳市某某自来水公司净水厂</span
+                >
+              </div>
+            </div>
+            <div class="info-item" style="margin-top: 16px">
+              <span class="info-label">采样地址</span>
+              <span class="info-value" id="samplingAddress"
+                >深圳市南山区科技园南路123号</span
+              >
+            </div>
+          </div>
+
+          <!-- 订单检测内容 -->
+          <div class="info-card">
+            <div class="card-title">
+              <div class="card-icon">🧪</div>
+              <span>订单检测内容</span>
+            </div>
+            <div class="test-content-card">
+              <div class="test-type" id="testType">50325-2020</div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">检测内容</span>
+                  <span class="info-value" id="testContent"
+                    >室内空气质量检测</span
+                  >
+                </div>
+                <div class="info-item">
+                  <span class="info-label">采样点数</span>
+                  <span class="info-value" id="samplingPoints">8个</span>
+                </div>
+              </div>
+              <div class="test-items">
+                <div class="test-item">甲醛</div>
+                <div class="test-item">苯</div>
+                <div class="test-item">甲苯</div>
+                <div class="test-item">二甲苯</div>
+                <div class="test-item">TVOC</div>
+              </div>
+            </div>
+
+            <div
+              class="special-notice"
+              id="specialRequirements"
+              style="display: none"
+            >
+              <div class="special-notice-title">特殊要求说明</div>
+              <div
+                class="special-notice-content"
+                id="specialRequirementsContent"
+              >
+                请在上午9点前到达现场，需要客户代表全程陪同。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧分派表单区 -->
+        <div class="dispatch-section">
+          <div class="dispatch-header">
+            <div class="dispatch-title">
+              <span>📝</span>
+              <span>任务分派</span>
+            </div>
+          </div>
+          <div class="dispatch-body">
+            <form id="dispatchForm">
+              <div class="form-group">
+                <label class="form-label">
+                  采样人员 <span class="required">*</span>
+                </label>
+                <div class="staff-select-container" id="staffSelectContainer">
+                  <!-- 人员选项将通过JavaScript生成 -->
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  采样日期 <span class="required">*</span>
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="samplingDate"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  采样时间 <span class="required">*</span>
+                </label>
+                <div class="form-row">
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="startTime"
+                    placeholder="开始时间"
+                    required
+                  />
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="endTime"
+                    placeholder="结束时间"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">备注说明</label>
+                <textarea
+                  class="form-control"
+                  id="remarks"
+                  placeholder="请输入特殊要求或注意事项..."
+                ></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="backButton">
+                  <span>←</span>
+                  <span>返回工作台</span>
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <span>✓</span>
+                  <span>立即分派</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="success-toast" id="successToast">
+      <span>✓</span>
+      <span>分派成功！正在返回列表...</span>
+    </div>
+
+    <script>
+      // 全局变量
+      let selectedStaff = new Set()
+      let taskData = {}
+
+      // 测试数据
+      const testData = {
+        XW2024030001: {
+          projectNumber: 'XW2024030001',
+          status: '待分派',
+          isUrgent: true,
+          createTime: '2024-03-15 09:00',
+          deadline: '2024-03-18 18:00',
+          customerName: '深圳市某某自来水公司',
+          contactPerson: '张经理',
+          contactPhone: '138-1234-5678',
+          inspectionUnit: '深圳市某某自来水公司净水厂',
+          samplingAddress: '深圳市南山区科技园南路123号',
+          testType: '50325-2020',
+          testContent: '室内空气质量检测',
+          samplingPoints: '8个',
+          testItems: ['甲醛', '苯', '甲苯', '二甲苯', 'TVOC'],
+          specialRequirements: '请在上午9点前到达现场，需要客户代表全程陪同。'
+        },
+        XW2024030002: {
+          projectNumber: 'XW2024030002',
+          status: '待分派',
+          isUrgent: false,
+          createTime: '2024-03-15 10:30',
+          deadline: '2024-03-20 18:00',
+          customerName: '福田区某酒店',
+          contactPerson: '李总监',
+          contactPhone: '139-8765-4321',
+          inspectionUnit: '福田区某五星级酒店',
+          samplingAddress: '深圳市福田区福华路88号',
+          testType: 'GB/T 18883',
+          testContent: '公共场所卫生检测',
+          samplingPoints: '12个',
+          testItems: ['细菌总数', '真菌总数', 'PM2.5', 'PM10', '甲醛', 'CO2'],
+          specialRequirements: null
+        },
+        XW2024030003: {
+          projectNumber: 'XW2024030003',
+          status: '待分派',
+          isUrgent: true,
+          createTime: '2024-03-15 11:00',
+          deadline: '2024-03-17 12:00',
+          customerName: '罗湖区某小区物业',
+          contactPerson: '王主任',
+          contactPhone: '136-5555-6666',
+          inspectionUnit: '罗湖区某花园小区',
+          samplingAddress: '深圳市罗湖区东门北路456号',
+          testType: 'HJ 583-2010',
+          testContent: '环境空气质量监测',
+          samplingPoints: '5个',
+          testItems: ['SO2', 'NO2', 'CO', 'O3', 'PM10', 'PM2.5'],
+          specialRequirements:
+            '需要在小区多个位置进行采样，请提前与保安处联系。'
+        }
+      }
+
+      // 采样人员数据
+      const staffList = [
+        { id: 1, name: '李采样', status: '空闲', tasks: 2 },
+        { id: 2, name: '王技术', status: '工作中', tasks: 3 },
+        { id: 3, name: '张工程', status: '空闲', tasks: 1 },
+        { id: 4, name: '陈专员', status: '空闲', tasks: 0 },
+        { id: 5, name: '赵技术', status: '工作中', tasks: 4 },
+        { id: 6, name: '刘采样', status: '空闲', tasks: 2 }
+      ]
+
+      // 页面初始化
+      document.addEventListener('DOMContentLoaded', () => {
+        // 设置页面标题
+        if (window.limsNav) {
+          window.limsNav.setPageTitle('采样任务详情')
+        } else {
+          // 如果导航栏未加载，等待一段时间后重试
+          setTimeout(() => {
+            if (window.limsNav) {
+              window.limsNav.setPageTitle('采样任务详情')
+            }
+          }, 100)
+        }
+
+        // 获取任务ID
+        const urlParams = new URLSearchParams(window.location.search)
+        const taskId = urlParams.get('taskId') || 'XW2024030001'
+
+        // 加载任务数据
+        loadTaskData(taskId)
+
+        // 初始化人员选择
+        initializeStaffSelect()
+
+        // 设置默认日期
+        const today = new Date().toISOString().split('T')[0]
+        document.getElementById('samplingDate').value = today
+
+        // 绑定表单提交事件
+        document
+          .getElementById('dispatchForm')
+          .addEventListener('submit', handleSubmit)
+
+        // 绑定返回按钮事件
+        const backButton = document.getElementById('backButton')
+        if (backButton) {
+          backButton.addEventListener('click', e => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('Back button clicked')
+            goBack()
+          })
+        }
+
+        // 绑定面包屑链接事件
+        const breadcrumbLink = document.getElementById('breadcrumbLink')
+        if (breadcrumbLink) {
+          breadcrumbLink.addEventListener('click', e => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('Breadcrumb link clicked')
+            goBack()
+          })
+        }
+
+        // 添加键盘快捷键支持
+        document.addEventListener('keydown', e => {
+          // ESC键返回列表（如果下拉菜单未打开）
+          if (e.key === 'Escape') {
+            // 检查是否有打开的下拉菜单
+            const hasOpenDropdown = document.querySelector(
+              '.user-dropdown.show'
+            )
+            if (!hasOpenDropdown) {
+              goBack()
+            }
+          }
+        })
+      })
+
+      // 加载任务数据
+      function loadTaskData(taskId) {
+        // 根据任务ID前缀生成对应的测试数据
+        const taskNumber = parseInt(taskId.slice(-3))
+        const testTypes = [
+          '50325-2020',
+          'GB/T 18883',
+          'HJ 583-2010',
+          'GB 50325',
+          'ISO 16000'
+        ]
+        const companies = [
+          '深圳市某某自来水公司',
+          '福田区某酒店',
+          '罗湖区某小区物业',
+          '南山区某医院',
+          '宝安区某工厂'
+        ]
+        const addresses = [
+          '深圳市南山区科技园南路123号',
+          '深圳市福田区福华路88号',
+          '深圳市罗湖区东门北路456号',
+          '深圳市南山区深南大道999号',
+          '深圳市宝安区新安街道'
+        ]
+
+        taskData = {
+          projectNumber: taskId,
+          status: '待分派',
+          isUrgent: taskNumber <= 8,
+          createTime: `2024-03-${15 - Math.floor(taskNumber / 100)} ${9 + (taskNumber % 12)}:00`,
+          deadline: `2024-03-${18 + Math.floor(taskNumber / 50)} 18:00`,
+          customerName: companies[taskNumber % 5],
+          contactPerson: ['张经理', '李总监', '王主任', '陈总', '赵经理'][
+            taskNumber % 5
+          ],
+          contactPhone: `13${8 + (taskNumber % 2)}-${1234 + taskNumber}-${5678 - taskNumber}`,
+          inspectionUnit: companies[taskNumber % 5] + '检测点',
+          samplingAddress: addresses[taskNumber % 5],
+          testType: testTypes[taskNumber % testTypes.length],
+          testContent: '室内空气质量检测',
+          samplingPoints: `${Math.floor(Math.random() * 10) + 5}个`,
+          testItems: ['甲醛', '苯', '甲苯', '二甲苯', 'TVOC'],
+          specialRequirements:
+            taskNumber % 3 === 0
+              ? '请在上午9点前到达现场，需要客户代表全程陪同。'
+              : null
+        }
+
+        // 更新页面显示
+        updatePageDisplay()
+      }
+
+      // 更新页面显示
+      function updatePageDisplay() {
+        document.getElementById('projectNumber').textContent =
+          taskData.projectNumber
+        document.getElementById('createTime').textContent = taskData.createTime
+        document.getElementById('deadline').textContent = taskData.deadline
+        document.getElementById('customerName').textContent =
+          taskData.customerName
+        document.getElementById('contactPerson').textContent =
+          taskData.contactPerson
+        document.getElementById('contactPhone').textContent =
+          taskData.contactPhone
+        document.getElementById('inspectionUnit').textContent =
+          taskData.inspectionUnit
+        document.getElementById('samplingAddress').textContent =
+          taskData.samplingAddress
+        document.getElementById('testType').textContent = taskData.testType
+        document.getElementById('testContent').textContent =
+          taskData.testContent
+        document.getElementById('samplingPoints').textContent =
+          taskData.samplingPoints
+
+        // 显示加急标识
+        if (taskData.isUrgent) {
+          document.getElementById('urgentBadge').style.display = 'inline-block'
+        }
+
+        // 显示特殊要求
+        if (taskData.specialRequirements) {
+          document.getElementById('specialRequirements').style.display = 'block'
+          document.getElementById('specialRequirementsContent').textContent =
+            taskData.specialRequirements
+        }
+
+        // 更新检测项目
+        const testItemsContainer = document.querySelector('.test-items')
+        testItemsContainer.innerHTML = taskData.testItems
+          .map(item => `<div class="test-item">${item}</div>`)
+          .join('')
+      }
+
+      // 初始化人员选择
+      function initializeStaffSelect() {
+        const container = document.getElementById('staffSelectContainer')
+
+        container.innerHTML = staffList
+          .map(
+            staff => `
+                <div class="staff-option" data-id="${staff.id}">
+                    <input type="checkbox" class="staff-checkbox" id="staff-${staff.id}" 
+                           onchange="toggleStaff(${staff.id})">
+                    <label for="staff-${staff.id}" class="staff-info">
+                        <div class="staff-name">${staff.name}</div>
+                        <div class="staff-status">状态: ${staff.status}</div>
+                    </label>
+                    <div class="staff-tasks">今日${staff.tasks}个任务</div>
+                </div>
+            `
+          )
+          .join('')
+      }
+
+      // 切换人员选择
+      function toggleStaff(id) {
+        const option = document.querySelector(`.staff-option[data-id="${id}"]`)
+        const checkbox = document.getElementById(`staff-${id}`)
+
+        if (checkbox.checked) {
+          selectedStaff.add(id)
+          option.classList.add('selected')
+        } else {
+          selectedStaff.delete(id)
+          option.classList.remove('selected')
+        }
+      }
+
+      // 处理表单提交
+      function handleSubmit(e) {
+        e.preventDefault()
+
+        // 验证是否选择了人员
+        if (selectedStaff.size === 0) {
+          alert('请至少选择一名采样人员')
+          return
+        }
+
+        // 获取表单数据
+        const formData = {
+          taskId: taskData.projectNumber,
+          staff: Array.from(selectedStaff),
+          date: document.getElementById('samplingDate').value,
+          startTime: document.getElementById('startTime').value,
+          endTime: document.getElementById('endTime').value,
+          remarks: document.getElementById('remarks').value
+        }
+
+        // 显示成功提示
+        showSuccessToast()
+
+        // 延迟返回列表
+        setTimeout(() => {
+          window.location.href = 'sampling-dispatch.html'
+        }, 2000)
+      }
+
+      // 显示成功提示
+      function showSuccessToast() {
+        const toast = document.getElementById('successToast')
+        toast.classList.add('show')
+
+        setTimeout(() => {
+          toast.classList.remove('show')
+        }, 3000)
+      }
+
+      // 返回列表（全局函数，供导航栏和页面按钮调用）
+      window.goBack = function () {
+        try {
+          console.log('goBack function called')
+
+          // 获取当前角色，返回对应的工作台页面
+          const role = sessionStorage.getItem('role')
+
+          // 检查是否有未保存的数据
+          const remarks = document.getElementById('remarks')?.value || ''
+          const samplingDate =
+            document.getElementById('samplingDate')?.value || ''
+          const startTime = document.getElementById('startTime')?.value || ''
+          const endTime = document.getElementById('endTime')?.value || ''
+          const today = new Date().toISOString().split('T')[0]
+
+          // 只有当用户修改了默认值或选择了人员时才算有未保存的数据
+          const hasUnsavedData =
+            remarks.trim() !== '' ||
+            selectedStaff.size > 0 ||
+            (samplingDate !== '' && samplingDate !== today) ||
+            startTime !== '' ||
+            endTime !== ''
+
+          if (hasUnsavedData) {
+            if (!confirm('您有未保存的数据，确定要返回吗？')) {
+              return
+            }
+          }
+
+          console.log('Navigating to sampling-dispatch.html')
+          // 返回到采样调度工作台
+          window.location.href = 'sampling-dispatch.html'
+        } catch (error) {
+          console.error('Error in goBack function:', error)
+          // 如果发生错误，直接跳转
+          window.location.href = 'sampling-dispatch.html'
+        }
+      }
+
+      // 确保导航栏的返回按钮也使用相同的逻辑
+      document.addEventListener('DOMContentLoaded', () => {
+        // 等待导航栏加载完成后重新绑定返回按钮事件
+        setTimeout(() => {
+          const navBackButton = document.getElementById('back-to-workspace')
+          if (navBackButton) {
+            // 移除原有事件监听器，使用页面的goBack函数
+            navBackButton.replaceWith(navBackButton.cloneNode(true))
+            const newNavBackButton =
+              document.getElementById('back-to-workspace')
+            if (newNavBackButton) {
+              newNavBackButton.addEventListener('click', e => {
+                e.preventDefault()
+                e.stopPropagation()
+                goBack()
+              })
+            }
+          }
+        }, 200)
+      })
+    </script>
+  </body>
+</html>
