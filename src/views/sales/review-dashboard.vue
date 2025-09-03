@@ -366,7 +366,7 @@ const handlePageChange = (page: number) => {
 const viewOrderDetail = (orderId: string) => {
   // 跳转到订单详情页面
   console.log('查看订单详情:', orderId)
-  // router.push(`/order-review/${orderId}`)
+  router.push(`/order-review/${orderId}`)
 }
 
 const approveOrder = (orderId: string) => {
