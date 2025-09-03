@@ -126,7 +126,11 @@
       <router-view v-slot="{ Component, route }">
         <transition name="router" mode="out-in">
           <keep-alive :include="[]">
-            <component :is="Component" :key="route.fullPath" />
+            <component
+              class="mx-auto max-w-[1400px] flex-auto overflow-y-auto p-5"
+              :is="Component"
+              :key="route.fullPath"
+            />
           </keep-alive>
         </transition>
       </router-view>

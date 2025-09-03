@@ -9,8 +9,12 @@
   }
 
   // 响应式：grid 布局列数
-  .md-grid {
+  .md-grid-26 {
     @apply grid grid-cols-2 md:grid-cols-6;
+  }
+
+  .md-grid-13 {
+    @apply grid grid-cols-1 md:grid-cols-3;
   }
 }
 

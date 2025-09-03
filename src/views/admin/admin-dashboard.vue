@@ -1,9 +1,9 @@
 <template>
-  <div class="mx-auto max-w-[1400px] p-5">
+  <div>
     <!-- 系统管理 -->
     <div class="rounded-2xl bg-white p-8 shadow-lg">
       <h3 class="mb-5 text-xl font-semibold text-gray-800">系统管理</h3>
-      <div class="md-grid gap-4">
+      <div class="md-grid26 gap-4">
         <button
           @click="goToAdminUser"
           class="group flex cursor-pointer flex-col items-center gap-2.5 rounded-xl bg-gray-50 p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-600 hover:shadow-lg"
@@ -26,6 +26,8 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+
+defineOptions({ name: 'AdminDashboard' })
 
 const router = useRouter()
 

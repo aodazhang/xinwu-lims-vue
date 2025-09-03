@@ -23,8 +23,14 @@ const router = createRouter({
         {
           path: '/admin-dashboard',
           name: 'AdminDashboard',
-          meta: { title: '系统管理仪表盘' },
+          meta: { title: '系统管理工作台' },
           component: () => import('@/views/admin/admin-dashboard.vue')
+        },
+        {
+          path: '/sales-dashboard',
+          name: 'SalesDashboard',
+          meta: { title: '销售工作台' },
+          component: () => import('@/views/sales/sales-dashboard.vue')
         }
       ]
     },
