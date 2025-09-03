@@ -3,9 +3,14 @@
 @tailwind utilities; // tailwind 工具样式（定义工具样式，默认包含绝大多数 atomic 样式）
 
 @layer utilities {
-  // 响应式显示
+  // 响应式：是否显示
   .md-hidden {
     @apply hidden md:block;
+  }
+
+  // 响应式：grid 布局列数
+  .md-grid {
+    @apply grid grid-cols-2 md:grid-cols-6;
   }
 }
 
