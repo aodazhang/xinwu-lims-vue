@@ -18,19 +18,13 @@ const router = createRouter({
     {
       path: '/',
       component: Layout,
-      redirect: '/network-node',
+      redirect: '/admin-dashboard',
       children: [
         {
-          path: '/network-node',
-          name: 'NetworkNode',
-          meta: { title: '首页' },
-          component: () => import('@/views/network-node.vue')
-        },
-        {
-          path: '/system-api',
-          name: 'SystemApi',
-          meta: { title: '接口' },
-          component: () => import('@/views/system-api.vue')
+          path: '/admin-dashboard',
+          name: 'AdminDashboard',
+          meta: { title: '系统管理仪表盘' },
+          component: () => import('@/views/admin/admin-dashboard.vue')
         }
       ]
     },
