@@ -416,7 +416,7 @@ const getStatusText = (status: string) => {
 
 const manageCustomers = () => {
   // 跳转到客户管理页面
-  console.log('客户管理')
+  router.push('/customer-management')
 }
 
 const viewOrder = (orderId: number) => {

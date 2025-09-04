@@ -4,7 +4,7 @@
     class="mt-5 rounded-xl bg-white shadow-sm"
     :header-cell-style="{
       padding: '10px 0',
-      backgroundColor: '#f9fafb',
+      backgroundColor: '#f9fafc',
       color: '#6b7280'
     }"
     :height="config.height || null"

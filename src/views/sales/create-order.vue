@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5">
+  <div>
     <!-- 页面头部 -->
     <common-title title="销售订单" content="销售工作台 / 销售订单" />
 

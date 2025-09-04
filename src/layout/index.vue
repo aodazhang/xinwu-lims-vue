@@ -43,7 +43,9 @@
       </section>
 
       <!-- 标题 -->
-      <h1 class="md-hidden text-base font-bold text-[#64748b]">
+      <h1
+        class="md-hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold text-[#64748b]"
+      >
         {{ routeTitle }}
       </h1>
 
@@ -147,12 +149,18 @@ const router = useRouter()
 const route = useRoute()
 
 // 状态管理
-const canBack = ref(false)
 const dropdownOpen = ref(false)
 const currentUser = ref('王总')
 const currentRole = ref('admin')
 
 // 计算属性
+const canBack = computed(
+  () =>
+    !['/admin-dashboard', '/sales-dashboard', '/review-dashboard'].includes(
+      route.path
+    )
+)
+
 const userInitial = computed(() => {
   return currentUser.value.charAt(0).toUpperCase()
 })

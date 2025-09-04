@@ -14,7 +14,7 @@
 
       <!-- 搜索按钮 -->
       <button
-        class="flex items-center gap-1 rounded-md bg-indigo-500 px-4 py-2 text-sm text-white transition-all duration-200 hover:bg-indigo-600"
+        class="flex items-center gap-1 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-sm text-white transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
         @click="$emit('filter')"
       >
         <svg
