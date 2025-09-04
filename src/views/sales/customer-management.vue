@@ -34,7 +34,12 @@
     >
       <!-- 客户编号插槽 -->
       <template #customerIdSlot="{ scope }">
-        <span class="font-medium text-indigo-600">{{ scope.customerId }}</span>
+        <button
+          class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200 cursor-pointer"
+          @click="viewCustomer(scope.customerId)"
+        >
+          {{ scope.customerId }}
+        </button>
       </template>
 
       <!-- 客户状态插槽 -->

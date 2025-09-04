@@ -270,11 +270,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
-import CommonStats from '@/components/common-stats.vue'
 import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonModalCustomer from '@/components/common-modal-customer.vue'
 

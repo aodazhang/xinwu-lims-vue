@@ -70,6 +70,15 @@ const router = createRouter({
           name: 'ReviewDashboard',
           meta: { title: '订单审核工作台' },
           component: () => import('@/views/sales/review-dashboard.vue')
+        },
+        {
+          path: '/order-review',
+          name: 'OrderReview',
+          meta: { title: '订单审核' },
+          component: () => import('@/views/sales/order-review.vue'),
+          props: route => ({
+            orderId: route.query.orderId
+          })
         }
       ]
     },

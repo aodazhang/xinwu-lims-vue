@@ -365,8 +365,12 @@ const handlePageChange = (page: number) => {
 // 订单操作
 const viewOrderDetail = (orderId: string) => {
   // 跳转到订单详情页面
-  console.log('查看订单详情:', orderId)
-  router.push(`/order-review/${orderId}`)
+  router.push({
+    path: '/order-review',
+    query: {
+      orderId
+    }
+  })
 }
 
 const approveOrder = (orderId: string) => {
