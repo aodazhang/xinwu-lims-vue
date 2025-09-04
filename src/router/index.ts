@@ -33,6 +33,12 @@ const router = createRouter({
           component: () => import('@/views/sales/sales-dashboard.vue')
         },
         {
+          path: '/customer-management',
+          name: 'CustomerManagement',
+          meta: { title: '客户管理' },
+          component: () => import('@/views/sales/customer-management.vue')
+        },
+        {
           path: '/review-dashboard',
           name: 'ReviewDashboard',
           meta: { title: '订单审核工作台' },
