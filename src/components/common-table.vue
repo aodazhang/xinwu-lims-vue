@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]表格 -->
+  <!-- [公共]列表-表格 -->
   <el-table
     class="mt-5 rounded-xl bg-white shadow-sm"
     :header-cell-style="{

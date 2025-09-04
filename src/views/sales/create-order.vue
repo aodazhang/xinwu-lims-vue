@@ -650,7 +650,7 @@ function loadOrderData(id: string) {
  * 取消操作
  */
 function handleCancel() {
-  router.push('/sales-dashboard')
+  router.go(-1)
 }
 
 /**
@@ -672,7 +672,7 @@ function handleSubmit() {
     setTimeout(() => {
       const message = props.orderId ? '订单更新成功！' : '订单提交成功！'
       alert(message)
-      router.push('/sales-dashboard')
+      router.go(-1)
       loading.value = false
     }, 1000)
   } catch (error) {

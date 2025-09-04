@@ -414,11 +414,6 @@ const getStatusText = (status: string) => {
   return statusTexts[status as keyof typeof statusTexts] || status
 }
 
-const createOrder = () => {
-  // 跳转到创建订单页面
-  router.push('/create-order')
-}
-
 const manageCustomers = () => {
   // 跳转到客户管理页面
   console.log('客户管理')
@@ -426,7 +421,15 @@ const manageCustomers = () => {
 
 const viewOrder = (orderId: number) => {
   // 查看订单详情
-  console.log('查看订单:', orderId)
+  router.push({
+    path: '/order-detail',
+    query: { orderId: orderId.toString() }
+  })
+}
+
+const createOrder = () => {
+  // 跳转到创建订单页面
+  router.push('/create-order')
 }
 
 const editOrder = (orderId: number) => {

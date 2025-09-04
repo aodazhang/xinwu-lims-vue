@@ -42,6 +42,15 @@ const router = createRouter({
           })
         },
         {
+          path: '/order-detail',
+          name: 'OrderDetail',
+          meta: { title: '销售订单' },
+          component: () => import('@/views/sales/order-detail.vue'),
+          props: route => ({
+            orderId: route.query.orderId
+          })
+        },
+        {
           path: '/customer-management',
           name: 'CustomerManagement',
           meta: { title: '客户管理' },

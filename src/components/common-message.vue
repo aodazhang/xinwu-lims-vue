@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]消息提示 -->
+  <!-- [公共]页面-消息提示 -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition-all duration-300 ease-out"
@@ -8,6 +8,7 @@
       leave-active-class="transition-all duration-200 ease-in"
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-2"
+      @after-leave="handleAfterLeave"
     >
       <div
         v-if="visible"
@@ -16,6 +17,7 @@
           typeClass
         ]"
       >
+        <!-- 消息类型 icon -->
         <svg
           v-if="type === 'success'"
           xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +74,11 @@
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
+
+        <!-- 消息内容 -->
         <span>{{ message }}</span>
+
+        <!-- 关闭 -->
         <button class="btn btn-circle btn-ghost btn-xs ml-2" @click="close">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -128,6 +134,13 @@ const typeClass = computed(() => {
 })
 
 /**
+ * 动画完成后的回调
+ */
+const handleAfterLeave = () => {
+  props.onClose?.()
+}
+
+/**
  * 关闭消息
  */
 const close = () => {
@@ -136,7 +149,6 @@ const close = () => {
     clearTimeout(timer)
     timer = null
   }
-  props.onClose?.()
 }
 
 /**
