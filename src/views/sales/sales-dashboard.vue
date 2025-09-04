@@ -166,6 +166,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
@@ -173,6 +174,8 @@ import CommonTable from '@/components/common-table.vue'
 import CommonPagination from '@/components/common-pagination.vue'
 
 defineOptions({ name: 'SalesDashboard' })
+
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
@@ -413,7 +416,7 @@ const getStatusText = (status: string) => {
 
 const createOrder = () => {
   // 跳转到创建订单页面
-  console.log('创建订单')
+  router.push('/create-order')
 }
 
 const manageCustomers = () => {
@@ -428,7 +431,10 @@ const viewOrder = (orderId: number) => {
 
 const editOrder = (orderId: number) => {
   // 编辑订单
-  console.log('编辑订单:', orderId)
+  router.push({
+    path: '/create-order',
+    query: { orderId: orderId.toString() }
+  })
 }
 
 // 监听搜索条件变化，自动搜索
