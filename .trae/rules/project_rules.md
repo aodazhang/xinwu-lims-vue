@@ -163,6 +163,10 @@ import UserProfile from './components/user-profile.vue'
 
 1. **css 类名**: 使用 `kebab-case` (短横线命名)，并遵循 BEM 准则，例如 `user-profile__header`
 
+### 工具和组件库
+
+1. **css 样式**：使用 tailwindcss 编写移动优先的样式，响应式只考虑 `md:` 断点（>= 768px）
+
 ## 6.性能优化规范
 
 ### 资源优化

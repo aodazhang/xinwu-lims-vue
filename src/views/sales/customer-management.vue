@@ -67,6 +67,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
@@ -74,6 +75,8 @@ import CommonTable from '@/components/common-table.vue'
 import CommonModalCustomer from '@/components/common-modal-customer.vue'
 
 defineOptions({ name: 'CustomerManagement' })
+
+const router = useRouter()
 
 // 响应式数据
 const searchKeyword = ref('')
@@ -195,16 +198,6 @@ const getStatusText = (status: string) => {
   return statusTexts[status as keyof typeof statusTexts] || status
 }
 
-// 生成客户编号
-const generateCustomerId = () => {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const sequence = String(customers.value.length + 1001).padStart(4, '0')
-  return `KH${year}${month}${day}${sequence}`
-}
-
 // 搜索处理
 const handleSearch = () => {
   // 搜索逻辑已在 computed 中处理
@@ -226,8 +219,12 @@ const handleRefresh = () => {
 
 // 查看客户详情
 const viewCustomer = (customerId: string) => {
-  console.log('查看客户详情:', customerId)
   // 这里可以跳转到客户详情页面
-  // router.push(`/customer-detail/${customerId}`)
+  router.push({
+    path: '/customer-detail',
+    query: {
+      customerId
+    }
+  })
 }
 </script>

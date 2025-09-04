@@ -422,7 +422,7 @@
     </div>
 
     <!-- 客户选择弹窗 -->
-    <common-customer-modal ref="customerModalRef" @select="selectCustomer" />
+    <common-modal-select ref="selectModalRef" @select="selectCustomer" />
   </div>
 </template>
 
@@ -431,7 +431,7 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonFormSection from '@/components/common-form-section.vue'
-import CommonCustomerModal from '@/components/common-customer-modal.vue'
+import CommonModalSelect from '@/components/common-modal-select.vue'
 
 const props = defineProps<{ orderId?: string }>()
 
@@ -476,7 +476,7 @@ const formData = ref({
 })
 
 // 客户选择弹窗引用
-const customerModalRef = ref<InstanceType<typeof CommonCustomerModal>>()
+const selectModalRef = ref<InstanceType<typeof CommonModalSelect>>()
 
 // 文件上传
 const fileInput = ref<HTMLInputElement>()
@@ -549,7 +549,7 @@ function validateAllFields() {
  * 打开客户选择弹窗
  */
 function openCustomerModal() {
-  customerModalRef.value?.open()
+  selectModalRef.value?.open()
 }
 
 /**

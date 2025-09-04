@@ -57,6 +57,15 @@ const router = createRouter({
           component: () => import('@/views/sales/customer-management.vue')
         },
         {
+          path: '/customer-detail',
+          name: 'CustomerDetail',
+          meta: { title: '客户详情' },
+          component: () => import('@/views/sales/customer-detail.vue'),
+          props: route => ({
+            customerId: route.query.customerId
+          })
+        },
+        {
           path: '/review-dashboard',
           name: 'ReviewDashboard',
           meta: { title: '订单审核工作台' },
