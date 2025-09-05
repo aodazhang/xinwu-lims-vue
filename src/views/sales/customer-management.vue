@@ -95,9 +95,11 @@ const statsData = computed(() => [
 ])
 
 // 客户数据
-const customers = ref([
+const customers = ref<SalesCustomer[]>([
   {
+    id: 'KH202504231001',
     customerId: 'KH202504231001',
+    name: '广州环保科技有限公司',
     customerName: '广州环保科技有限公司',
     contactName: '王经理',
     contactPhone: '13800138001',
@@ -105,7 +107,9 @@ const customers = ref([
     status: 'active'
   },
   {
+    id: 'KH202504231002',
     customerId: 'KH202504231002',
+    name: '深圳创新工业园',
     customerName: '深圳创新工业园',
     contactName: '李主任',
     contactPhone: '13800138002',
@@ -113,7 +117,9 @@ const customers = ref([
     status: 'active'
   },
   {
+    id: 'KH202504251003',
     customerId: 'KH202504251003',
+    name: '佛山制造企业',
     customerName: '佛山制造企业',
     contactName: '张总',
     contactPhone: '13800138003',
@@ -121,7 +127,9 @@ const customers = ref([
     status: 'following'
   },
   {
+    id: 'KH202504261004',
     customerId: 'KH202504261004',
+    name: '东莞电子厂',
     customerName: '东莞电子厂',
     contactName: '刘经理',
     contactPhone: '13800138004',
@@ -129,7 +137,9 @@ const customers = ref([
     status: 'active'
   },
   {
+    id: 'KH202504271005',
     customerId: 'KH202504271005',
+    name: '惠州化工园区',
     customerName: '惠州化工园区',
     contactName: '陈主管',
     contactPhone: '13800138005',
@@ -137,7 +147,9 @@ const customers = ref([
     status: 'public'
   },
   {
+    id: 'KH202504281006',
     customerId: 'KH202504281006',
+    name: '中山物流园区',
     customerName: '中山物流园区',
     contactName: '周经理',
     contactPhone: '13800138006',

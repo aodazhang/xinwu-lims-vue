@@ -5,6 +5,34 @@
 declare global {
   // ==================== 业务管理 ====================
 
+  /** 销售客户 */
+  interface SalesCustomer {
+    /** 客户ID/编号 */
+    id: string
+    /** 客户ID（别名，兼容 customer-management.vue） */
+    customerId?: string
+    /** 客户名称 */
+    name: string
+    /** 客户名称（别名，兼容 customer-management.vue） */
+    customerName?: string
+    /** 联系人姓名 */
+    contactName: string
+    /** 联系人电话 */
+    contactPhone: string
+    /** 客户地址 */
+    address?: string
+    /** 客户分类 */
+    category?: string
+    /** 客户来源 */
+    source: string
+    /** 客户状态：active-已成交 | public-公海 | following-跟进中 */
+    status: 'active' | 'public' | 'following' | string
+    /** 所属行业 */
+    industry?: string
+    /** 创建时间 */
+    createdAt?: string
+  }
+
   /** 审核订单 */
   interface ReviewOrder {
     /** 订单ID */

@@ -64,7 +64,7 @@ types/               # 全局类型定义
 1. **目录名**: 使用 `kebab-case` (短横线命名)，例如 `home`
 2. **js/ts 文件名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile.ts`
 3. **vue 文件名**: 使用 `kebab-case` (短横线命名)，例如 `user-profile.vue`
-4. **页面路径**: 小写字母加连字符
+4. **页面路径**: 使用 `kebab-case` (短横线命名)，例如 `/user-profile`
 
 ## 3.Git 提交规范
 
@@ -155,8 +155,10 @@ import UserProfile from './components/user-profile.vue'
 ```
 
 3. **语法规范**: 使用 Composition API 并遵循 `<script setup lang="ts">` 语法
-4. **props 规范**: 使用 `defineProps` 定义 props 并通过 ts 定义 props 类型，使用 `defineEmits` 定义事件并通过 ts 定义事件类型
-5. **常用方法**: 使用 `loadDataList` 方法定义列表数据查询，使用 `loadDataDetail` 方法定义详情数据查询，使用 `loadDataSave` 方法定义详情数据提交
+4. **props 定义规范**: 使用 `defineProps` 定义 props 并通过 ts 定义 props 类型
+5. **emit 定义规范**: 使用 `defineEmits` 定义 emit 事件并通过 ts 定义事件类型
+6. **state 定义规范**: 使用 `ref` 定义响应式对象并通过 ts 定义 state 类型，原则上一个页面的 state 应该收敛在一个响应式对象中
+7. **常用方法**: 使用 `loadDataList` 方法定义列表数据查询，使用 `loadDataDetail` 方法定义详情数据查询，使用 `loadDataSave` 方法定义详情数据提交
 
 ## 5.CSS 样式规范
 

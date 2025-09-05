@@ -292,7 +292,7 @@ const customerModalRef = ref<InstanceType<typeof CommonModalCustomer> | null>(
 )
 
 // 客户数据
-const customerData = reactive({
+const customerData = reactive<SalesCustomer>({
   id: 'KH202504231001',
   name: '广州环保科技有限公司',
   contactName: '王经理',
@@ -433,7 +433,7 @@ const loadCustomerData = async () => {
     await new Promise(resolve => setTimeout(resolve, 800))
 
     // 模拟从后端获取数据
-    const customerMap: Record<string, any> = {
+    const customerMap: Record<string, SalesCustomer> = {
       KH202504231001: {
         id: 'KH202504231001',
         name: '广州环保科技有限公司',
