@@ -322,10 +322,13 @@ const getStatusText = (status: string): string => {
  * @param taskId 任务ID
  */
 const openTaskDetail = (taskId: string): void => {
-  // 保存任务ID到sessionStorage
-  sessionStorage.setItem('currentTaskId', taskId)
   // 跳转到任务详情页
-  router.push(`/sample/sampling-detail/${taskId}`)
+  router.push({
+    path: '/sampler-detail',
+    query: {
+      taskId
+    }
+  })
 }
 
 /**

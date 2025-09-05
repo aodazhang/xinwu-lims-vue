@@ -32,7 +32,7 @@
           </div>
 
           <!-- 弹窗内容 -->
-          <div class="px-5 pb-8 pt-5">
+          <div class="max-h-[calc(90vh-300px)] overflow-y-auto p-6">
             <form @submit.prevent="handleReject">
               <div class="space-y-4">
                 <!-- 驳回原因 -->

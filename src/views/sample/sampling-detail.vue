@@ -124,15 +124,6 @@
       </div>
     </div>
 
-    <!-- 成功提示 -->
-    <div
-      v-if="showSuccessToast"
-      class="fixed right-6 top-6 z-50 flex animate-[slideIn_0.3s_ease-out] items-center gap-3 rounded-lg bg-emerald-500 px-6 py-4 text-white shadow-xl"
-    >
-      <span>✓</span>
-      <span>分派成功！正在返回列表...</span>
-    </div>
-
     <!-- 任务分派/调整弹窗 -->
     <common-modal-task ref="taskModalRef" @refresh="loadTaskData" />
   </div>
@@ -140,11 +131,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
 import CommonDetailStatus from '@/components/common-detail-status.vue'
 import CommonModalTask from '@/components/common-modal-task.vue'
-import { toolSleep } from '@/utils/tool'
 
 // Props
 const props = defineProps<{ taskId?: string }>()
@@ -215,7 +206,6 @@ const staffList = ref<Staff[]>([
   { id: 6, name: '刘采样', status: '空闲', tasks: 2 }
 ])
 
-const showSuccessToast = ref(false)
 const taskModalRef = ref<InstanceType<typeof CommonModalTask> | null>(null)
 
 const formData = reactive<FormData>({

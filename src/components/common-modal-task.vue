@@ -35,7 +35,7 @@
           </div>
 
           <!-- 弹窗内容 -->
-          <div class="max-h-[calc(90vh-300px)] overflow-y-auto px-5 pb-8 pt-5">
+          <div class="max-h-[calc(90vh-300px)] overflow-y-auto p-6">
             <form @submit.prevent="confirmTask">
               <!-- 调整任务时显示对比信息 -->
               <div
