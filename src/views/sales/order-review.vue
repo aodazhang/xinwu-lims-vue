@@ -260,7 +260,7 @@ const approveOrder = () => {
 }
 
 const showRejectModal = () => {
-  rejectModalRef.value?.open()
+  rejectModalRef.value?.open(props.orderId)
 }
 
 const handleRefresh = () => {

@@ -63,13 +63,13 @@
 </template>
 
 <script setup lang="ts">
-import { toolSleep } from '@/utils/tool'
 import { ref } from 'vue'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { toolSleep } from '@/utils/tool'
 
 defineOptions({ name: 'Login' })
 
-// const router = useRouter()
+const router = useRouter()
 
 // 表单数据
 const loginForm = ref({
@@ -100,6 +100,8 @@ const handleLogin = async () => {
 
     // 登录成功
     showSuccessTip.value = true
+
+    router.push({ path: '/sales-dashboard' })
   } catch (error) {
     errorMessage.value = '登录失败，请检查用户名和密码'
   } finally {
@@ -121,22 +123,7 @@ const handleLogin = async () => {
   }
 }
 
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
 .animate-slide-in {
   animation: slide-in 0.5s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
 }
 </style>

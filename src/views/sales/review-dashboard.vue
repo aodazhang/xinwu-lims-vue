@@ -96,6 +96,9 @@
       :current="currentPage"
       @current-change="handlePageChange"
     />
+
+    <!-- 驳回弹窗 -->
+    <common-modal-reject ref="rejectModalRef" @refresh="loadOrdersData" />
   </div>
 </template>
 
@@ -107,6 +110,7 @@ import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 import CommonPagination from '@/components/common-pagination.vue'
 import CommonStats from '@/components/common-stats.vue'
+import CommonModalReject from '@/components/common-modal-reject.vue'
 
 defineOptions({ name: 'ReviewDashboard' })
 
@@ -127,7 +131,8 @@ const filteredOrders = ref<Order[]>([])
 const currentPage = ref(1)
 const searchKeyword = ref('')
 const urgentOnly = ref(false)
-const loading = ref(false)
+const tableLoading = ref(false)
+const rejectModalRef = ref<InstanceType<typeof CommonModalReject> | null>(null)
 
 // 统计数据
 const statsData = computed(() => [
@@ -146,10 +151,11 @@ const statsData = computed(() => [
 ])
 
 // 表格配置
-const tableConfig = {
+const tableConfig = computed(() => ({
   rowKey: 'id',
-  selection: false
-}
+  selection: false,
+  loading: tableLoading.value
+}))
 
 // 表格列配置
 const tableColumns = [
@@ -373,58 +379,44 @@ const viewOrderDetail = (orderId: string) => {
   })
 }
 
-const approveOrder = (orderId: string) => {
+const approveOrder = async (orderId: string) => {
   if (confirm(`确定要通过订单 ${orderId} 吗？`)) {
-    loading.value = true
-
-    setTimeout(() => {
-      // 从列表中移除该订单
-      const index = allOrders.value.findIndex(o => o.id === orderId)
-      if (index !== -1) {
-        allOrders.value.splice(index, 1)
-        applyFilters()
-
-        // 如果当前页没有数据了，返回上一页
-        const totalPages = Math.ceil(filteredOrders.value.length / 10) || 1
-        if (currentPage.value > totalPages) {
-          currentPage.value = totalPages
-        }
-
-        alert(`订单 ${orderId} 已通过审核！`)
-      }
-      loading.value = false
-    }, 500)
+    try {
+      // 模拟审核请求
+      await new Promise(resolve =>
+        setTimeout(resolve, 500 + Math.random() * 500)
+      )
+      loadOrdersData()
+    } catch (error) {
+      console.error('审核失败:', error)
+    } finally {
+    }
   }
 }
 
 const rejectOrder = (orderId: string) => {
-  const reason = prompt(`请输入驳回订单 ${orderId} 的原因：`)
-  if (reason) {
-    loading.value = true
+  rejectModalRef.value?.open(orderId)
+}
 
-    setTimeout(() => {
-      // 从列表中移除该订单
-      const index = allOrders.value.findIndex(o => o.id === orderId)
-      if (index !== -1) {
-        allOrders.value.splice(index, 1)
-        applyFilters()
-
-        // 如果当前页没有数据了，返回上一页
-        const totalPages = Math.ceil(filteredOrders.value.length / 10) || 1
-        if (currentPage.value > totalPages) {
-          currentPage.value = totalPages
-        }
-
-        alert(`订单 ${orderId} 已被驳回！\n驳回原因：${reason}`)
-      }
-      loading.value = false
-    }, 500)
+// 加载订单数据
+const loadOrdersData = async () => {
+  try {
+    tableLoading.value = true
+    // 模拟网络请求延迟
+    await new Promise(resolve =>
+      setTimeout(resolve, 1000 + Math.random() * 1000)
+    )
+    allOrders.value = generateTestOrders()
+    applyFilters()
+  } catch (error) {
+    console.error('加载订单数据失败:', error)
+  } finally {
+    tableLoading.value = false
   }
 }
 
 // 初始化
 onMounted(() => {
-  allOrders.value = generateTestOrders()
-  filteredOrders.value = [...allOrders.value]
+  loadOrdersData()
 })
 </script>

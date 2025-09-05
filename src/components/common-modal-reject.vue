@@ -103,6 +103,7 @@ const visible = ref(false)
 const isSubmitting = ref(false)
 const rejectReason = ref('')
 const formError = ref('')
+const currentOrderId = ref('')
 
 // 表单是否有效
 const isFormValid = computed(() => {
@@ -138,9 +139,11 @@ const resetForm = (): void => {
 
 /**
  * 对外暴露的 open 方法
+ * @param orderId 订单ID
  */
-const open = (): void => {
+const open = (orderId?: string): void => {
   visible.value = true
+  currentOrderId.value = orderId || ''
   resetForm()
 }
 
