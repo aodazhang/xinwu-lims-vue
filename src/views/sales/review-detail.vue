@@ -184,7 +184,8 @@ const loading = ref(true)
 const rejectModalRef = ref<InstanceType<typeof CommonModalReject> | null>(null)
 
 // 订单数据
-const orderData = reactive({
+const orderData = reactive<ReviewOrder>({
+  id: '',
   orderNumber: '',
   isUrgent: false,
   salesperson: '',
@@ -217,7 +218,8 @@ const fetchOrderData = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // 模拟根据orderId获取不同的数据
-    const mockData = {
+    const mockData: ReviewOrder = {
+      id: props.orderId,
       orderNumber: `XW250903-${props.orderId}`,
       isUrgent: true,
       salesperson: '张三',

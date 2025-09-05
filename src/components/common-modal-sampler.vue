@@ -115,7 +115,7 @@ interface SamplerForm {
   description: string
 }
 
-interface SamplingLocation {
+export interface SamplingLocation {
   name: string
   sampleId: string
   description?: string

@@ -46,12 +46,12 @@
       <template #testTypeSlot="{ scope }">
         <span
           :class="
-            isStandardTest(scope.testType)
+            isStandardTest(scope.testing.testType)
               ? 'font-medium text-emerald-600'
               : 'text-gray-800'
           "
         >
-          {{ scope.testType }}
+          {{ scope.testing.testType }}
         </span>
       </template>
 
@@ -107,20 +107,11 @@ import CommonModalReject from '@/components/common-modal-reject.vue'
 
 defineOptions({ name: 'ReviewDashboard' })
 
-interface Order {
-  id: string
-  customer: string
-  unit: string
-  testType: string
-  submitTime: string
-  isUrgent: boolean
-}
-
 const router = useRouter()
 
 // 响应式数据
-const allOrders = ref<Order[]>([])
-const filteredOrders = ref<Order[]>([])
+const allOrders = ref<ReviewOrder[]>([])
+const filteredOrders = ref<ReviewOrder[]>([])
 const searchKeyword = ref('')
 const urgentOnly = ref(false)
 const rejectModalRef = ref<InstanceType<typeof CommonModalReject> | null>(null)
@@ -161,17 +152,17 @@ const tableColumns = [
   },
   {
     label: '客户名称',
-    props: 'customer',
+    props: 'customer.name',
     minWidth: 150
   },
   {
     label: '受检单位',
-    props: 'unit',
+    props: 'testing.unit',
     minWidth: 120
   },
   {
     label: '检测类型',
-    props: 'testType',
+    props: 'testing.testType',
     minWidth: 120,
     slotName: 'testTypeSlot'
   },
@@ -197,7 +188,7 @@ const tableColumns = [
 ]
 
 // 生成测试数据
-const generateTestOrders = (): Order[] => {
+const generateTestOrders = (): ReviewOrder[] => {
   const customers = [
     '深圳科技创新中心',
     '广州医药研究院',
@@ -270,7 +261,7 @@ const generateTestOrders = (): Order[] => {
     'VOCs检测'
   ]
 
-  const orders: Order[] = []
+  const orders: ReviewOrder[] = []
   const today = new Date()
 
   for (let i = 0; i < 30; i++) {
@@ -278,14 +269,39 @@ const generateTestOrders = (): Order[] => {
     const submitTime = new Date(today)
     submitTime.setHours(today.getHours() - Math.floor(Math.random() * 72))
 
+    const customerName = customers[Math.floor(Math.random() * customers.length)]
+    const unitName = units[Math.floor(Math.random() * units.length)]
+    const testTypeName = testTypes[Math.floor(Math.random() * testTypes.length)]
+
     orders.push({
       id: `XW${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${String(100 + i).padStart(3, '0')}`,
-      customer: customers[Math.floor(Math.random() * customers.length)],
-      unit: units[Math.floor(Math.random() * units.length)],
-      testType: testTypes[Math.floor(Math.random() * testTypes.length)],
+      orderNumber: `XW${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${String(100 + i).padStart(3, '0')}`,
+      isUrgent,
+      salesperson: '张三',
       submitTime: formatDateTime(submitTime),
-      isUrgent
+      customer: {
+        name: customerName,
+        contact: '李经理',
+        phone: '138****8888'
+      },
+      testing: {
+        unit: unitName,
+        address: '广东省深圳市南山区科技园',
+        serviceType: '初测',
+        testType: testTypeName,
+        testContent: '环境检测项目'
+      },
+      finance: {
+        totalAmount: Math.floor(Math.random() * 50000) + 10000,
+        paidAmount: Math.floor(Math.random() * 20000),
+        pendingAmount: 0
+      }
     })
+
+    // 计算待付金额
+    const lastOrder = orders[orders.length - 1]
+    lastOrder.finance.pendingAmount =
+      lastOrder.finance.totalAmount - lastOrder.finance.paidAmount
   }
 
   // 按提交时间倒序排序（最新的在前）
@@ -340,9 +356,9 @@ const applyFilters = () => {
     filtered = filtered.filter(
       order =>
         order.id.toLowerCase().includes(keyword) ||
-        order.customer.toLowerCase().includes(keyword) ||
-        order.unit.toLowerCase().includes(keyword) ||
-        order.testType.toLowerCase().includes(keyword)
+        order.customer.name.toLowerCase().includes(keyword) ||
+        order.testing.unit.toLowerCase().includes(keyword) ||
+        order.testing.testType.toLowerCase().includes(keyword)
     )
   }
 

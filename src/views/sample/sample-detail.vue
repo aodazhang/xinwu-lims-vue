@@ -1,10 +1,7 @@
 <template>
   <div v-loading="loading">
     <!-- 页面头部 -->
-    <common-title
-      :title="orderData.orderId"
-      content="样品管理工作台 / 样品详情"
-    >
+    <common-title :title="orderInfo.id" content="样品管理工作台 / 样品详情">
       <button
         class="flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-600 px-5 py-2 text-white transition-all hover:from-green-600 hover:to-emerald-700"
         :disabled="!canConfirmReceive"
@@ -27,13 +24,13 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">受检单位</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.inspectedUnit
+                orderInfo.inspectedUnit
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">采样点数</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.samplingPoints
+                orderInfo.samplingPoints
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
@@ -45,7 +42,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">检测内容</span>
               <span class="text-sm font-medium text-emerald-600">{{
-                orderData.testContent
+                orderInfo.testContent
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
@@ -57,7 +54,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">订单类型</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.orderType
+                orderInfo.orderType
               }}</span>
             </div>
           </div>
@@ -69,25 +66,25 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">采样人员名称</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.sampler
+                orderInfo.sampler
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">采样地址</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.samplingAddress
+                orderInfo.samplingAddress
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">采样完成时间</span>
               <span class="text-sm font-medium text-gray-900">{{
-                orderData.samplingCompletedTime
+                orderInfo.completionTime
               }}</span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">样品数量</span>
               <span class="text-sm font-semibold text-indigo-600"
-                >{{ orderData.sampleCount }}个</span
+                >{{ orderInfo.sampleCount }}个</span
               >
             </div>
           </div>
@@ -97,7 +94,7 @@
         <common-detail-card title="样品列表和状态确认">
           <div class="flex flex-col gap-4">
             <div
-              v-for="sample in samples"
+              v-for="sample in orderInfo.samples"
               :key="sample.id"
               class="rounded-lg border border-gray-200 bg-gray-50 p-5"
             >
@@ -121,7 +118,6 @@
                       :name="sample.id"
                       value="good"
                       class="h-4 w-4 cursor-pointer"
-                      @change="updateStats"
                     />
                     <label
                       :for="`${sample.id}_good`"
@@ -138,7 +134,6 @@
                       :name="sample.id"
                       value="damaged"
                       class="h-4 w-4 cursor-pointer"
-                      @change="updateStats"
                     />
                     <label
                       :for="`${sample.id}_damaged`"
@@ -158,9 +153,9 @@
       <div class="space-y-5">
         <!-- 任务状态 -->
         <common-detail-status
-          :status="orderData.status"
-          :status-text="orderData.statusText"
-          :details="statusDetails"
+          :status="mappedStatus"
+          :status-text="'采样中'"
+          :details="orderInfo.statusDetails || []"
         />
 
         <!-- 待接收样品 -->
@@ -195,7 +190,7 @@
 
         <!-- 相关人员 -->
         <common-detail-card title="相关人员">
-          <common-detail-person :persons="relatedPersons" />
+          <common-detail-person :persons="orderInfo.relatedPersons || []" />
         </common-detail-card>
       </div>
     </div>
@@ -213,28 +208,6 @@ import CommonDetailPerson from '@/components/common-detail-person.vue'
 
 defineOptions({ name: 'SampleDetail' })
 
-/**
- * 样品数据接口
- */
-interface Sample {
-  id: string
-  location: string
-  status: 'good' | 'damaged' | ''
-}
-
-/**
- * 订单信息接口
- */
-interface OrderInfo {
-  customer: string
-  testType: string
-  sampler: string
-  samplingDate: string
-  samplingAddress: string
-  completionTime: string
-  sampleCount: number
-}
-
 // Props
 const props = defineProps<{ orderId?: string }>()
 
@@ -243,75 +216,64 @@ const router = useRouter()
 const loading = ref(false)
 
 // 订单基本信息
-const orderInfo = ref<OrderInfo>({
-  customer: '广州环保科技总部',
-  testType: '室内空气质量检测',
+const orderInfo = ref<SampleOrder>({
+  id: 'XW250903-100',
+  customer: '上海心吾科技有限公司',
+  testType: '室内空气检测',
+  testContent: '甲醛、苯、TVOC等有害物质检测',
   sampler: '张三',
-  samplingDate: '2025-09-04',
-  samplingAddress: '广州市天河区科技园A栋3楼',
-  completionTime: '2025-09-04 16:30',
-  sampleCount: 12
-})
-
-// 样品列表
-const samples = ref<Sample[]>([
-  { id: 'XW250903-100-001', location: '办公室A区域', status: 'good' },
-  { id: 'XW250903-100-002', location: '会议室B区域', status: 'good' },
-  { id: 'XW250903-100-003', location: '休息室C区域', status: 'good' },
-  { id: 'XW250903-100-004', location: '财务室', status: 'damaged' },
-  { id: 'XW250903-100-005', location: '总经理办公室', status: 'good' },
-  { id: 'XW250903-100-006', location: '人事部', status: 'good' },
-  { id: 'XW250903-100-007', location: '技术部', status: 'good' },
-  { id: 'XW250903-100-008', location: '市场部', status: 'good' },
-  { id: 'XW250903-100-009', location: '前台接待区', status: 'good' },
-  { id: 'XW250903-100-010', location: '会议室D区域', status: 'good' },
-  { id: 'XW250903-100-011', location: '储物间', status: 'good' },
-  { id: 'XW250903-100-012', location: '茶水间', status: 'good' }
-])
-
-// 订单数据
-const orderData = ref({
-  orderId: 'XW250903-100',
-  status: 'pending' as
-    | 'pending'
-    | 'approved'
-    | 'sampling'
-    | 'testing'
-    | 'completed',
-  statusText: '样品接收中',
-  inspectedUnit: '广州环保科技总部',
+  samplingDate: '2025-09-03',
+  samplingAddress: '上海市浦东新区张江高科技园区',
+  completionTime: '2025-09-04 14:30',
+  expectedTime: '2025-09-10',
+  sampleCount: 12,
+  inspectedUnit: '上海心吾科技有限公司',
   samplingPoints: 12,
-  testType: '50325-2020',
-  testContent: '三苯五项：甲醛、苯、甲苯、二甲苯、TVOC',
-  customerName: '广州环保科技有限公司',
-  orderType: '委托检测（采样）',
-  sampler: '赵六',
-  samplingAddress: '广州市天河区科技园A栋3楼',
-  samplingCompletedTime: '2025-09-04 16:30',
-  sampleCount: 12
+  orderType: '常规检测',
+  isUrgent: true,
+  status: 'sampling',
+  samples: [
+    { id: 'XW250903-100-001', location: '办公室A区域', status: '' },
+    { id: 'XW250903-100-002', location: '会议室B区域', status: '' },
+    { id: 'XW250903-100-003', location: '休息室C区域', status: '' },
+    { id: 'XW250903-100-004', location: '财务室', status: '' }
+  ],
+  relatedPersons: [
+    { id: 1, name: '张三', role: '销售人员' },
+    { id: 2, name: '赵六', role: '采样人员' },
+    { id: 3, name: '李四', role: '样品管理员' }
+  ],
+  statusDetails: [
+    { label: '当前阶段', value: '样品接收' },
+    { label: '优先级', value: '加急', type: 'danger' },
+    { label: '采样日期', value: '2025-09-04' },
+    { label: '预计检测开始', value: '2025-09-05' }
+  ]
 })
 
-// 状态详情
-const statusDetails = ref([
-  { label: '当前阶段', value: '样品接收' },
-  { label: '优先级', value: '加急', type: 'danger' },
-  { label: '采样日期', value: '2025-09-04' },
-  { label: '预计检测开始', value: '2025-09-05' }
-])
-
-// 相关人员
-const relatedPersons = ref([
-  { id: 1, name: '张三', role: '销售人员' },
-  { id: 2, name: '赵六', role: '采样人员' },
-  { id: 3, name: '李四', role: '样品管理员' }
-])
+// 状态映射：将SampleOrder的status映射为common-detail-status组件支持的类型
+const mappedStatus = computed(() => {
+  const statusMap: Record<
+    string,
+    'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
+  > = {
+    waiting: 'pending',
+    received: 'approved',
+    processing: 'sampling',
+    sampling: 'sampling',
+    testing: 'testing',
+    completed: 'completed'
+  }
+  return statusMap[orderInfo.value.status] || 'pending'
+})
 
 // 统计数据
 const stats = computed(() => {
-  const total = samples.value.length
-  const good = samples.value.filter(s => s.status === 'good').length
-  const damaged = samples.value.filter(s => s.status === 'damaged').length
-  const checked = samples.value.filter(s => s.status !== '').length
+  const samples = orderInfo.value.samples || []
+  const total = samples.length
+  const good = samples.filter(s => s.status === 'good').length
+  const damaged = samples.filter(s => s.status === 'damaged').length
+  const checked = samples.filter(s => s.status !== '').length
   const completionRate = total > 0 ? Math.round((checked / total) * 100) : 0
 
   return {
@@ -324,15 +286,9 @@ const stats = computed(() => {
 
 // 是否可以确认接收
 const canConfirmReceive = computed(() => {
-  return samples.value.every(sample => sample.status !== '')
+  const samples = orderInfo.value.samples || []
+  return samples.every(sample => sample.status !== '')
 })
-
-/**
- * 更新统计数据
- */
-const updateStats = () => {
-  // 统计数据通过计算属性自动更新
-}
 
 /**
  * 加载订单数据
@@ -342,12 +298,12 @@ const loadOrderData = async (): Promise<void> => {
     loading.value = true
 
     // 从路由参数获取订单ID
-    orderData.value.orderId = props.orderId
+    orderInfo.value.id = props.orderId
 
     // 模拟API调用加载数据
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    console.log('订单数据加载完成:', orderData.value.orderId)
+    console.log('订单数据加载完成:', orderInfo.value.id)
   } catch (error) {
     console.error('加载订单数据失败:', error)
   } finally {
@@ -371,14 +327,16 @@ const confirmReceive = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     const receiveData = {
-      orderId: orderData.value.orderId,
-      samples: samples.value.map(s => ({
+      orderId: orderInfo.value.id,
+      samples: orderInfo.value.samples.map(s => ({
         id: s.id,
         location: s.location,
         status: s.status
       })),
       receiver:
-        relatedPersons.value.find(p => p.role === '样品管理员')?.name || '未知',
+        (orderInfo.value.relatedPersons || []).find(
+          p => p.role === '样品管理员'
+        )?.name || '未知',
       receiveTime: new Date().toISOString()
     }
 

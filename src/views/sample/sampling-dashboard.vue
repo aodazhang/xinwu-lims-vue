@@ -180,28 +180,6 @@ import CommonModalTask from '@/components/common-modal-task.vue'
 // 路由实例
 const router = useRouter()
 
-// 接口定义
-interface Task {
-  id: string
-  company: string
-  address: string
-  points: number
-  priority: 'urgent' | 'normal'
-  createTime: string
-  assignedStaff?: string
-  assignedDate?: string
-  assignedTime?: string
-  duration?: string
-  status?: 'today' | 'scheduled'
-}
-
-interface Staff {
-  id: number
-  name: string
-  status: string
-  tasks: number
-}
-
 // 响应式数据
 const searchQuery = ref('')
 const statusFilter = ref('')
@@ -283,9 +261,9 @@ const tableColumns = [
 const taskModalRef = ref<InstanceType<typeof CommonModalTask> | null>(null)
 
 // 测试数据
-const allTasks = ref<Task[]>([])
+const allTasks = ref<SamplingTask[]>([])
 const loading = ref(false)
-const staffList = ref<Staff[]>([
+const staffList = ref<SamplerStaff[]>([
   { id: 1, name: '李采样', status: '空闲', tasks: 2 },
   { id: 2, name: '王技术', status: '工作中', tasks: 3 },
   { id: 3, name: '张工程', status: '空闲', tasks: 1 },
@@ -352,11 +330,11 @@ const filteredTasks = computed(() => {
   return allTasks.value
 })
 
-const openAssignModal = (task: Task) => {
+const openAssignModal = (task: SamplingTask) => {
   taskModalRef.value?.open('assign', task, staffList.value)
 }
 
-const openAdjustModal = (task: Task) => {
+const openAdjustModal = (task: SamplingTask) => {
   taskModalRef.value?.open('adjust', task, staffList.value)
 }
 
@@ -379,12 +357,12 @@ const fetchTaskList = async (params?: {
   endDate?: string
   page?: number
   pageSize?: number
-}): Promise<{ data: Task[]; total: number }> => {
+}): Promise<{ data: SamplingTask[]; total: number }> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 300))
 
   // 生成模拟数据
-  const generateMockTasks = (): Task[] => {
+  const generateMockTasks = (): SamplingTask[] => {
     const companies = [
       '深圳市某某自来水公司',
       '福田区某酒店',
@@ -418,7 +396,7 @@ const fetchTaskList = async (params?: {
       '刘采样'
     ]
 
-    const tasks: Task[] = []
+    const tasks: SamplingTask[] = []
 
     // 生成待分派任务
     for (let i = 1; i <= 30; i++) {

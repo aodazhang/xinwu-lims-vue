@@ -15,6 +15,7 @@
         <option value="">全部任务</option>
         <option value="pending">待处理</option>
         <option value="ongoing">进行中</option>
+        <option value="sampling">采样中</option>
         <option value="completed">已完成</option>
       </select>
 
@@ -97,36 +98,12 @@ import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 
-/**
- * 任务数据接口
- */
-interface Task {
-  id: string
-  company: string
-  address: string
-  testType: string
-  points: number
-  status: 'pending' | 'ongoing' | 'completed'
-  isUrgent: boolean
-  scheduledTime: string
-  createTime: string
-}
-
-/**
- * 统计数据接口
- */
-interface Statistics {
-  today: number
-  pending: number
-  total: number
-}
-
 const router = useRouter()
 
 // 响应式数据
 const statusFilter = ref('')
 const sortBy = ref('urgent')
-const statistics = ref<Statistics>({
+const statistics = ref({
   today: 0,
   pending: 0,
   total: 0
@@ -213,7 +190,7 @@ const tableColumns = [
 ]
 
 // 任务列表数据
-const tasks = ref<Task[]>([
+const tasks = ref<SamplerTask[]>([
   {
     id: 'XW2024031501',
     company: '深圳市某某自来水公司',
@@ -280,8 +257,13 @@ const filteredTasks = computed(() => {
         if (!a.isUrgent && b.isUrgent) return 1
         return 0
       case 'status':
-        // 按状态排序：待处理 > 进行中 > 已完成
-        const statusOrder = { pending: 0, ongoing: 1, completed: 2 }
+        // 按状态排序：待处理 > 进行中 > 采样中 > 已完成
+        const statusOrder: Record<SamplerTask['status'], number> = {
+          pending: 0,
+          ongoing: 1,
+          sampling: 2,
+          completed: 3
+        }
         return statusOrder[a.status] - statusOrder[b.status]
       case 'time':
       case 'created':
@@ -299,6 +281,7 @@ const getStatusBadgeClass = (status: string): string => {
   const classes = {
     pending: 'bg-amber-100 text-amber-800',
     ongoing: 'bg-indigo-100 text-indigo-800',
+    sampling: 'bg-blue-100 text-blue-800',
     completed: 'bg-emerald-100 text-emerald-800'
   }
   return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800'
@@ -312,6 +295,7 @@ const getStatusText = (status: string): string => {
   const texts = {
     pending: '待处理',
     ongoing: '进行中',
+    sampling: '采样中',
     completed: '已完成'
   }
   return texts[status as keyof typeof texts] || '未知'

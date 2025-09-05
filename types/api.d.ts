@@ -2,22 +2,265 @@
  * @description 业务 API 接口定义
  */
 
-interface CommonJson {
-  /** 接口地址拼接：ip */
-  SOUTHBOUND_SERVER_IP: { [key: string]: string }
-  /** 接口地址拼接：port */
-  SOUTHBOUND_SERVER_PORT: { [key: string]: string }
-  /** 网络节点信息：key-关联 index */
-  Router_List: {
-    [key: string]: {
-      /** 节点 id */
-      LOCAL_LABEL: string
-      /** 节点类型：fz-封装、zf-转发 */
-      TYPE: 'fz' | 'zf'
-      /** 节点编号映射 */
-      PORT_LIST: { [key: string]: number }
-      /** 节点编号速率 */
-      PORT_LIMIT: { [key: string]: string }
+declare global {
+  // ==================== 业务管理 ====================
+
+  /** 审核订单 */
+  interface ReviewOrder {
+    /** 订单ID */
+    id: string
+    /** 订单编号 */
+    orderNumber: string
+    /** 是否紧急订单 */
+    isUrgent: boolean
+    /** 销售人员 */
+    salesperson: string
+    /** 提交时间 */
+    submitTime: string
+    /** 客户信息 */
+    customer: {
+      /** 客户名称 */
+      name: string
+      /** 联系人 */
+      contact: string
+      /** 联系电话 */
+      phone: string
+    }
+    /** 检测信息 */
+    testing: {
+      /** 委托单位 */
+      unit: string
+      /** 检测地址 */
+      address: string
+      /** 服务类型 */
+      serviceType: string
+      /** 检测类型 */
+      testType: string
+      /** 检测内容 */
+      testContent: string
+    }
+    /** 财务信息 */
+    finance: {
+      /** 总金额 */
+      totalAmount: number
+      /** 已付金额 */
+      paidAmount: number
+      /** 待付金额 */
+      pendingAmount: number
     }
   }
+
+  // ==================== 现场作业 ====================
+
+  /** 采样调度任务 */
+  interface SamplingTask {
+    /** 任务ID */
+    id: string
+    /** 项目编号 */
+    projectNumber?: string
+    /** 委托单位名称 */
+    company: string
+    /** 客户名称 */
+    customerName?: string
+    /** 联系人姓名 */
+    contactPerson?: string
+    /** 联系人电话 */
+    contactPhone?: string
+    /** 检验单位 */
+    inspectionUnit?: string
+    /** 采样地址 */
+    address: string
+    /** 采样地址（详情页字段名） */
+    samplingAddress?: string
+    /** 采样点数量 */
+    points?: number
+    /** 采样点数量（详情页字段名） */
+    samplingPoints?: string
+    /** 检测类型 */
+    testType?: string
+    /** 检测内容 */
+    testContent?: string
+    /** 检测项目列表 */
+    testItems?: string[]
+    /** 特殊要求 */
+    specialRequirements?: string
+    /** 任务优先级：紧急 | 普通 */
+    priority?: 'urgent' | 'normal'
+    /** 是否紧急任务 */
+    isUrgent?: boolean
+    /** 任务创建时间 */
+    createTime: string
+    /** 截止时间 */
+    deadline?: string
+    /** 分派人员姓名 */
+    assignedStaff?: string
+    /** 分派日期 */
+    assignedDate?: string
+    /** 分派时间段 */
+    assignedTime?: string
+    /** 预计耗时 */
+    duration?: string
+    /** 任务状态：今日任务 | 已安排 | 待处理 | 已审批 | 采样中 | 检测中 | 已完成 */
+    status?:
+      | 'today'
+      | 'scheduled'
+      | 'pending'
+      | 'approved'
+      | 'sampling'
+      | 'testing'
+      | 'completed'
+    /** 状态文本描述 */
+    statusText?: string
+    /** 状态详情 */
+    statusDetails?: {
+      /** 标签 */
+      label: string
+      /** 值 */
+      value: string
+      /** 类型 */
+      type?: string
+    }[]
+  }
+
+  /** 采样任务 */
+  interface SamplerTask {
+    /** 任务ID */
+    id: string
+    /** 任务ID（详情页字段名） */
+    taskId?: string
+    /** 委托单位名称 */
+    company?: string
+    /** 采样地址 */
+    address?: string
+    /** 采样地址（详情页字段名） */
+    samplingAddress?: string
+    /** 检测类型 */
+    testType: string
+    /** 检测内容 */
+    testContent?: string
+    /** 采样点数量 */
+    points?: number
+    /** 采样点数量（详情页字段名） */
+    samplingPoints?: number
+    /** 任务状态：待处理 | 进行中 | 采样中 | 已完成 */
+    status: 'pending' | 'ongoing' | 'sampling' | 'completed'
+    /** 状态文本描述 */
+    statusText?: string
+    /** 是否紧急任务 */
+    isUrgent: boolean
+    /** 预定采样时间 */
+    scheduledTime: string
+    /** 任务创建时间 */
+    createTime?: string
+    /** 客户名称 */
+    customerName?: string
+    /** 联系人姓名 */
+    contactPerson?: string
+    /** 联系人电话 */
+    contactPhone?: string
+    /** 被检单位 */
+    inspectedUnit?: string
+    /** 采样员姓名 */
+    sampler?: string
+    /** 服务类型 */
+    serviceType?: string
+    /** 检测项目列表 */
+    testItems?: string[]
+    /** 采样位置列表 */
+    samplingLocations?: {
+      /** 采样点名称 */
+      name: string
+      /** 样品ID */
+      sampleId: string
+    }[]
+    /** 状态详情 */
+    statusDetails?: {
+      /** 标签 */
+      label: string
+      /** 值 */
+      value: string
+      /** 类型 */
+      type?: string
+    }[]
+  }
+
+  /** 采样员 */
+  interface SamplerStaff {
+    /** 人员ID */
+    id: number
+    /** 人员姓名 */
+    name: string
+    /** 人员状态 */
+    status: string
+    /** 当前任务数量 */
+    tasks: number
+  }
+
+  /** 样品管理订单 */
+  interface SampleOrder {
+    /** 订单ID */
+    id: string
+    /** 客户名称 */
+    customer: string
+    /** 样品数量 */
+    sampleCount: number
+    /** 采样员姓名 */
+    sampler: string
+    /** 检测类型 */
+    testType: string
+    /** 检测内容 */
+    testContent?: string
+    /** 预期完成时间 */
+    expectedTime: string
+    /** 采样日期 */
+    samplingDate?: string
+    /** 采样地址 */
+    samplingAddress?: string
+    /** 完成时间 */
+    completionTime?: string
+    /** 受检单位 */
+    inspectedUnit?: string
+    /** 采样点数 */
+    samplingPoints?: number
+    /** 订单类型 */
+    orderType?: string
+    /** 是否紧急订单 */
+    isUrgent: boolean
+    /** 订单状态：等待中 | 已接收 | 处理中 | 采样中 | 检测中 | 已完成 */
+    status:
+      | 'waiting'
+      | 'received'
+      | 'processing'
+      | 'sampling'
+      | 'testing'
+      | 'completed'
+    samples?: {
+      /** 样品ID */
+      id: string
+      /** 采样位置 */
+      location: string
+      /** 样品状态：完好 | 破损 | 未知 */
+      status: 'good' | 'damaged' | ''
+    }[]
+    /** 相关人员 */
+    relatedPersons?: {
+      /** 人员ID */
+      id: number
+      /** 姓名 */
+      name: string
+      /** 角色 */
+      role: string
+    }[]
+    /** 状态详情 */
+    statusDetails?: {
+      /** 标签 */
+      label: string
+      /** 值 */
+      value: string
+      /** 类型 */
+      type?: string
+    }[]
+  }
 }
+
+export {}

@@ -96,25 +96,11 @@ import CommonTable from '@/components/common-table.vue'
 
 defineOptions({ name: 'SampleDashboard' })
 
-/**
- * 订单数据接口
- */
-interface Order {
-  id: string
-  customer: string
-  sampleCount: number
-  sampler: string
-  testType: string
-  expectedTime: string
-  isUrgent: boolean
-  status: 'waiting' | 'received' | 'processing'
-}
-
 const router = useRouter()
 
 // 响应式数据
-const allOrders = ref<Order[]>([])
-const orderList = ref<Order[]>([])
+const allOrders = ref<SampleOrder[]>([])
+const orderList = ref<SampleOrder[]>([])
 const searchQuery = ref('')
 const statusFilter = ref('')
 const loading = ref(false)

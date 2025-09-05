@@ -136,7 +136,7 @@
         <common-detail-card title="采样位置和样品列表">
           <div class="space-y-3">
             <div
-              v-for="(location, index) in samplingLocations"
+              v-for="(location, index) in taskData.samplingLocations"
               :key="index"
               class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4"
             >
@@ -179,9 +179,9 @@
       <div class="space-y-5">
         <!-- 状态指示器 -->
         <common-detail-status
-          :status="taskData.status"
+          :status="detailStatus"
           :status-text="taskData.statusText"
-          :details="statusDetails"
+          :details="taskData.statusDetails"
         />
       </div>
     </div>
@@ -197,54 +197,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
 import CommonDetailStatus from '@/components/common-detail-status.vue'
-import CommonModalSampler from '@/components/common-modal-sampler.vue'
+import CommonModalSampler, {
+  type SamplingLocation
+} from '@/components/common-modal-sampler.vue'
 import CommonModalDelegate from '@/components/common-modal-delegate.vue'
-
-// 定义任务数据接口
-interface TaskData {
-  taskId: string
-  status: 'pending' | 'sampling' | 'completed'
-  statusText: string
-  customerName: string
-  contactPerson: string
-  contactPhone: string
-  inspectedUnit: string
-  samplingAddress: string
-  scheduledTime: string
-  sampler: string
-  isUrgent: boolean
-  testType: string
-  testContent: string
-  samplingPoints: number
-  serviceType: string
-  testItems: string[]
-}
-
-// 定义采样位置接口
-interface SamplingLocation {
-  name: string
-  sampleId: string
-}
-
-// 定义现场检测数据接口
-interface FieldData {
-  freeCl: number | null
-  totalCl: number | null
-  temperature: number | null
-  humidity: number | null
-}
 
 // Props
 const props = defineProps<{ taskId?: string }>()
 
 // 响应式数据
 const loading = ref(false)
-const taskData = ref<TaskData>({
+const taskData = ref<SamplerTask>({
+  id: 'XW250903-100',
   taskId: 'XW250903-100',
   status: 'sampling',
   statusText: '采样中',
@@ -260,32 +229,32 @@ const taskData = ref<TaskData>({
   testContent: '三苯五项：甲醛、苯、甲苯、二甲苯、TVOC',
   samplingPoints: 12,
   serviceType: '初测',
-  testItems: ['甲醛', '苯', '甲苯', '二甲苯', 'TVOC']
+  testItems: ['甲醛', '苯', '甲苯', '二甲苯', 'TVOC'],
+  statusDetails: [
+    { label: '任务编号', value: 'XW250903-100' },
+    { label: '创建时间', value: '2025-09-03 09:00' },
+    { label: '截止时间', value: '2025-09-04 18:00' }
+  ],
+  samplingLocations: [
+    {
+      name: '办公室A区域',
+      sampleId: 'XW250903-100-001'
+    },
+    {
+      name: '会议室B区域',
+      sampleId: 'XW250903-100-002'
+    }
+  ]
 })
 
-// 状态详情
-const statusDetails = ref([
-  { label: '任务编号', value: 'XW250903-100' },
-  { label: '创建时间', value: '2025-09-03 09:00' },
-  { label: '截止时间', value: '2025-09-04 18:00' }
-])
-
-const samplingLocations = ref<SamplingLocation[]>([
-  {
-    name: '办公室A区域',
-    sampleId: 'XW250903-100-001'
-  },
-  {
-    name: '会议室B区域',
-    sampleId: 'XW250903-100-002'
+// 计算属性：将采样员状态转换为详情页状态
+const detailStatus = computed(() => {
+  const status = taskData.value.status
+  // 将采样员状态映射为详情状态
+  if (status === 'ongoing') {
+    return 'sampling'
   }
-])
-
-const fieldData = ref<FieldData>({
-  freeCl: null,
-  totalCl: null,
-  temperature: null,
-  humidity: null
+  return status as 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
 })
 
 // 组件引用
@@ -341,7 +310,10 @@ const showAddSamplingModal = (): void => {
  * 处理采样位置添加
  */
 const handleSamplingLocationAdded = (location: SamplingLocation): void => {
-  samplingLocations.value.push(location)
+  if (!taskData.value.samplingLocations) {
+    taskData.value.samplingLocations = []
+  }
+  taskData.value.samplingLocations.push(location)
   samplingCounter++
 }
 
@@ -349,7 +321,9 @@ const handleSamplingLocationAdded = (location: SamplingLocation): void => {
  * 删除采样位置
  */
 const removeSamplingLocation = (index: number): void => {
-  samplingLocations.value.splice(index, 1)
+  if (taskData.value.samplingLocations) {
+    taskData.value.samplingLocations.splice(index, 1)
+  }
 }
 
 /**
@@ -357,7 +331,6 @@ const removeSamplingLocation = (index: number): void => {
  */
 const completeSamplingTask = (): void => {
   console.log('完成采样任务:', props.taskId)
-  console.log('现场检测数据:', fieldData.value)
   taskData.value.status = 'completed'
   taskData.value.statusText = '已完成'
   // TODO: 实现完成采样任务逻辑
