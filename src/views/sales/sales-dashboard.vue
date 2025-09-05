@@ -38,7 +38,7 @@
         <input
           v-model="searchFilters.projectId"
           type="text"
-          class="w-48 rounded-md border border-gray-300 py-2 pl-9 pr-9 text-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-48 rounded-lg border border-gray-300 bg-white px-9 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           placeholder="项目编号精确查询"
         />
         <svg
@@ -68,7 +68,7 @@
         <input
           v-model="searchFilters.customerName"
           type="text"
-          class="w-48 rounded-md border border-gray-300 py-2 pl-9 pr-9 text-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-48 rounded-lg border border-gray-300 bg-white px-9 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           placeholder="客户名称模糊查询"
         />
         <svg
@@ -87,7 +87,7 @@
       <!-- 状态筛选 -->
       <select
         v-model="searchFilters.status"
-        class="cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
       >
         <option value="">全部状态</option>
         <option value="pending">待审核</option>

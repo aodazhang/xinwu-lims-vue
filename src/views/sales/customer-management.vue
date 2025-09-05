@@ -21,7 +21,7 @@
       <input
         v-model="searchKeyword"
         type="text"
-        class="w-64 rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        class="w-64 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
         placeholder="搜索客户名称..."
       />
     </CommonFilter>
@@ -35,7 +35,7 @@
       <!-- 客户编号插槽 -->
       <template #customerIdSlot="{ scope }">
         <button
-          class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors duration-200 cursor-pointer"
+          class="cursor-pointer font-medium text-indigo-600 transition-colors duration-200 hover:text-indigo-800 hover:underline"
           @click="viewCustomer(scope.customerId)"
         >
           {{ scope.customerId }}

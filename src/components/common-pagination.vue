@@ -113,7 +113,7 @@
       <input
         v-model="jumpPage"
         type="number"
-        class="w-16 rounded-md border border-gray-300 p-2 text-center text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+        class="w-16 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
         :min="1"
         :max="totalPages"
         placeholder="页码"

@@ -11,7 +11,7 @@
       <input
         v-model="searchKeyword"
         type="text"
-        class="w-64 rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-64 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
         placeholder="搜索项目编号..."
         @input="handleSearch"
       />
