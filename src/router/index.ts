@@ -114,6 +114,21 @@ const router = createRouter({
           props: route => ({
             taskId: route.query.taskId
           })
+        },
+        {
+          path: '/sample-dashboard',
+          name: 'SampleDashboard',
+          meta: { title: '样品管理工作台' },
+          component: () => import('@/views/sample/sample-dashboard.vue')
+        },
+        {
+          path: '/sample-detail',
+          name: 'SampleDetail',
+          meta: { title: '样品详情' },
+          component: () => import('@/views/sample/sample-detail.vue'),
+          props: route => ({
+            orderId: route.query.orderId
+          })
         }
       ]
     },
