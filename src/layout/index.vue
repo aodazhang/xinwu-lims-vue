@@ -154,12 +154,7 @@ const currentUser = ref('王总')
 const currentRole = ref('admin')
 
 // 计算属性
-const canBack = computed(
-  () =>
-    !['/admin-dashboard', '/sales-dashboard', '/review-dashboard'].includes(
-      route.path
-    )
-)
+const canBack = computed(() => route.path.indexOf('-dashboard') === -1)
 
 const userInitial = computed(() => {
   return currentUser.value.charAt(0).toUpperCase()

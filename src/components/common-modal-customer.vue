@@ -261,6 +261,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
 
+// 定义接口
 interface CustomerForm {
   customerName: string
   contactName: string
@@ -290,11 +291,8 @@ interface FormErrors {
   status: string
 }
 
-// 不再需要 Props，移除 initialData prop
-
-const emit = defineEmits<{
-  refresh: []
-}>()
+// 定义 emits
+const emit = defineEmits<{ refresh: [] }>()
 
 // 内部维护的状态
 const visible = ref(false)

@@ -20,12 +20,15 @@ const router = createRouter({
       component: Layout,
       redirect: '/admin-dashboard',
       children: [
+        // 系统管理
         {
           path: '/admin-dashboard',
           name: 'AdminDashboard',
           meta: { title: '系统管理工作台' },
           component: () => import('@/views/admin/admin-dashboard.vue')
         },
+
+        // 业务管理
         {
           path: '/sales-dashboard',
           name: 'SalesDashboard',
@@ -79,6 +82,14 @@ const router = createRouter({
           props: route => ({
             orderId: route.query.orderId
           })
+        },
+
+        // 现场作业
+        {
+          path: '/sampling-dashboard',
+          name: 'SamplingDashboard',
+          meta: { title: '采样调度工作台' },
+          component: () => import('@/views/sample/sampling-dashboard.vue')
         }
       ]
     },

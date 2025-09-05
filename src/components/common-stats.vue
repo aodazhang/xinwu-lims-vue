@@ -1,6 +1,6 @@
 <template>
   <!-- [公共]列表-统计卡片 -->
-  <ul class="md-grid-13 mt-4 gap-5">
+  <ul class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-3">
     <li
       class="rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
       v-for="(item, index) of model"
