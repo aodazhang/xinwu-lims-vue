@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <common-title
       :title="orderData.orderNumber"
-      content="销售工作台 / 销售订单"
+      content="销售工作台 / 销售订单详情"
     >
       <button
         class="rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg"
@@ -167,7 +167,7 @@ import CommonDetailStatus from '@/components/common-detail-status.vue'
 import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonDetailAttachment from '@/components/common-detail-attachment.vue'
 
-defineOptions({ name: 'OrderDetail' })
+defineOptions({ name: 'SalesDetail' })
 
 const props = defineProps<{ orderId?: string }>()
 
@@ -275,7 +275,7 @@ const attachments = ref([
 function editOrder() {
   // 跳转到编辑页面，传递当前订单ID
   router.push({
-    path: '/create-order',
+    path: '/sales-form',
     query: { orderId: props.orderId }
   })
 }

@@ -505,11 +505,21 @@ const exportCustomerInfo = () => {
 }
 
 const goToOrderDetail = (orderNumber: string) => {
-  router.push({ name: 'OrderDetail', query: { orderId: orderNumber } })
+  router.push({
+    path: '/sales-detail',
+    query: {
+      orderId: orderNumber
+    }
+  })
 }
 
 const showCreateOrder = () => {
-  router.push({ name: 'CreateOrder', query: { customer: customerData.id } })
+  router.push({
+    path: '/sales-form',
+    query: {
+      customer: customerData.id
+    }
+  })
 }
 
 // 生命周期

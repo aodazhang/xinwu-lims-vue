@@ -389,20 +389,20 @@ const manageCustomers = () => {
 const viewOrder = (orderId: number) => {
   // 查看订单详情
   router.push({
-    path: '/order-detail',
+    path: '/sales-detail',
     query: { orderId: orderId.toString() }
   })
 }
 
 const createOrder = () => {
   // 跳转到创建订单页面
-  router.push('/create-order')
+  router.push('/sales-form')
 }
 
 const editOrder = (orderId: number) => {
   // 编辑订单
   router.push({
-    path: '/create-order',
+    path: '/sales-form',
     query: { orderId: orderId.toString() }
   })
 }

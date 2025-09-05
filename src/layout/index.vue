@@ -190,7 +190,7 @@ const getRoleDisplayName = (role: string) => {
 const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {
     // 跳转到登录页
-    router.push('/login')
+    router.replace('/login')
   }
   dropdownOpen.value = false
 }

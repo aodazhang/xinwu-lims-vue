@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <common-title
       :title="taskData.projectNumber"
-      content="采样调度工作台 / 任务详情"
+      content="采样调度工作台 / 采样调度详情"
     >
       <button
         v-if="taskData.status === 'pending'"

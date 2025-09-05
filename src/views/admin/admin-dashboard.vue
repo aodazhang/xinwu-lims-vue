@@ -25,14 +25,14 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
 defineOptions({ name: 'AdminDashboard' })
 
-const router = useRouter()
+// const router = useRouter()
 
 // 跳转到员工管理
 const goToAdminUser = () => {
-  router.push('/')
+  // TODO: 员工管理页面
 }
 </script>

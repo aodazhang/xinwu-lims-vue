@@ -3,7 +3,7 @@
     <!-- 订单头部信息 -->
     <common-title
       :title="orderData.orderNumber"
-      content="订单审核工作台 / 订单审核"
+      content="订单审核工作台 / 订单审核详情"
     />
 
     <!-- 信息卡片 -->
@@ -255,7 +255,7 @@ const fetchOrderData = async () => {
 const approveOrder = () => {
   if (confirm('确定要通过该订单的审核吗？')) {
     alert('订单审核已通过！')
-    router.push('/review-dashboard')
+    router.go(-1)
   }
 }
 

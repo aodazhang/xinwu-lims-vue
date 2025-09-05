@@ -363,7 +363,7 @@ const openAdjustModal = (task: Task) => {
 const viewTaskDetail = (taskId: string) => {
   // 跳转到详情页面，通过query参数传递taskId
   router.push({
-    name: 'SamplingDetail',
+    path: '/sampling-detail',
     query: {
       taskId
     }

@@ -353,7 +353,7 @@ const applyFilters = () => {
 const viewOrderDetail = (orderId: string) => {
   // 跳转到订单详情页面
   router.push({
-    path: '/order-review',
+    path: '/review-detail',
     query: {
       orderId
     }

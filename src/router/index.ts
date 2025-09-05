@@ -36,19 +36,19 @@ const router = createRouter({
           component: () => import('@/views/sales/sales-dashboard.vue')
         },
         {
-          path: '/create-order',
-          name: 'CreateOrder',
-          meta: { title: '销售订单' },
-          component: () => import('@/views/sales/create-order.vue'),
+          path: '/sales-detail',
+          name: 'SalesDetail',
+          meta: { title: '销售订单详情' },
+          component: () => import('@/views/sales/sales-detail.vue'),
           props: route => ({
             orderId: route.query.orderId
           })
         },
         {
-          path: '/order-detail',
-          name: 'OrderDetail',
+          path: '/sales-form',
+          name: 'SalesForm',
           meta: { title: '销售订单' },
-          component: () => import('@/views/sales/order-detail.vue'),
+          component: () => import('@/views/sales/sales-form.vue'),
           props: route => ({
             orderId: route.query.orderId
           })
@@ -75,10 +75,10 @@ const router = createRouter({
           component: () => import('@/views/sales/review-dashboard.vue')
         },
         {
-          path: '/order-review',
-          name: 'OrderReview',
-          meta: { title: '订单审核' },
-          component: () => import('@/views/sales/order-review.vue'),
+          path: '/review-detail',
+          name: 'ReviewDetail',
+          meta: { title: '订单审核详情' },
+          component: () => import('@/views/sales/review-detail.vue'),
           props: route => ({
             orderId: route.query.orderId
           })
@@ -94,7 +94,7 @@ const router = createRouter({
         {
           path: '/sampling-detail',
           name: 'SamplingDetail',
-          meta: { title: '采样任务详情' },
+          meta: { title: '采样调度详情' },
           component: () => import('@/views/sample/sampling-detail.vue'),
           props: route => ({
             taskId: route.query.taskId
@@ -109,7 +109,7 @@ const router = createRouter({
         {
           path: '/sampler-detail',
           name: 'SamplerDetail',
-          meta: { title: '采样任务详情' },
+          meta: { title: '采样详情' },
           component: () => import('@/views/sample/sampler-detail.vue'),
           props: route => ({
             taskId: route.query.taskId

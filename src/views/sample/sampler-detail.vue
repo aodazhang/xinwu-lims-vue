@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading">
     <!-- 页面头部 -->
-    <common-title :title="taskData.taskId" content="采样工作台 / 采样任务详情">
+    <common-title :title="taskData.taskId" content="采样工作台 / 采样详情">
       <button
         v-if="taskData.status === 'pending'"
         @click="startSamplingTask"

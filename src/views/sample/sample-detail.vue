@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <common-title
       :title="orderData.orderId"
-      content="样品管理工作台 / 样品接收详情"
+      content="样品管理工作台 / 样品详情"
     >
       <button
         class="flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-600 px-5 py-2 text-white transition-all hover:from-green-600 hover:to-emerald-700"
