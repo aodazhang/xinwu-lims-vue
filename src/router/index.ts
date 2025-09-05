@@ -99,6 +99,12 @@ const router = createRouter({
           props: route => ({
             taskId: route.query.taskId
           })
+        },
+        {
+          path: '/sampler-dashboard',
+          name: 'SamplerDashboard',
+          meta: { title: '采样工作台' },
+          component: () => import('@/views/sample/sampler-dashboard.vue')
         }
       ]
     },
