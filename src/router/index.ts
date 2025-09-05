@@ -90,6 +90,15 @@ const router = createRouter({
           name: 'SamplingDashboard',
           meta: { title: '采样调度工作台' },
           component: () => import('@/views/sample/sampling-dashboard.vue')
+        },
+        {
+          path: '/sampling-detail',
+          name: 'SamplingDetail',
+          meta: { title: '采样任务详情' },
+          component: () => import('@/views/sample/sampling-detail.vue'),
+          props: route => ({
+            taskId: route.query.taskId
+          })
         }
       ]
     },

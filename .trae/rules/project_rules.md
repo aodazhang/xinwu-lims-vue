@@ -101,21 +101,21 @@ types/               # 全局类型定义
 
 ## 4.代码编写规范
 
-### 命名规范
+### 代码命名
 
 1. **js/ts 变量名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
 2. **js/ts 常量名**: 使用 `UPPER_SNAKE_CASE` (大写下划线命名)，例如 `USER_PROFILE`
 3. **js/ts 函数名**: 使用 `camelCase` (小驼峰命名)，例如 `getUserProfile`
-4. **vue 组件名**: 使用 `PascalCase` (大驼峰命名)，例如 `UserProfile`
+4. **vue 组件名**: 使用 `kebab-case` (大驼峰命名)，例如 `user-profile.vue`、`<user-profile />`
 5. **vue props 属性名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
 6. **vue 事件名**: 使用 `kebab-case` (短横线命名)，例如 `@user-profile-click`
 
-### 注释规范
+### 代码注释
 
 1. **js/ts 注释**: 函数使用 JSDoc 注释，解释其功能、参数和返回值，例如 `/** @param {string} name - 用户名 */`
 2. **临时注释**: 未实现功能代码使用 `// TODO:` 标记，例如 `// TODO: 实现用户登录功能`
 
-### Vue 文件结构
+### Vue 组件
 
 1. **结构顺序**: 按照模板、脚本、样式的固定结构顺序创建 vue 文件，例如：
 
@@ -154,8 +154,9 @@ import { CommentModel } from '@/model'
 import UserProfile from './components/user-profile.vue'
 ```
 
-3. **组件规范**: 使用 Composition API 并遵循 `<script setup lang="ts">` 语法
-4. **Props 规范**: 使用 `defineProps` 定义 props 并通过 ts 定义 props 类型，使用 `defineEmits` 定义事件并通过 ts 定义事件类型
+3. **语法规范**: 使用 Composition API 并遵循 `<script setup lang="ts">` 语法
+4. **props 规范**: 使用 `defineProps` 定义 props 并通过 ts 定义 props 类型，使用 `defineEmits` 定义事件并通过 ts 定义事件类型
+5. **常用方法**: 使用 `loadDataList` 方法定义列表数据查询，使用 `loadDataDetail` 方法定义详情数据查询，使用 `loadDataSave` 方法定义详情数据提交
 
 ## 5.CSS 样式规范
 
@@ -165,7 +166,7 @@ import UserProfile from './components/user-profile.vue'
 
 ### 工具和组件库
 
-1. **css 样式**：使用 tailwindcss 编写移动优先的样式，响应式只考虑 `md:` 断点（>= 768px）
+1. **css 样式**：使用 tailwindcss 编写移动优先的样式，只考虑 `md:` 断点（>= 768px）
 
 ## 6.性能优化规范
 

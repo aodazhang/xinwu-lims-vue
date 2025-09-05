@@ -170,11 +170,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 import CommonModalTask from '@/components/common-modal-task.vue'
+
+// 路由实例
+const router = useRouter()
 
 // 接口定义
 interface Task {
@@ -357,8 +361,13 @@ const openAdjustModal = (task: Task) => {
 }
 
 const viewTaskDetail = (taskId: string) => {
-  // 跳转到详情页面
-  console.log('查看任务详情:', taskId)
+  // 跳转到详情页面，通过query参数传递taskId
+  router.push({
+    name: 'SamplingDetail',
+    query: {
+      taskId
+    }
+  })
 }
 
 // 模拟 API 请求函数
