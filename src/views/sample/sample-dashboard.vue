@@ -74,13 +74,12 @@
 
       <!-- 操作列插槽 -->
       <template #actions="{ scope }">
-        <el-button
-          type="primary"
-          size="small"
+        <button
+          class="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30"
           @click="viewOrderDetail(scope.id)"
         >
           查看详情
-        </el-button>
+        </button>
       </template>
     </common-table>
   </div>
