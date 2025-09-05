@@ -29,7 +29,8 @@
     <common-table
       :config="tableConfig"
       :items="tableColumns"
-      :model="paginatedOrders"
+      :model="filteredOrders"
+      @current-change="loadOrdersData"
     >
       <!-- 订单号列 -->
       <template #orderIdSlot="{ scope }">
@@ -90,13 +91,6 @@
       </template>
     </common-table>
 
-    <!-- 分页控件 -->
-    <common-pagination
-      :total="filteredOrders.length"
-      :current="currentPage"
-      @current-change="handlePageChange"
-    />
-
     <!-- 驳回弹窗 -->
     <common-modal-reject ref="rejectModalRef" @refresh="loadOrdersData" />
   </div>
@@ -108,7 +102,6 @@ import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
-import CommonPagination from '@/components/common-pagination.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonModalReject from '@/components/common-modal-reject.vue'
 
@@ -128,10 +121,8 @@ const router = useRouter()
 // 响应式数据
 const allOrders = ref<Order[]>([])
 const filteredOrders = ref<Order[]>([])
-const currentPage = ref(1)
 const searchKeyword = ref('')
 const urgentOnly = ref(false)
-const tableLoading = ref(false)
 const rejectModalRef = ref<InstanceType<typeof CommonModalReject> | null>(null)
 
 // 统计数据
@@ -151,11 +142,14 @@ const statsData = computed(() => [
 ])
 
 // 表格配置
-const tableConfig = computed(() => ({
+const tableConfig = ref({
   rowKey: 'id',
   selection: false,
-  loading: tableLoading.value
-}))
+  loading: false,
+  pagination: true,
+  total: 0,
+  current: 1
+})
 
 // 表格列配置
 const tableColumns = [
@@ -201,13 +195,6 @@ const tableColumns = [
     slotName: 'actionSlot'
   }
 ]
-
-// 分页计算
-const paginatedOrders = computed(() => {
-  const start = (currentPage.value - 1) * 10
-  const end = start + 10
-  return filteredOrders.value.slice(start, end)
-})
 
 // 生成测试数据
 const generateTestOrders = (): Order[] => {
@@ -360,12 +347,6 @@ const applyFilters = () => {
   }
 
   filteredOrders.value = filtered
-  currentPage.value = 1
-}
-
-// 分页方法
-const handlePageChange = (page: number) => {
-  currentPage.value = page
 }
 
 // 订单操作
@@ -401,17 +382,18 @@ const rejectOrder = (orderId: string) => {
 // 加载订单数据
 const loadOrdersData = async () => {
   try {
-    tableLoading.value = true
+    tableConfig.value.loading = true
     // 模拟网络请求延迟
     await new Promise(resolve =>
       setTimeout(resolve, 1000 + Math.random() * 1000)
     )
     allOrders.value = generateTestOrders()
     applyFilters()
+    tableConfig.value.total = filteredOrders.value.length
   } catch (error) {
     console.error('加载订单数据失败:', error)
   } finally {
-    tableLoading.value = false
+    tableConfig.value.loading = false
   }
 }
 

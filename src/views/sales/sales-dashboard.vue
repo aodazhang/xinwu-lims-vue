@@ -23,7 +23,7 @@
     </div>
 
     <!-- 筛选 -->
-    <common-filter title="订单列表" @filter="performSearch">
+    <common-filter title="订单列表" @filter="loadDataList">
       <!-- 项目编号搜索 -->
       <div class="relative">
         <svg
@@ -102,7 +102,8 @@
     <common-table
       :config="tableConfig"
       :items="tableColumns"
-      :model="paginatedOrders"
+      :model="filteredOrders"
+      @current-change="loadDataList"
     >
       <!-- 项目编号列 -->
       <template #projectId="{ scope }">
@@ -154,39 +155,30 @@
         </div>
       </template>
     </common-table>
-
-    <!-- 分页控件 -->
-    <common-pagination
-      :total="totalRecords"
-      :current="currentPage"
-      @current-change="handlePageChange"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
-import CommonPagination from '@/components/common-pagination.vue'
 
 defineOptions({ name: 'SalesDashboard' })
 
 const router = useRouter()
 
-// 响应式数据
-const loading = ref(false)
-const currentPage = ref(1)
-const pageSize = ref(10)
-
 // 表格配置
-const tableConfig = {
+const tableConfig = ref({
   rowKey: 'id',
-  selection: false
-}
+  loading: false,
+  selection: false,
+  pagination: true,
+  total: 0,
+  current: 1
+})
 
 // 表格列配置
 const tableColumns = [
@@ -364,31 +356,6 @@ const statsData = computed(() => [
   }
 ])
 
-// 分页相关计算属性
-const totalRecords = computed(() => filteredOrders.value.length)
-
-// 当前页显示的订单
-const paginatedOrders = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredOrders.value.slice(start, end)
-})
-
-// 方法
-const performSearch = () => {
-  loading.value = true
-  currentPage.value = 1
-
-  // 模拟搜索延迟
-  setTimeout(() => {
-    loading.value = false
-  }, 500)
-}
-
-const handlePageChange = (page: number) => {
-  currentPage.value = page
-}
-
 const getStatusClass = (status: string) => {
   const statusClasses = {
     pending: 'bg-yellow-100 text-yellow-800',
@@ -440,21 +407,24 @@ const editOrder = (orderId: number) => {
   })
 }
 
-// 监听搜索条件变化，自动搜索
-watch(
-  () => [
-    searchFilters.value.projectId,
-    searchFilters.value.customerName,
-    searchFilters.value.status
-  ],
-  () => {
-    currentPage.value = 1
-  },
-  { deep: true }
-)
+const loadDataList = async () => {
+  try {
+    tableConfig.value.loading = true
+    // 模拟网络请求延迟
+    await new Promise(resolve =>
+      setTimeout(resolve, 1000 + Math.random() * 1000)
+    )
+    tableConfig.value.total = filteredOrders.value.length
+  } catch (error) {
+    console.error('加载数据失败:', error)
+  } finally {
+    tableConfig.value.loading = false
+  }
+}
 
 // 组件挂载时初始化数据
 onMounted(() => {
   // 可以在这里调用API获取真实数据
+  loadDataList()
 })
 </script>

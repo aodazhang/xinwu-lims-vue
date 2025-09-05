@@ -147,10 +147,11 @@ const customers = ref([
 ])
 
 // 表格配置
-const tableConfig = {
+const tableConfig = ref({
   rowKey: 'customerId',
-  selection: false
-}
+  selection: false,
+  pagination: false
+})
 
 // 表格列配置
 const tableColumns = [
