@@ -1,10 +1,10 @@
 <template>
   <div>
     <!-- 页面头部 -->
-    <CommonTitle title="客户管理" content="销售工作台 / 客户管理" />
+    <common-title title="客户管理" content="销售工作台 / 客户管理" />
 
     <!-- 统计卡片 -->
-    <CommonStats :model="statsData" />
+    <common-stats :model="statsData" />
 
     <!-- 操作按钮 -->
     <div class="mt-5 flex flex-wrap gap-4">

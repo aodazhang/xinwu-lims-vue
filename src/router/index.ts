@@ -27,6 +27,12 @@ const router = createRouter({
           meta: { title: '系统管理工作台' },
           component: () => import('@/views/admin/admin-dashboard.vue')
         },
+        {
+          path: '/user-management',
+          name: 'UserManagement',
+          meta: { title: '用户管理' },
+          component: () => import('@/views/admin/user-management.vue')
+        },
 
         // 业务管理
         {
