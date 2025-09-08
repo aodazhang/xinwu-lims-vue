@@ -4,11 +4,10 @@
 
 ### 核心框架
 
-1. **编辑器**: 使用 Visual Studio Code
-2. **框架**: 使用 Vue (>=3)
-3. **语言**: 使用 TypeScript (>=5)
-4. **包管理**: 使用 pnpm (>=9)
-5. **Node**: 使用 LTS 版本 (>=20)
+1. **框架**: 使用 Vue (>=3)
+2. **语言**: 使用 TypeScript (>=5)
+3. **包管理**: 使用 pnpm (>=9)
+4. **Node**: 使用 LTS 版本 (>=20)
 
 ### 开发工具链
 
@@ -106,9 +105,12 @@ types/               # 全局类型定义
 1. **js/ts 变量名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
 2. **js/ts 常量名**: 使用 `UPPER_SNAKE_CASE` (大写下划线命名)，例如 `USER_PROFILE`
 3. **js/ts 函数名**: 使用 `camelCase` (小驼峰命名)，例如 `getUserProfile`
-4. **vue 组件名**: 使用 `kebab-case` (大驼峰命名)，例如 `user-profile.vue`、`<user-profile />`
-5. **vue props 属性名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
-6. **vue 事件名**: 使用 `kebab-case` (短横线命名)，例如 `@user-profile-click`
+4. **ts 接口名**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
+5. **ts 类型名**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
+6. **ts 枚举**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
+7. **vue 组件引用**: 使用 `kebab-case` (短横线命名)，例如 `<user-profile />`
+8. **vue props 属性名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
+9. **vue 事件名**: 使用 `kebab-case` (短横线命名)，例如 `@user-profile-click`
 
 ### 代码注释
 
@@ -121,10 +123,24 @@ types/               # 全局类型定义
 
 ```vue
 <!-- 1.模板 html -->
-<template></template>
+<template>
+  <div></div>
+</template>
 
 <!-- 2.脚本 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// Props
+const props = defineProps<{ id?: string }>()
+
+// Event
+const emit = defineEmits<{
+  refresh: []
+  change: [page: number]
+}>()
+
+// 对外暴露方法
+defineExpose({ open, close })
+</script>
 
 <!-- 3.样式 -->
 <style lang="scss" scoped></style>
@@ -169,11 +185,3 @@ import UserProfile from './components/user-profile.vue'
 ### 工具和组件库
 
 1. **css 样式**：使用 tailwindcss 编写移动优先的样式，只考虑 `md:` 断点（>= 768px）
-
-## 6.性能优化规范
-
-### 资源优化
-
-1. 图片压缩: 控制单张图片 < 500KB
-2. 图片格式: 优先使用 WebP
-3. 图片懒加载: 长列表使用懒加载
