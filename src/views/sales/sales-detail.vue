@@ -130,7 +130,7 @@
 
         <!-- 订单进度 -->
         <common-detail-card title="订单进度">
-          <common-detail-timeline :items="timelineItems" />
+          <common-detail-timeline :items="orderData.timelineItems" />
         </common-detail-card>
       </div>
 
@@ -140,17 +140,17 @@
         <common-detail-status
           :status="orderData.status"
           :status-text="orderData.statusText"
-          :details="statusDetails"
+          :details="orderData.statusDetails"
         />
 
         <!-- 相关人员 -->
         <common-detail-card title="相关人员">
-          <common-detail-person :persons="relatedPersons" />
+          <common-detail-person :persons="orderData.relatedPersons" />
         </common-detail-card>
 
         <!-- 相关附件 -->
         <common-detail-card title="相关附件">
-          <common-detail-attachment :attachments="attachments" />
+          <common-detail-attachment :attachments="orderData.attachments" />
         </common-detail-card>
       </div>
     </div>
@@ -177,7 +177,7 @@ const router = useRouter()
 const loading = ref(false)
 
 // 订单数据
-const orderData = ref({
+const orderData = ref<SalesOrder>({
   orderNumber: 'XW250903-100',
   urgent: true,
   customerName: '广州环保科技有限公司',
@@ -196,78 +196,70 @@ const orderData = ref({
   remark:
     '客户要求尽快出报告，需要优先处理。检测区域为新装修办公室，重点关注甲醛和TVOC指标。',
   status: 'sampling' as const,
-  statusText: '采样中'
+  statusText: '采样中',
+  statusDetails: [{ label: '当前阶段', value: '采样执行' }],
+  timelineItems: [
+    {
+      title: '订单创建',
+      description: '销售人员：张三',
+      time: '2025-09-03 09:15',
+      status: 'completed' as const
+    },
+    {
+      title: '订单审核通过',
+      description: '审核人员：李四',
+      time: '2025-09-03 10:30',
+      status: 'completed' as const
+    },
+    {
+      title: '采样任务分派',
+      description: '调度员：王五 | 采样员：赵六',
+      time: '2025-09-03 11:00',
+      status: 'completed' as const
+    },
+    {
+      title: '采样执行中',
+      description: '预计完成时间：2025-09-04 15:00',
+      time: '进行中',
+      status: 'pending' as const
+    },
+    {
+      title: '样品接收',
+      description: '等待采样完成',
+      time: '',
+      status: 'pending' as const
+    },
+    {
+      title: '实验室检测',
+      description: '等待样品接收',
+      time: '',
+      status: 'pending' as const
+    },
+    {
+      title: '报告生成',
+      description: '等待检测完成',
+      time: '',
+      status: 'pending' as const
+    },
+    {
+      title: '报告交付',
+      description: '等待报告审批',
+      time: '',
+      status: 'pending' as const
+    }
+  ],
+  relatedPersons: [
+    { name: '张三', role: '销售人员' },
+    { name: '李四', role: '订单审核员' },
+    { name: '王五', role: '采样调度员' },
+    { name: '赵六', role: '采样人员' }
+  ],
+  attachments: [
+    { name: '检测委托单.pdf', size: '1.2 MB' },
+    { name: '现场照片.jpg', size: '2.5 MB' },
+    { name: '客户要求说明.docx', size: '56 KB' }
+  ]
 })
-
-// 状态详情
-const statusDetails = ref([{ label: '当前阶段', value: '采样执行' }])
-
-// 时间轴数据
-const timelineItems = ref([
-  {
-    title: '订单创建',
-    description: '销售人员：张三',
-    time: '2025-09-03 09:15',
-    status: 'completed' as const
-  },
-  {
-    title: '订单审核通过',
-    description: '审核人员：李四',
-    time: '2025-09-03 10:30',
-    status: 'completed' as const
-  },
-  {
-    title: '采样任务分派',
-    description: '调度员：王五 | 采样员：赵六',
-    time: '2025-09-03 11:00',
-    status: 'completed' as const
-  },
-  {
-    title: '采样执行中',
-    description: '预计完成时间：2025-09-04 15:00',
-    time: '进行中',
-    status: 'pending' as const
-  },
-  {
-    title: '样品接收',
-    description: '等待采样完成',
-    time: '',
-    status: 'pending' as const
-  },
-  {
-    title: '实验室检测',
-    description: '等待样品接收',
-    time: '',
-    status: 'pending' as const
-  },
-  {
-    title: '报告生成',
-    description: '等待检测完成',
-    time: '',
-    status: 'pending' as const
-  },
-  {
-    title: '报告交付',
-    description: '等待报告审批',
-    time: '',
-    status: 'pending' as const
-  }
-])
-
-// 相关人员
-const relatedPersons = ref([
-  { name: '张三', role: '销售人员' },
-  { name: '李四', role: '订单审核员' },
-  { name: '王五', role: '采样调度员' },
-  { name: '赵六', role: '采样人员' }
-])
-
-// 附件列表
-const attachments = ref([
-  { name: '检测委托单.pdf', size: '1.2 MB' },
-  { name: '现场照片.jpg', size: '2.5 MB' },
-  { name: '客户要求说明.docx', size: '56 KB' }
-])
 
 /**
  * 编辑订单
@@ -298,21 +290,11 @@ async function loadOrderData() {
 
   try {
     console.log('加载订单数据:', props.orderId)
-    // TODO: 实现从API加载订单数据的逻辑
-    // const response = await api.getOrderDetail(id)
-    // orderData.value = response.data
 
     // 模拟API请求
     await new Promise(resolve => setTimeout(resolve, 500))
-
-    // 这里可以根据实际API返回的数据更新 orderData
-    // orderData.value = {
-    //   ...orderData.value,
-    //   ...response.data
-    // }
   } catch (error) {
     console.error('加载订单数据失败:', error)
-    // TODO: 显示错误提示
   } finally {
     loading.value = false
   }

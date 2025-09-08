@@ -102,7 +102,7 @@
     <common-table
       :config="tableConfig"
       :items="tableColumns"
-      :model="filteredOrders"
+      :model="orders"
       @current-change="loadDataList"
     >
       <!-- 项目编号列 -->
@@ -171,7 +171,7 @@ defineOptions({ name: 'SalesDashboard' })
 const router = useRouter()
 
 // 表格配置
-const tableConfig = ref({
+const tableConfig = ref<TableConfig>({
   rowKey: 'id',
   loading: false,
   selection: false,
@@ -181,7 +181,7 @@ const tableConfig = ref({
 })
 
 // 表格列配置
-const tableColumns = [
+const tableColumns: TableColumn[] = [
   {
     label: '项目编号',
     props: 'projectId',
@@ -207,7 +207,7 @@ const tableColumns = [
     label: '检测点数',
     props: 'testPoints',
     minWidth: 80,
-    align: 'center' as const
+    align: 'center'
   },
   {
     label: '项目金额',
@@ -252,93 +252,7 @@ const searchFilters = ref({
 })
 
 // 所有订单数据
-const allOrders = ref([
-  {
-    id: 1,
-    projectId: 'XW-2024-001',
-    customerName: '广州环保科技有限公司',
-    inspectedUnit: '广州某工厂',
-    testType: '水质检测',
-    testPoints: 5,
-    amount: 12800,
-    status: 'pending',
-    createTime: '2024-01-15',
-    urgent: true
-  },
-  {
-    id: 2,
-    projectId: 'XW-2024-002',
-    customerName: '深圳科技发展有限公司',
-    inspectedUnit: '深圳某园区',
-    testType: '土壤检测',
-    testPoints: 8,
-    amount: 25600,
-    status: 'approved',
-    createTime: '2024-01-14',
-    urgent: false
-  },
-  {
-    id: 3,
-    projectId: 'XW-2024-003',
-    customerName: '东莞制造业集团',
-    inspectedUnit: '东莞某车间',
-    testType: '噪声检测',
-    testPoints: 12,
-    amount: 18900,
-    status: 'sampling',
-    createTime: '2024-01-13',
-    urgent: false
-  },
-  {
-    id: 4,
-    projectId: 'XW-2024-004',
-    customerName: '佛山环境工程公司',
-    inspectedUnit: '佛山某厂区',
-    testType: '大气检测',
-    testPoints: 6,
-    amount: 15200,
-    status: 'testing',
-    createTime: '2024-01-12',
-    urgent: true
-  },
-  {
-    id: 5,
-    projectId: 'XW-2024-005',
-    customerName: '中山工业园区',
-    inspectedUnit: '中山某企业',
-    testType: '综合检测',
-    testPoints: 15,
-    amount: 38500,
-    status: 'completed',
-    createTime: '2024-01-11',
-    urgent: false
-  }
-])
-
-// 过滤后的订单数据
-const filteredOrders = computed(() => {
-  let filtered = allOrders.value
-
-  if (searchFilters.value.projectId) {
-    filtered = filtered.filter(order =>
-      order.projectId.includes(searchFilters.value.projectId)
-    )
-  }
-
-  if (searchFilters.value.customerName) {
-    filtered = filtered.filter(order =>
-      order.customerName.includes(searchFilters.value.customerName)
-    )
-  }
-
-  if (searchFilters.value.status) {
-    filtered = filtered.filter(
-      order => order.status === searchFilters.value.status
-    )
-  }
-
-  return filtered
-})
+const orders = ref<SalesOrder[]>([])
 
 // 统计数据适配公共组件
 const statsData = computed(() => [
@@ -386,14 +300,6 @@ const manageCustomers = () => {
   router.push('/customer-management')
 }
 
-const viewOrder = (orderId: number) => {
-  // 查看订单详情
-  router.push({
-    path: '/sales-detail',
-    query: { orderId: orderId.toString() }
-  })
-}
-
 const createOrder = () => {
   // 跳转到创建订单页面
   router.push('/sales-form')
@@ -407,6 +313,14 @@ const editOrder = (orderId: number) => {
   })
 }
 
+const viewOrder = (orderId: number) => {
+  // 查看订单详情
+  router.push({
+    path: '/sales-detail',
+    query: { orderId: orderId.toString() }
+  })
+}
+
 const loadDataList = async () => {
   try {
     tableConfig.value.loading = true
@@ -414,7 +328,69 @@ const loadDataList = async () => {
     await new Promise(resolve =>
       setTimeout(resolve, 1000 + Math.random() * 1000)
     )
-    tableConfig.value.total = filteredOrders.value.length
+    orders.value = [
+      {
+        id: 1,
+        projectId: 'XW-2024-001',
+        customerName: '广州环保科技有限公司',
+        inspectedUnit: '广州某工厂',
+        testType: '水质检测',
+        testPoints: 5,
+        amount: 12800,
+        status: 'pending',
+        createTime: '2024-01-15',
+        urgent: true
+      },
+      {
+        id: 2,
+        projectId: 'XW-2024-002',
+        customerName: '深圳科技发展有限公司',
+        inspectedUnit: '深圳某园区',
+        testType: '土壤检测',
+        testPoints: 8,
+        amount: 25600,
+        status: 'approved',
+        createTime: '2024-01-14',
+        urgent: false
+      },
+      {
+        id: 3,
+        projectId: 'XW-2024-003',
+        customerName: '东莞制造业集团',
+        inspectedUnit: '东莞某车间',
+        testType: '噪声检测',
+        testPoints: 12,
+        amount: 18900,
+        status: 'sampling',
+        createTime: '2024-01-13',
+        urgent: false
+      },
+      {
+        id: 4,
+        projectId: 'XW-2024-004',
+        customerName: '佛山环境工程公司',
+        inspectedUnit: '佛山某厂区',
+        testType: '大气检测',
+        testPoints: 6,
+        amount: 15200,
+        status: 'testing',
+        createTime: '2024-01-12',
+        urgent: true
+      },
+      {
+        id: 5,
+        projectId: 'XW-2024-005',
+        customerName: '中山工业园区',
+        inspectedUnit: '中山某企业',
+        testType: '综合检测',
+        testPoints: 15,
+        amount: 38500,
+        status: 'completed',
+        createTime: '2024-01-11',
+        urgent: false
+      }
+    ]
+    tableConfig.value.total = orders.value.length
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {

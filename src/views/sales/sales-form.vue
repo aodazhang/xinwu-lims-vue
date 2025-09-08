@@ -427,7 +427,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonFormSection from '@/components/common-form-section.vue'
@@ -438,7 +438,7 @@ const props = defineProps<{ orderId?: string }>()
 const router = useRouter()
 
 // 表单验证错误
-const errors = reactive<Record<string, string>>({})
+const errors = ref<Record<string, string>>({})
 
 // 加载状态
 const loading = ref(false)
@@ -446,7 +446,14 @@ const loading = ref(false)
 // 表单验证规则
 const validationRules: Record<
   string,
-  { required: boolean; message: string; min?: number }
+  {
+    /** 是否必填 */
+    required: boolean
+    /** 验证失败消息 */
+    message: string
+    /** 最小值（用于数字类型） */
+    min?: number
+  }
 > = {
   orderType: { required: true, message: '请选择订单类型' },
   customerName: { required: true, message: '请选择客户' },
@@ -460,7 +467,7 @@ const validationRules: Record<
 }
 
 // 表单数据
-const formData = ref({
+const formData = ref<SalesOrder>({
   orderType: '',
   urgent: 'no',
   customerName: '',
@@ -519,16 +526,16 @@ function validateField(field: string) {
   const value = formData.value[field as keyof typeof formData.value]
 
   if (rule.required && (!value || value === '')) {
-    errors[field] = rule.message
+    errors.value[field] = rule.message
     return false
   }
 
   if (rule.min !== undefined && typeof value === 'number' && value < rule.min) {
-    errors[field] = rule.message
+    errors.value[field] = rule.message
     return false
   }
 
-  delete errors[field]
+  delete errors.value[field]
   return true
 }
 
@@ -557,20 +564,16 @@ function openCustomerModal() {
  */
 function updateTestItems() {
   formData.value.testContent = ''
-  delete errors.testContent
+  delete errors.value.testContent
 }
 
 /**
  * 选择客户
  * @param customer 客户信息
  */
-function selectCustomer(customer: {
-  id: number
-  name: string
-  contact: string
-}) {
+function selectCustomer(customer: SalesCustomer) {
   formData.value.customerName = customer.name
-  delete errors.customerName
+  delete errors.value.customerName
 }
 
 /**
@@ -658,7 +661,7 @@ function handleCancel() {
  */
 function handleSubmit() {
   if (!validateAllFields()) {
-    console.log('表单验证失败:', errors)
+    console.log('表单验证失败:', errors.value)
     return
   }
 

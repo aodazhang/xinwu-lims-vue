@@ -30,7 +30,11 @@
                 @click="handleSelect(customer)"
               >
                 <div class="font-medium text-gray-800">{{ customer.name }}</div>
-                <div class="text-xs text-gray-500">{{ customer.contact }}</div>
+                <div class="text-xs text-gray-500">
+                  联系人：{{ customer.contactName }} | 电话：{{
+                    customer.contactPhone
+                  }}
+                </div>
               </div>
             </div>
           </div>
@@ -53,52 +57,71 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-interface Customer {
-  id: number
-  name: string
-  contact: string
-}
-
-const emit = defineEmits<{ select: [customer: Customer] }>()
+const emit = defineEmits<{ select: [customer: SalesCustomer] }>()
 
 // 内部维护的状态
 const visible = ref(false)
-const customers = ref<Customer[]>([])
+const customers = ref<SalesCustomer[]>([])
 const loading = ref(false)
 
 /**
  * 模拟获取客户数据的API请求
  */
-const fetchCustomers = async (): Promise<Customer[]> => {
+const fetchCustomers = async (): Promise<SalesCustomer[]> => {
   // 模拟API延迟
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   // 模拟返回客户数据
   return [
     {
-      id: 1,
+      id: '1',
       name: '广州环保科技有限公司',
-      contact: '联系人：王经理 | 电话：13800138001'
+      contactName: '王经理',
+      contactPhone: '13800138001',
+      address: '广州市天河区科技园',
+      category: '个体户',
+      source: '网络推广',
+      status: 'active'
     },
     {
-      id: 2,
+      id: '2',
       name: '深圳创新工业园',
-      contact: '联系人：李主任 | 电话：13800138002'
+      contactName: '李主任',
+      contactPhone: '13800138002',
+      address: '深圳市南山区科技园B区',
+      category: '渠道',
+      source: '渠道',
+      status: 'active'
     },
     {
-      id: 3,
+      id: '3',
       name: '佛山制造企业',
-      contact: '联系人：张总 | 电话：13800138003'
+      contactName: '张总',
+      contactPhone: '13800138003',
+      address: '佛山市顺德区工业园',
+      category: '个体户',
+      source: '转介绍',
+      status: 'following'
     },
     {
-      id: 4,
+      id: '4',
       name: '东莞电子厂',
-      contact: '联系人：刘经理 | 电话：13800138004'
+      contactName: '刘经理',
+      contactPhone: '13800138004',
+      address: '东莞市松山湖高新区',
+      category: '个体户',
+      source: '电话营销',
+      status: 'active'
     },
     {
-      id: 5,
+      id: '5',
       name: '惠州化工园区',
-      contact: '联系人：陈主管 | 电话：13800138005'
+      contactName: '陈主管',
+      contactPhone: '13800138005',
+      address: '惠州市大亚湾石化区',
+      category: '渠道',
+      source: '展会',
+      status: 'public'
     }
   ]
 }
@@ -132,7 +155,7 @@ const close = () => {
  * 处理客户选择
  * @param customer 客户信息
  */
-function handleSelect(customer: Customer) {
+function handleSelect(customer: SalesCustomer) {
   emit('select', customer)
   close()
 }

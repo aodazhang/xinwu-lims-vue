@@ -5,6 +5,64 @@
 declare global {
   // ==================== 业务管理 ====================
 
+  /** 销售订单 */
+  interface SalesOrder {
+    /** 订单ID */
+    id?: number
+    /** 项目编号 */
+    projectId?: string
+    /** 订单编号 */
+    orderNumber?: string
+    /** 是否紧急订单 */
+    urgent: boolean | 'yes' | 'no'
+    /** 客户名称 */
+    customerName: string
+    /** 客户联系人 */
+    customerContact?: string
+    /** 客户联系电话 */
+    customerPhone?: string
+    /** 受检单位 */
+    inspectedUnit?: string
+    /** 受检单位 */
+    inspectionUnit?: string
+    /** 项目金额 */
+    amount?: number
+    /** 项目金额 */
+    projectAmount?: number | null
+    /** 实收金额 */
+    receivedAmount?: number | null
+    /** 创建时间 */
+    createTime?: string
+    /** 采样地址 */
+    samplingAddress?: string
+    /** 检测点数 */
+    testPoints: number | null
+    /** 检测类型 */
+    testType: string
+    /** 检测内容 */
+    testContent?: string
+    /** 服务类型 */
+    serviceType?: string
+    /** 订单类型 */
+    orderType?: string
+    /** 备注 */
+    remark?: string
+    /** 销售备注 */
+    salesRemark?: string
+    /** 订单状态 */
+    status?: 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
+    /** 状态文本 */
+    statusText?: string
+    /** 状态详情 */
+    statusDetails?: StatusDetailItem[]
+    /** 时间轴项目 */
+    timelineItems?: TimelineItem[]
+    /** 相关人员 */
+    relatedPersons?: RelatedPerson[]
+    /** 附件列表 */
+    attachments?: AttachmentInfo[]
+  }
+
   /** 销售客户 */
   interface SalesCustomer {
     /** 客户ID/编号 */
