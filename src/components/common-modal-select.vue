@@ -11,11 +11,11 @@
     >
       <div
         v-if="visible"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
         @click.self="close"
       >
         <div
-          class="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-xl"
+          class="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300"
           v-loading="loading"
         >
           <div class="border-b border-gray-200 p-5">

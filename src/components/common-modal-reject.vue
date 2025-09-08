@@ -15,7 +15,7 @@
         @click="close"
       >
         <div
-          class="w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300"
+          class="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300"
           @click.stop
         >
           <!-- 弹窗头部 -->
