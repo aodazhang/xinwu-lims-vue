@@ -252,33 +252,18 @@
 
     <!-- 编辑客户弹窗 -->
     <common-modal-customer ref="customerModalRef" @refresh="loadCustomerData" />
-
-    <!-- 成功提示 -->
-    <div
-      v-if="showSuccessToast"
-      class="fixed right-5 top-5 z-50 flex transform items-center gap-3 rounded-lg bg-white p-4 shadow-lg transition-transform"
-      :class="showSuccessToast ? 'translate-x-0' : 'translate-x-full'"
-    >
-      <div
-        class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-sm text-white"
-      >
-        ✓
-      </div>
-      <div class="text-sm text-gray-900">客户信息更新成功</div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
 import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonModalCustomer from '@/components/common-modal-customer.vue'
 
 // 路由相关
-const route = useRoute()
 const router = useRouter()
 
 // Props
@@ -286,13 +271,12 @@ const props = defineProps<{ customerId?: string }>()
 
 // 响应式数据
 const loading = ref(true)
-const showSuccessToast = ref(false)
 const customerModalRef = ref<InstanceType<typeof CommonModalCustomer> | null>(
   null
 )
 
 // 客户数据
-const customerData = reactive<SalesCustomer>({
+const customerData = ref<SalesCustomer>({
   id: 'KH202504231001',
   name: '广州环保科技有限公司',
   contactName: '王经理',
@@ -331,13 +315,13 @@ const orderList = ref([
 ])
 
 // 统计数据
-const stats = reactive({
+const stats = ref({
   orderCount: 15,
   totalAmount: '¥128,900'
 })
 
 // 状态详情
-const statusDetails = reactive({
+const statusDetails = ref({
   firstOrderDate: '2024-06-15',
   lastOrderDate: '2025-09-03',
   avgOrderAmount: '¥8,593',
@@ -347,7 +331,7 @@ const statusDetails = reactive({
 })
 
 // 销售人员
-const salesPerson = reactive({
+const salesPerson = ref({
   name: '张三',
   role: '销售人员'
 })
@@ -381,101 +365,26 @@ const getOrderStatusClass = (status: string) => {
   }
 }
 
-// 数据转换辅助函数
-const getSourceValue = (source: string) => {
-  const sourceMap: Record<string, string> = {
-    自己开发: 'self',
-    渠道: 'channel',
-    转介绍: 'referral',
-    老客户: 'old',
-    美团点评: 'meituan',
-    天猫: 'tmall',
-    百度: 'baidu',
-    抖音: 'douyin',
-    腾讯地图: 'tencent',
-    代理商: 'agent'
-  }
-  return sourceMap[source] || 'self'
-}
-
-const getStatusValue = (status: string) => {
-  const statusMap: Record<string, string> = {
-    已成交: 'active',
-    公海: 'public',
-    跟进中: 'following'
-  }
-  return statusMap[status] || 'active'
-}
-
-const getIndustryValue = (industry: string) => {
-  const industryMap: Record<string, string> = {
-    室内净化: 'indoor',
-    空调清洗: 'ac',
-    检测行业: 'testing',
-    环保设备: 'env'
-  }
-  return industryMap[industry] || 'indoor'
-}
-
 const loadCustomerData = async () => {
   try {
     loading.value = true
 
-    // 获取客户 ID，优先使用路由参数，其次使用 props
-    const customerId = (route.params.id as string) || props.customerId
-
-    if (!customerId) {
-      console.error('未找到客户 ID')
-      return
-    }
+    console.log('客户 id', props.customerId)
 
     // 模拟 API 调用延迟
     await new Promise(resolve => setTimeout(resolve, 800))
 
-    // 模拟从后端获取数据
-    const customerMap: Record<string, SalesCustomer> = {
-      KH202504231001: {
-        id: 'KH202504231001',
-        name: '广州环保科技有限公司',
-        contactName: '王经理',
-        contactPhone: '13800138001',
-        address: '广州市天河区科技园A栋3楼',
-        category: '渠道',
-        source: '自己开发',
-        status: '已成交',
-        industry: '室内净化',
-        createdAt: '2025-08-15 10:30'
-      },
-      KH202504231002: {
-        id: 'KH202504231002',
-        name: '深圳创新工业园',
-        contactName: '李主任',
-        contactPhone: '13800138002',
-        address: '深圳市南山区科技园B区',
-        category: '渠道',
-        source: '渠道',
-        status: '已成交',
-        industry: '检测行业',
-        createdAt: '2025-08-16 14:20'
-      },
-      KH202504251003: {
-        id: 'KH202504251003',
-        name: '佛山制造企业',
-        contactName: '张总',
-        contactPhone: '13800138003',
-        address: '佛山市顺德区工业园',
-        category: '个体户',
-        source: '转介绍',
-        status: '跟进中',
-        industry: '环保设备',
-        createdAt: '2025-08-17 09:15'
-      }
-    }
-
-    if (customerMap[customerId]) {
-      Object.assign(customerData, customerMap[customerId])
-    } else {
-      console.error(`未找到客户数据: ${customerId}`)
+    customerData.value = {
+      id: 'KH202504231001',
+      name: '广州环保科技有限公司',
+      contactName: '王经理',
+      contactPhone: '13800138001',
+      address: '广州市天河区科技园A栋3楼',
+      category: '渠道',
+      source: '自己开发',
+      status: '已成交',
+      industry: '室内净化',
+      createdAt: '2025-08-15 10:30'
     }
   } catch (error) {
     console.error('加载客户数据失败:', error)
@@ -486,22 +395,12 @@ const loadCustomerData = async () => {
 
 const showEditModal = () => {
   // 转换数据格式并打开公共弹窗组件
-  const customerFormData = {
-    customerName: customerData.name,
-    contactName: customerData.contactName,
-    contactPhone: customerData.contactPhone,
-    address: customerData.address,
-    category: customerData.category === '个体户' ? 'individual' : 'channel',
-    source: getSourceValue(customerData.source),
-    status: getStatusValue(customerData.status),
-    industry: getIndustryValue(customerData.industry)
-  }
-  customerModalRef.value?.open(customerFormData)
+  customerModalRef.value?.open(customerData.value)
 }
 
 const exportCustomerInfo = () => {
   // 实际应该调用后端API生成导出文件
-  alert(`导出客户 ${customerData.name} 的信息`)
+  alert(`导出客户 ${customerData.value.name} 的信息`)
 }
 
 const goToOrderDetail = (orderNumber: string) => {
@@ -517,7 +416,7 @@ const showCreateOrder = () => {
   router.push({
     path: '/sales-form',
     query: {
-      customer: customerData.id
+      customer: customerData.value.id
     }
   })
 }

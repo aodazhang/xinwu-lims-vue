@@ -42,6 +42,7 @@
                   </label>
                   <input
                     v-model="customerForm.customerName"
+                    @input="customerForm.name = customerForm.customerName"
                     type="text"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
@@ -259,37 +260,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 
-// 定义接口
-interface CustomerForm {
-  customerName: string
-  contactName: string
-  contactPhone: string
-  address: string
-  category: string
-  source: string
-  status: string
-  industry: string
-}
-
-interface Customer {
-  customerId: string
-  customerName: string
-  contactName: string
-  contactPhone: string
-  source: string
-  status: string
-}
-
-interface FormErrors {
-  customerName: string
-  contactName: string
-  contactPhone: string
-  category: string
-  source: string
-  status: string
-}
+// 使用工具类型从 SalesCustomer 中提取 FormErrors 类型
+type FormErrors = Pick<
+  SalesCustomer,
+  | 'customerName'
+  | 'contactName'
+  | 'contactPhone'
+  | 'category'
+  | 'source'
+  | 'status'
+>
 
 // 定义 emits
 const emit = defineEmits<{ refresh: [] }>()
@@ -299,7 +281,10 @@ const visible = ref(false)
 const isSubmitting = ref(false)
 
 // 客户表单数据
-const customerForm = reactive<CustomerForm>({
+const customerForm = ref<SalesCustomer>({
+  id: '',
+  customerId: '',
+  name: '',
   customerName: '',
   contactName: '',
   contactPhone: '',
@@ -307,11 +292,12 @@ const customerForm = reactive<CustomerForm>({
   category: '',
   source: '',
   status: '',
-  industry: ''
+  industry: '',
+  createdAt: ''
 })
 
 // 表单错误信息
-const formErrors = reactive<FormErrors>({
+const formErrors = ref<FormErrors>({
   customerName: '',
   contactName: '',
   contactPhone: '',
@@ -322,21 +308,21 @@ const formErrors = reactive<FormErrors>({
 
 // 表单是否有效
 const isFormValid = computed(() => {
-  return !Object.values(formErrors).some(error => error !== '')
+  return !Object.values(formErrors.value).some(error => error !== '')
 })
 
 /**
  * 校验客户名称
  */
 function validateCustomerName() {
-  if (!customerForm.customerName.trim()) {
-    formErrors.customerName = '请输入客户名称'
-  } else if (customerForm.customerName.trim().length < 2) {
-    formErrors.customerName = '客户名称至少需要2个字符'
-  } else if (customerForm.customerName.trim().length > 50) {
-    formErrors.customerName = '客户名称不能超过50个字符'
+  if (!customerForm.value.customerName.trim()) {
+    formErrors.value.customerName = '请输入客户名称'
+  } else if (customerForm.value.customerName.trim().length < 2) {
+    formErrors.value.customerName = '客户名称至少需要2个字符'
+  } else if (customerForm.value.customerName.trim().length > 50) {
+    formErrors.value.customerName = '客户名称不能超过50个字符'
   } else {
-    formErrors.customerName = ''
+    formErrors.value.customerName = ''
   }
 }
 
@@ -344,14 +330,14 @@ function validateCustomerName() {
  * 校验联系人姓名
  */
 function validateContactName() {
-  if (!customerForm.contactName.trim()) {
-    formErrors.contactName = '请输入联系人姓名'
-  } else if (customerForm.contactName.trim().length < 2) {
-    formErrors.contactName = '联系人姓名至少需要2个字符'
-  } else if (customerForm.contactName.trim().length > 20) {
-    formErrors.contactName = '联系人姓名不能超过20个字符'
+  if (!customerForm.value.contactName.trim()) {
+    formErrors.value.contactName = '请输入联系人姓名'
+  } else if (customerForm.value.contactName.trim().length < 2) {
+    formErrors.value.contactName = '联系人姓名至少需要2个字符'
+  } else if (customerForm.value.contactName.trim().length > 20) {
+    formErrors.value.contactName = '联系人姓名不能超过20个字符'
   } else {
-    formErrors.contactName = ''
+    formErrors.value.contactName = ''
   }
 }
 
@@ -360,12 +346,12 @@ function validateContactName() {
  */
 function validateContactPhone() {
   const phoneRegex = /^1[3-9]\d{9}$|^0\d{2,3}-?\d{7,8}$|^400-?\d{3}-?\d{4}$/
-  if (!customerForm.contactPhone.trim()) {
-    formErrors.contactPhone = '请输入联系电话'
-  } else if (!phoneRegex.test(customerForm.contactPhone.trim())) {
-    formErrors.contactPhone = '请输入正确的手机号码或固定电话'
+  if (!customerForm.value.contactPhone.trim()) {
+    formErrors.value.contactPhone = '请输入联系电话'
+  } else if (!phoneRegex.test(customerForm.value.contactPhone.trim())) {
+    formErrors.value.contactPhone = '请输入正确的手机号码或固定电话'
   } else {
-    formErrors.contactPhone = ''
+    formErrors.value.contactPhone = ''
   }
 }
 
@@ -373,10 +359,10 @@ function validateContactPhone() {
  * 校验客户分类
  */
 function validateCategory() {
-  if (!customerForm.category) {
-    formErrors.category = '请选择客户分类'
+  if (!customerForm.value.category) {
+    formErrors.value.category = '请选择客户分类'
   } else {
-    formErrors.category = ''
+    formErrors.value.category = ''
   }
 }
 
@@ -384,10 +370,10 @@ function validateCategory() {
  * 校验客户来源
  */
 function validateSource() {
-  if (!customerForm.source) {
-    formErrors.source = '请选择客户来源'
+  if (!customerForm.value.source) {
+    formErrors.value.source = '请选择客户来源'
   } else {
-    formErrors.source = ''
+    formErrors.value.source = ''
   }
 }
 
@@ -395,10 +381,10 @@ function validateSource() {
  * 校验客户状态
  */
 function validateStatus() {
-  if (!customerForm.status) {
-    formErrors.status = '请选择客户状态'
+  if (!customerForm.value.status) {
+    formErrors.value.status = '请选择客户状态'
   } else {
-    formErrors.status = ''
+    formErrors.value.status = ''
   }
 }
 
@@ -415,12 +401,12 @@ function validateForm() {
 }
 
 // 监听表单字段变化，实时校验
-watch(() => customerForm.customerName, validateCustomerName)
-watch(() => customerForm.contactName, validateContactName)
-watch(() => customerForm.contactPhone, validateContactPhone)
-watch(() => customerForm.category, validateCategory)
-watch(() => customerForm.source, validateSource)
-watch(() => customerForm.status, validateStatus)
+watch(() => customerForm.value.customerName, validateCustomerName)
+watch(() => customerForm.value.contactName, validateContactName)
+watch(() => customerForm.value.contactPhone, validateContactPhone)
+watch(() => customerForm.value.category, validateCategory)
+watch(() => customerForm.value.source, validateSource)
+watch(() => customerForm.value.status, validateStatus)
 
 /**
  * 生成客户编号
@@ -439,7 +425,9 @@ const generateCustomerId = (): string => {
  * 重置表单数据
  */
 const resetForm = (): void => {
-  Object.assign(customerForm, {
+  Object.assign(customerForm.value, {
+    id: '',
+    customerId: '',
     customerName: '',
     contactName: '',
     contactPhone: '',
@@ -447,11 +435,12 @@ const resetForm = (): void => {
     category: '',
     source: '',
     status: '',
-    industry: ''
+    industry: '',
+    createdAt: ''
   })
 
   // 清空错误信息
-  Object.assign(formErrors, {
+  Object.assign(formErrors.value, {
     customerName: '',
     contactName: '',
     contactPhone: '',
@@ -465,19 +454,22 @@ const resetForm = (): void => {
  * 对外暴露的 open 方法
  * @param data 可选的初始数据
  */
-const open = (data?: Partial<CustomerForm>): void => {
+const open = (data?: SalesCustomer): void => {
   visible.value = true
   resetForm()
   // 如果有初始数据，设置到表单中，否则重置表单
-  Object.assign(customerForm, {
+  Object.assign(customerForm.value, {
+    id: data?.id || '',
+    customerId: data?.customerId || '',
     customerName: data?.customerName || '',
     contactName: data?.contactName || '',
     contactPhone: data?.contactPhone || '',
     address: data?.address || '',
     category: data?.category || '',
+    industry: data?.industry || '',
     source: data?.source || '',
     status: data?.status || '',
-    industry: data?.industry || ''
+    createdAt: data?.createdAt || ''
   })
 }
 
@@ -507,22 +499,27 @@ const createCustomer = async (): Promise<void> => {
   isSubmitting.value = true
 
   try {
-    const newCustomer: Customer = {
+    const newCustomer = {
+      id: generateCustomerId(),
       customerId: generateCustomerId(),
-      customerName: customerForm.customerName.trim(),
-      contactName: customerForm.contactName.trim(),
-      contactPhone: customerForm.contactPhone.trim(),
-      source: customerForm.source,
-      status: customerForm.status
+      name:
+        customerForm.value.name.trim() ||
+        customerForm.value.customerName.trim(),
+      customerName: customerForm.value.customerName.trim(),
+      contactName: customerForm.value.contactName.trim(),
+      contactPhone: customerForm.value.contactPhone.trim(),
+      address: customerForm.value.address?.trim(),
+      category: customerForm.value.category,
+      source: customerForm.value.source,
+      status: customerForm.value.status,
+      industry: customerForm.value.industry,
+      createdAt: new Date().toISOString()
     }
 
     console.log('创建客户:', newCustomer)
 
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
-
-    // 显示成功提示
-    alert(`客户创建成功！客户编号：${newCustomer.customerId}`)
 
     // 触发刷新事件
     emit('refresh')
@@ -531,7 +528,6 @@ const createCustomer = async (): Promise<void> => {
     close()
   } catch (error) {
     console.error('创建客户失败:', error)
-    alert('创建客户失败，请重试')
   } finally {
     isSubmitting.value = false
   }

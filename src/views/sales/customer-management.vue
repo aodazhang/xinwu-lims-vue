@@ -17,20 +17,20 @@
     </div>
 
     <!-- 搜索栏 -->
-    <CommonFilter title="客户列表" @filter="handleSearch">
+    <common-filter title="客户列表" @filter="loadDataList">
       <input
         v-model="searchKeyword"
         type="text"
         class="w-48 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
         placeholder="搜索客户名称"
       />
-    </CommonFilter>
+    </common-filter>
 
     <!-- 客户列表 -->
-    <CommonTable
+    <common-table
       :config="tableConfig"
       :items="tableColumns"
-      :model="filteredCustomers"
+      :model="customers"
     >
       <!-- 客户编号插槽 -->
       <template #customerIdSlot="{ scope }">
@@ -63,16 +63,17 @@
           </button>
         </div>
       </template>
-    </CommonTable>
+    </common-table>
 
     <!-- 创建客户弹窗 -->
-    <common-modal-customer ref="createModalRef" @refresh="handleRefresh" />
+    <common-modal-customer ref="createModalRef" @refresh="loadDataList" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
@@ -95,72 +96,12 @@ const statsData = computed(() => [
 ])
 
 // 客户数据
-const customers = ref<SalesCustomer[]>([
-  {
-    id: 'KH202504231001',
-    customerId: 'KH202504231001',
-    name: '广州环保科技有限公司',
-    customerName: '广州环保科技有限公司',
-    contactName: '王经理',
-    contactPhone: '13800138001',
-    source: '自己开发',
-    status: 'active'
-  },
-  {
-    id: 'KH202504231002',
-    customerId: 'KH202504231002',
-    name: '深圳创新工业园',
-    customerName: '深圳创新工业园',
-    contactName: '李主任',
-    contactPhone: '13800138002',
-    source: '渠道',
-    status: 'active'
-  },
-  {
-    id: 'KH202504251003',
-    customerId: 'KH202504251003',
-    name: '佛山制造企业',
-    customerName: '佛山制造企业',
-    contactName: '张总',
-    contactPhone: '13800138003',
-    source: '转介绍',
-    status: 'following'
-  },
-  {
-    id: 'KH202504261004',
-    customerId: 'KH202504261004',
-    name: '东莞电子厂',
-    customerName: '东莞电子厂',
-    contactName: '刘经理',
-    contactPhone: '13800138004',
-    source: '老客户',
-    status: 'active'
-  },
-  {
-    id: 'KH202504271005',
-    customerId: 'KH202504271005',
-    name: '惠州化工园区',
-    customerName: '惠州化工园区',
-    contactName: '陈主管',
-    contactPhone: '13800138005',
-    source: '美团点评',
-    status: 'public'
-  },
-  {
-    id: 'KH202504281006',
-    customerId: 'KH202504281006',
-    name: '中山物流园区',
-    customerName: '中山物流园区',
-    contactName: '周经理',
-    contactPhone: '13800138006',
-    source: '百度',
-    status: 'following'
-  }
-])
+const customers = ref<SalesCustomer[]>([])
 
 // 表格配置
 const tableConfig = ref({
   rowKey: 'customerId',
+  loading: false,
   selection: false,
   pagination: false
 })
@@ -180,18 +121,6 @@ const tableColumns = [
   { label: '客户状态', props: 'status', minWidth: 120, slotName: 'statusSlot' },
   { label: '操作', props: 'action', minWidth: 100, slotName: 'actionSlot' }
 ]
-
-// 过滤后的客户数据
-const filteredCustomers = computed(() => {
-  if (!searchKeyword.value) {
-    return customers.value
-  }
-  return customers.value.filter(customer =>
-    customer.customerName
-      .toLowerCase()
-      .includes(searchKeyword.value.toLowerCase())
-  )
-})
 
 // 获取状态样式类
 const getStatusClass = (status: string) => {
@@ -216,23 +145,9 @@ const getStatusText = (status: string) => {
   return statusTexts[status as keyof typeof statusTexts] || status
 }
 
-// 搜索处理
-const handleSearch = () => {
-  // 搜索逻辑已在 computed 中处理
-  console.log('搜索关键词:', searchKeyword.value)
-}
-
 // 打开创建客户弹窗
 const openCreateModal = () => {
   createModalRef.value?.open()
-}
-
-// 处理刷新事件
-const handleRefresh = () => {
-  // 这里可以重新获取客户列表数据
-  console.log('刷新客户列表')
-  // 实际项目中可以调用API重新获取数据
-  // await fetchCustomers()
 }
 
 // 查看客户详情
@@ -245,4 +160,82 @@ const viewCustomer = (customerId: string) => {
     }
   })
 }
+
+// 处理刷新事件
+const loadDataList = async () => {
+  try {
+    tableConfig.value.loading = true
+    await toolSleep(1000)
+    customers.value = [
+      {
+        id: 'KH202504231001',
+        customerId: 'KH202504231001',
+        name: '广州环保科技有限公司',
+        customerName: '广州环保科技有限公司',
+        contactName: '王经理',
+        contactPhone: '13800138001',
+        source: '自己开发',
+        status: 'active'
+      },
+      {
+        id: 'KH202504231002',
+        customerId: 'KH202504231002',
+        name: '深圳创新工业园',
+        customerName: '深圳创新工业园',
+        contactName: '李主任',
+        contactPhone: '13800138002',
+        source: '渠道',
+        status: 'active'
+      },
+      {
+        id: 'KH202504251003',
+        customerId: 'KH202504251003',
+        name: '佛山制造企业',
+        customerName: '佛山制造企业',
+        contactName: '张总',
+        contactPhone: '13800138003',
+        source: '转介绍',
+        status: 'following'
+      },
+      {
+        id: 'KH202504261004',
+        customerId: 'KH202504261004',
+        name: '东莞电子厂',
+        customerName: '东莞电子厂',
+        contactName: '刘经理',
+        contactPhone: '13800138004',
+        source: '老客户',
+        status: 'active'
+      },
+      {
+        id: 'KH202504271005',
+        customerId: 'KH202504271005',
+        name: '惠州化工园区',
+        customerName: '惠州化工园区',
+        contactName: '陈主管',
+        contactPhone: '13800138005',
+        source: '美团点评',
+        status: 'public'
+      },
+      {
+        id: 'KH202504281006',
+        customerId: 'KH202504281006',
+        name: '中山物流园区',
+        customerName: '中山物流园区',
+        contactName: '周经理',
+        contactPhone: '13800138006',
+        source: '百度',
+        status: 'following'
+      }
+    ]
+  } catch (error) {
+  } finally {
+    tableConfig.value.loading = false
+  }
+}
+
+// 生命周期
+onMounted(() => {
+  loadDataList()
+})
 </script>
