@@ -62,8 +62,8 @@ types/               # 全局类型定义
 
 1. **目录名**: 使用 `kebab-case` (短横线命名)，例如 `home`
 2. **js/ts 文件名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile.ts`
-3. **vue 文件名**: 使用 `kebab-case` (短横线命名)，例如 `user-profile.vue`
-4. **页面路径**: 使用 `kebab-case` (短横线命名)，例如 `/user-profile`
+3. **vue 组件文件名**: 使用 `kebab-case` (短横线命名)，例如 `user-profile.vue`
+4. **vue 路由路径**: 使用 `kebab-case` (短横线命名)，例如 `/user-profile`
 
 ## 3.Git 提交规范
 
@@ -108,14 +108,22 @@ types/               # 全局类型定义
 4. **ts 接口名**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
 5. **ts 类型名**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
 6. **ts 枚举**: 使用 `PascalCase`（帕斯卡命名），例如 `UserProfile`
-7. **vue 组件引用**: 使用 `kebab-case` (短横线命名)，例如 `<user-profile />`
-8. **vue props 属性名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
-9. **vue 事件名**: 使用 `kebab-case` (短横线命名)，例如 `@user-profile-click`
+7. **vue 组件注册名**: 使用 `PascalCase` (帕斯卡命名)，例如 `UserProfile`
+8. **vue 组件使用**: 使用 `<user-profile />`
+9. **vue props 属性名**: 使用 `camelCase` (小驼峰命名)，例如 `userProfile`
+10. **vue 事件名**: 使用 `kebab-case` (短横线命名)，例如 `@user-profile-click`
+11. **vue 方法名**: 使用 `on` 前缀定义事件处理方法，使用 `load` 前缀定义数据加载方法，使用 `handle` 前缀定义数据处理方法
 
 ### 代码注释
 
 1. **js/ts 注释**: 函数使用 JSDoc 注释，解释其功能、参数和返回值，例如 `/** @param {string} name - 用户名 */`
 2. **临时注释**: 未实现功能代码使用 `// TODO:` 标记，例如 `// TODO: 实现用户登录功能`
+
+### 异常处理
+
+1. **异步操作**: 使用 `async/await` 语法，避免回调地狱
+2. **错误处理**: 使用 `try-catch` 包装异步操作
+3. **加载状态**: 为异步操作提供 `loading` 状态
 
 ### Vue 组件
 
@@ -129,36 +137,49 @@ types/               # 全局类型定义
 
 <!-- 2.脚本 -->
 <script setup lang="ts">
-// Props
+// Options API 配置
+defineOptions({ name: 'ComponentName' })
+
+// Props 定义
 const props = defineProps<{ id?: string }>()
 
-// Event
+// Emits 定义
 const emit = defineEmits<{
   refresh: []
   change: [page: number]
 }>()
 
-// 对外暴露方法
-defineExpose({ open, close })
+// Ref 响应式数据
+const state = ref({})
+const computed = computed(() => {})
+
+// Method 方法定义
+function methodName() {}
+
+// LifeCycle 生命周期
+onMounted(() => {})
+
+// Expose 暴露方法
+defineExpose({ methodName })
 </script>
 
 <!-- 3.样式 -->
 <style lang="scss" scoped></style>
 ```
 
-2. **导入顺序**: Vue 相关库 > 第三方库 (按字母顺序) > 内部绝对路径 (按路径层级) > 相对路径 (按路径层级)，例如：
+2. **导入顺序**: 导入顺序 Vue 核心库（vue、vue-router、pinia） > 第三方库 (按字母顺序) > 项目内部模块（@/ 开头，按字母顺序）> 相对路径模块（./ 或 ../ 开头），例如：
 
 ```ts
-// 1. Vue 相关库
+// 1.Vue 核心库（vue、vue-router、pinia）
 import { computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
-// 2. 第三方库 (按字母顺序)
+// 2.第三方库 (按字母顺序)
 import axios from 'axios'
 import dayjs from 'dayjs'
 
-// 3. 内部绝对路径 (按路径层级)
+// 3.项目内部模块（@/ 开头，按字母顺序）
 import { useStore } from '@/store'
 import type { User } from '@/types/user'
 import { dateToString } from '@/utils/date'
@@ -166,7 +187,7 @@ import { useTable } from '@/use'
 import api from '@/api'
 import { CommentModel } from '@/model'
 
-// 4. 相对路径 (按路径层级)
+// 4.相对路径模块（./ 或 ../ 开头）
 import UserProfile from './components/user-profile.vue'
 ```
 
@@ -174,7 +195,8 @@ import UserProfile from './components/user-profile.vue'
 4. **props 定义规范**: 使用 `defineProps` 定义 props 并通过 ts 定义 props 类型
 5. **emit 定义规范**: 使用 `defineEmits` 定义 emit 事件并通过 ts 定义事件类型
 6. **state 定义规范**: 使用 `ref` 定义响应式对象并通过 ts 定义 state 类型，原则上一个页面的 state 应该收敛在一个响应式对象中
-7. **常用方法**: 使用 `loadDataList` 方法定义列表数据查询，使用 `loadDataDetail` 方法定义详情数据查询，使用 `loadDataSave` 方法定义详情数据提交
+7. **组件懒加载**: 路由组件使用动态导入 `() => import('./Component.vue')`
+8. **响应式优化**: 合理使用 `computed`、`watch`、`watchEffect`
 
 ## 5.CSS 样式规范
 
@@ -184,4 +206,4 @@ import UserProfile from './components/user-profile.vue'
 
 ### 工具和组件库
 
-1. **css 样式**：使用 tailwindcss 编写移动优先的样式，只考虑 `md:` 断点（>= 768px）
+1. **css 响应式设计**: 使用 tailwindcss 编写移动优先的样式，优先使用 tailwindcss 的响应式前缀 `md:`
