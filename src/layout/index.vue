@@ -107,6 +107,18 @@
           <div class="h-px bg-gray-200"></div>
           <ul class="m-0 list-none py-2">
             <li
+              @click="handlePassword"
+              class="flex cursor-pointer items-center gap-3 border-none bg-none px-5 py-2.5 text-left text-sm text-indigo-600 transition-colors duration-300 hover:bg-indigo-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <path
+                  d="M8 1a4 4 0 0 1 4 4v2h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v2h4V5a2 2 0 0 0-2-2z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>修改密码</span>
+            </li>
+            <li
               @click="handleLogout"
               class="flex cursor-pointer items-center gap-3 border-none bg-none px-5 py-2.5 text-left text-sm text-red-600 transition-colors duration-300 hover:bg-red-50"
             >
@@ -121,6 +133,9 @@
           </ul>
         </div>
       </button>
+
+      <!-- 修改密码弹窗 -->
+      <common-modal-password ref="passwordModalRef" />
     </header>
 
     <!-- 2.底部内容 -->
@@ -146,6 +161,7 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { userStore } from '@/store/modules/user'
+import CommonModalPassword from '@/components/common-modal-password.vue'
 
 const route = useRoute()
 const store = userStore()
@@ -153,6 +169,7 @@ const { user, role } = storeToRefs(store)
 
 // 状态管理
 const dropdownOpen = ref(false)
+const passwordModalRef = ref<InstanceType<typeof CommonModalPassword>>()
 
 // 计算属性
 const canBack = computed(() => route.path.indexOf('-dashboard') === -1)
@@ -171,10 +188,17 @@ const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
 
+const handlePassword = () => {
+  dropdownOpen.value = true
+
+  passwordModalRef.value?.open()
+}
+
 const handleLogout = () => {
+  dropdownOpen.value = true
+
   if (confirm('确定要退出登录吗？')) {
     store.signout()
   }
-  dropdownOpen.value = false
 }
 </script>

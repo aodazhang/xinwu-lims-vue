@@ -77,3 +77,38 @@ export async function loadLogin(data: unknown): Promise<{ token: string }> {
 export async function loadCurrentUser(): Promise<SystemUser> {
   return instance.get('/current-user')
 }
+
+export async function loadRoles(): Promise<SystemRole[]> {
+  return instance.get('/roles')
+}
+
+export async function loadAdminUsers(
+  params: unknown
+): Promise<CommonList<SystemUser>> {
+  return instance.get('/admin/users', { params })
+}
+
+export async function loadAdminUsersDetail(id: number): Promise<SystemUser> {
+  return instance.get(`/admin/users/${id}`)
+}
+
+export async function loadAdminUsersAdd(data: unknown): Promise<void> {
+  return instance.post('/admin/users', data)
+}
+
+export async function loadAdminUsersEdit(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.post(`/admin/users/${id}`, data)
+}
+
+export async function loadAdminUsersPasswordReset(id: number): Promise<void> {
+  return instance.post(`/admin/users/${id}/password-reset`)
+}
+
+export async function loadAdminUsersPasswordChanging(
+  data: unknown
+): Promise<void> {
+  return instance.post('/password-changing', data)
+}

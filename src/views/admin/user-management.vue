@@ -10,14 +10,14 @@
     <div class="mt-5 flex flex-wrap gap-4">
       <button
         class="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30"
-        @click="openCreateModal"
+        @click="onClickAdd"
       >
         创建用户
       </button>
     </div>
 
     <!-- 搜索栏 -->
-    <common-filter title="用户列表" @filter="loadDataList">
+    <common-filter title="用户列表" @filter="loadDataList(true)">
       <input
         v-model="searchKeyword"
         type="text"
@@ -27,12 +27,17 @@
     </common-filter>
 
     <!-- 用户列表 -->
-    <common-table :config="tableConfig" :items="tableColumns" :model="users">
+    <common-table
+      :config="tableConfig"
+      :items="tableColumns"
+      :model="users"
+      @current-change="loadDataList(false)"
+    >
       <!-- 用户ID插槽 -->
       <template #userIdSlot="{ scope }">
         <button
           class="cursor-pointer font-medium text-indigo-600 transition-colors duration-200 hover:text-indigo-800 hover:underline"
-          @click="editUser(scope)"
+          @click="onClickEdit(scope)"
         >
           {{ scope.id }}
         </button>
@@ -40,35 +45,54 @@
 
       <!-- 用户角色插槽 -->
       <template #roleSlot="{ scope }">
-        <span
-          class="inline-block rounded px-2 py-1 text-xs font-medium"
-          :class="getRoleClass(scope.role)"
-        >
-          {{ getRoleText(scope.role) }}
-        </span>
+        <div class="flex flex-wrap gap-1">
+          <span
+            v-for="role in scope.roles"
+            :key="role.roleCode"
+            class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+            :class="getRoleClass(role.roleCode)"
+          >
+            {{ role.roleName }}
+          </span>
+        </div>
+      </template>
+
+      <!-- 创建时间插槽 -->
+      <template #createTimeSlot="{ scope }">
+        <div>{{ dateToString(scope.createTime) }}</div>
       </template>
 
       <!-- 操作插槽 -->
       <template #actionSlot="{ scope }">
         <div class="flex gap-2">
           <button
-            class="rounded border border-green-500 px-2 py-1 text-xs text-green-600 transition-all duration-200 hover:bg-green-500 hover:text-white"
-            @click="editUser(scope)"
+            class="rounded border border-indigo-500 px-2 py-1 text-xs text-indigo-600 transition-all duration-200 hover:bg-indigo-500 hover:text-white"
+            @click="onClickEdit(scope)"
           >
             编辑
+          </button>
+
+          <button
+            class="rounded border border-green-500 px-2 py-1 text-xs text-green-600 transition-all duration-200 hover:bg-green-500 hover:text-white"
+            @click="onClickReset(scope)"
+          >
+            重置密码
           </button>
         </div>
       </template>
     </common-table>
 
     <!-- 创建用户弹窗 -->
-    <common-modal-user ref="createModalRef" @refresh="loadDataList" />
+    <common-modal-user ref="createModalRef" @refresh="loadDataList(false)" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { toolSleep } from '@/utils/tool'
+import { isArray, isNumber, isString } from '@/utils/is'
+import { dateToString } from '@/utils/date'
+import Message from '@/utils/message'
+import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
@@ -83,9 +107,9 @@ const createModalRef = ref<InstanceType<typeof CommonModalUser>>()
 
 // 统计数据
 const statsData = computed(() => [
-  { label: '当前用户数量', value: 25 },
-  { label: '活跃用户数量', value: 18 },
-  { label: '管理员数量', value: 3 }
+  { label: '当前用户数量', value: tableConfig.value.total },
+  { label: '活跃用户数量', value: 0 },
+  { label: '管理员数量', value: 0 }
 ])
 
 // 用户数据
@@ -96,7 +120,9 @@ const tableConfig = ref({
   rowKey: 'id',
   loading: false,
   selection: false,
-  pagination: false
+  pagination: true,
+  total: 0,
+  current: 1
 })
 
 // 表格列配置
@@ -107,127 +133,71 @@ const tableColumns = [
     minWidth: 150,
     slotName: 'userIdSlot'
   },
-  { label: '用户名称', props: 'name', minWidth: 200 },
+  { label: '用户名称', props: 'userName', minWidth: 180 },
   { label: '用户角色', props: 'role', minWidth: 150, slotName: 'roleSlot' },
-  { label: '创建时间', props: 'createdAt', minWidth: 180 },
-  { label: '操作', props: 'action', minWidth: 150, slotName: 'actionSlot' }
+  {
+    label: '创建时间',
+    props: 'createTime',
+    minWidth: 180,
+    slotName: 'createTimeSlot'
+  },
+  { label: '操作', props: 'action', width: 150, slotName: 'actionSlot' }
 ]
 
 // 获取角色样式类
-const getRoleClass = (role: string) => {
+const getRoleClass = (roleCode: string) => {
   const roleClasses = {
-    admin: 'bg-red-100 text-red-800',
-    sales: 'bg-blue-100 text-blue-800',
-    reviewer: 'bg-green-100 text-green-800',
-    sampling_dispatcher: 'bg-purple-100 text-purple-800',
-    sampling_staff: 'bg-yellow-100 text-yellow-800',
-    sample_manager: 'bg-indigo-100 text-indigo-800',
-    'lab-supervisor': 'bg-pink-100 text-pink-800',
-    'lab-technician': 'bg-cyan-100 text-cyan-800',
-    report_creator: 'bg-orange-100 text-orange-800',
-    report_reviewer: 'bg-teal-100 text-teal-800',
-    report_approver: 'bg-emerald-100 text-emerald-800'
+    ADMIN: 'bg-red-100 text-red-800',
+    SALES_PERSON: 'bg-blue-100 text-blue-800',
+    ORDER_REVIEWER: 'bg-green-100 text-green-800',
+    SAMPLING_DISPATCHER: 'bg-purple-100 text-purple-800',
+    SAMPLING_OPERATOR: 'bg-yellow-100 text-yellow-800',
+    SAMPLE_MANAGER: 'bg-indigo-100 text-indigo-800',
+    LAB_SUPERVISOR: 'bg-pink-100 text-pink-800',
+    LAB_TECHNICIAN: 'bg-cyan-100 text-cyan-800',
+    REPORT_WRITER: 'bg-orange-100 text-orange-800',
+    REPORT_REVIEWER: 'bg-teal-100 text-teal-800',
+    REPORT_APPROVER: 'bg-emerald-100 text-emerald-800'
   }
   return (
-    roleClasses[role as keyof typeof roleClasses] || 'bg-gray-100 text-gray-800'
+    roleClasses[roleCode as keyof typeof roleClasses] ||
+    'bg-gray-100 text-gray-800'
   )
 }
 
-// 获取角色文本
-const getRoleText = (role: string) => {
-  const roleTexts = {
-    admin: '系统管理员',
-    sales: '销售人员',
-    reviewer: '订单审核员',
-    sampling_dispatcher: '采样调度员',
-    sampling_staff: '采样人员',
-    sample_manager: '样品管理员',
-    'lab-supervisor': '实验室主管',
-    'lab-technician': '检测员',
-    report_creator: '报告编制员',
-    report_reviewer: '报告审核员',
-    report_approver: '报告审批员'
-  }
-  return roleTexts[role as keyof typeof roleTexts] || role
-}
-
 // 打开创建用户弹窗
-const openCreateModal = () => {
+const onClickAdd = () => {
   createModalRef.value?.open()
 }
 
 // 编辑用户
-const editUser = (user: SystemUser) => {
+const onClickEdit = (user: SystemUser) => {
   createModalRef.value?.open(user)
 }
 
+// 重置密码
+const onClickReset = async (user: SystemUser) => {
+  await api.loadAdminUsersPasswordReset(user.id)
+  Message.success('密码重置成功')
+}
+
 // 处理刷新事件
-const loadDataList = async () => {
+const loadDataList = async (reset: boolean) => {
   try {
+    if (reset) {
+      tableConfig.value.current = 1
+    }
     tableConfig.value.loading = true
-    await toolSleep(1000)
-    users.value = [
-      {
-        id: 'U001',
-        name: '系统管理员',
-        role: 'admin',
-        createdAt: '2024-01-01 09:00:00'
-      },
-      {
-        id: 'U002',
-        name: '张三',
-        role: 'sales',
-        createdAt: '2024-01-15 10:30:00'
-      },
-      {
-        id: 'U003',
-        name: '李四',
-        role: 'reviewer',
-        createdAt: '2024-01-20 14:15:00'
-      },
-      {
-        id: 'U004',
-        name: '王五',
-        role: 'sampling_dispatcher',
-        createdAt: '2024-02-01 08:45:00'
-      },
-      {
-        id: 'U005',
-        name: '赵六',
-        role: 'sampling_staff',
-        createdAt: '2024-02-05 16:20:00'
-      },
-      {
-        id: 'U006',
-        name: '钱七',
-        role: 'sample_manager',
-        createdAt: '2024-02-10 11:10:00'
-      },
-      {
-        id: 'U007',
-        name: '孙八',
-        role: 'lab-supervisor',
-        createdAt: '2024-02-15 13:30:00'
-      },
-      {
-        id: 'U008',
-        name: '周九',
-        role: 'lab-technician',
-        createdAt: '2024-02-20 09:45:00'
-      },
-      {
-        id: 'U009',
-        name: '吴十',
-        role: 'report_creator',
-        createdAt: '2024-02-25 15:00:00'
-      },
-      {
-        id: 'U010',
-        name: '郑十一',
-        role: 'report_reviewer',
-        createdAt: '2024-03-01 10:20:00'
-      }
-    ]
+    const res = await api.loadAdminUsers({
+      username: isString(searchKeyword.value) ? searchKeyword.value : null,
+      page: tableConfig.value.current,
+      size: 10,
+      sort: 'id,desc'
+    })
+    tableConfig.value.total = isNumber(res.totalElements)
+      ? res.totalElements
+      : 0
+    users.value = isArray(res.content) ? res.content : []
   } catch (error) {
     console.error('加载用户数据失败:', error)
   } finally {
@@ -237,6 +207,6 @@ const loadDataList = async () => {
 
 // 生命周期
 onMounted(() => {
-  loadDataList()
+  loadDataList(true)
 })
 </script>

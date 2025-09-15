@@ -5,6 +5,7 @@
 declare global {
   // ==================== 公共 ====================
 
+  /** 通用请求 */
   interface CommonResponse<T = any> {
     /** 是否成功 */
     success: boolean
@@ -20,6 +21,14 @@ declare global {
     timestamp: number
   }
 
+  /** 通用分页列表 */
+  interface CommonList<T = any> {
+    /** 内容项 */
+    content: T[]
+    /** 总计数据量 */
+    totalElements: number
+  }
+
   // ==================== 系统管理 ====================
 
   /** 系统用户 */
@@ -32,6 +41,8 @@ declare global {
     updateTime: string
     /** 用户名 */
     userName: string
+    /** 密码 */
+    password: string
     /** 手机号 */
     mobile: string
     /** 真实姓名 */

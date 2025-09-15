@@ -35,62 +35,123 @@
           <div class="max-h-[calc(90vh-300px)] overflow-y-auto p-6">
             <form @submit.prevent="createUser">
               <div class="space-y-6 pb-4">
-                <!-- 用户名称 -->
-                <div class="relative flex flex-col gap-1">
+                <!-- 用户名 -->
+                <div class="relative flex flex-col gap-1" v-if="!userForm.id">
                   <label class="text-sm font-medium text-gray-700">
-                    用户名称 <span class="text-red-500">*</span>
+                    用户名 <span class="text-red-500">*</span>
                   </label>
                   <input
-                    v-model="userForm.name"
+                    v-model="userForm.userName"
                     type="text"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.name
+                      formErrors.userName
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
-                    placeholder="请输入用户名称"
+                    placeholder="请输入用户名"
                   />
                   <div
-                    v-if="formErrors.name"
+                    v-if="formErrors.userName"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.name }}
+                    {{ formErrors.userName }}
                   </div>
                 </div>
 
-                <!-- 用户角色 -->
-                <div class="relative flex flex-col gap-1">
+                <!-- 密码 -->
+                <div class="relative flex flex-col gap-1" v-if="!userForm.id">
                   <label class="text-sm font-medium text-gray-700">
-                    用户角色 <span class="text-red-500">*</span>
+                    密码 <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    v-model="userForm.role"
+                  <input
+                    v-model="userForm.password"
+                    type="text"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.role
+                      formErrors.password
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
-                  >
-                    <option value="">请选择</option>
-                    <option value="admin">系统管理员</option>
-                    <option value="sales">销售人员</option>
-                    <option value="reviewer">订单审核员</option>
-                    <option value="sampling_dispatcher">采样调度员</option>
-                    <option value="sampling_staff">采样人员</option>
-                    <option value="sample_manager">样品管理员</option>
-                    <option value="lab-supervisor">实验室主管</option>
-                    <option value="lab-technician">检测员</option>
-                    <option value="report_creator">报告编制员</option>
-                    <option value="report_reviewer">报告审核员</option>
-                    <option value="report_approver">报告审批员</option>
-                  </select>
+                    placeholder="请输入密码"
+                  />
                   <div
-                    v-if="formErrors.role"
+                    v-if="formErrors.password"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.role }}
+                    {{ formErrors.password }}
+                  </div>
+                </div>
+
+                <!-- 真实姓名 -->
+                <div class="relative flex flex-col gap-1">
+                  <label class="text-sm font-medium text-gray-700">
+                    真实姓名 <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    v-model="userForm.realName"
+                    type="text"
+                    :class="[
+                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                      formErrors.realName
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                    ]"
+                    placeholder="请输入真实姓名"
+                  />
+                  <div
+                    v-if="formErrors.realName"
+                    class="absolute -bottom-5 left-0 text-xs text-red-500"
+                  >
+                    {{ formErrors.realName }}
+                  </div>
+                </div>
+
+                <!-- 手机号 -->
+                <div class="relative flex flex-col gap-1">
+                  <label class="text-sm font-medium text-gray-700">
+                    手机号 <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    v-model="userForm.mobile"
+                    type="tel"
+                    :class="[
+                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                      formErrors.mobile
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                    ]"
+                    placeholder="请输入手机号"
+                  />
+                  <div
+                    v-if="formErrors.mobile"
+                    class="absolute -bottom-5 left-0 text-xs text-red-500"
+                  >
+                    {{ formErrors.mobile }}
+                  </div>
+                </div>
+
+                <!-- 邮箱 -->
+                <div class="relative flex flex-col gap-1">
+                  <label class="text-sm font-medium text-gray-700">
+                    邮箱
+                  </label>
+                  <input
+                    v-model="userForm.email"
+                    type="email"
+                    :class="[
+                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                      formErrors.email
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                    ]"
+                    placeholder="请输入邮箱（可选）"
+                  />
+                  <div
+                    v-if="formErrors.email"
+                    class="absolute -bottom-5 left-0 text-xs text-red-500"
+                  >
+                    {{ formErrors.email }}
                   </div>
                 </div>
               </div>
@@ -130,9 +191,13 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import api from '@/api'
 
-// 使用工具类型从 SystemUser 中提取 FormErrors 类型
-type FormErrors = Pick<SystemUser, 'name' | 'role'>
+// 表单错误类型定义
+type FormErrors = Pick<
+  SystemUser,
+  'userName' | 'password' | 'realName' | 'mobile' | 'email'
+>
 
 // 定义 emits
 const emit = defineEmits<{ refresh: [] }>()
@@ -142,17 +207,27 @@ const visible = ref(false)
 const isSubmitting = ref(false)
 
 // 用户表单数据
-const userForm = ref<SystemUser>({
-  id: '',
-  name: '',
-  role: '',
-  createdAt: ''
+const userForm = ref<
+  Pick<
+    SystemUser,
+    'id' | 'userName' | 'password' | 'realName' | 'mobile' | 'email'
+  >
+>({
+  id: 0,
+  userName: '',
+  password: '',
+  realName: '',
+  mobile: '',
+  email: ''
 })
 
 // 表单错误信息
 const formErrors = ref<FormErrors>({
-  name: '',
-  role: ''
+  userName: '',
+  password: '',
+  realName: '',
+  mobile: '',
+  email: ''
 })
 
 // 表单是否有效
@@ -161,28 +236,84 @@ const isFormValid = computed(() => {
 })
 
 /**
- * 校验用户名称
+ * 校验用户名
  */
-function validateName() {
-  if (!userForm.value.name.trim()) {
-    formErrors.value.name = '请输入用户名称'
-  } else if (userForm.value.name.trim().length < 2) {
-    formErrors.value.name = '用户名称至少需要2个字符'
-  } else if (userForm.value.name.trim().length > 20) {
-    formErrors.value.name = '用户名称不能超过20个字符'
+function validateUserName() {
+  // 只在新增用户时（id为空）校验用户名
+  if (!userForm.value.id) {
+    if (!userForm.value.userName?.trim()) {
+      formErrors.value.userName = '请输入用户名'
+    } else if (userForm.value.userName.trim().length < 2) {
+      formErrors.value.userName = '用户名至少需要2个字符'
+    } else if (userForm.value.userName.trim().length > 20) {
+      formErrors.value.userName = '用户名不能超过20个字符'
+    } else {
+      formErrors.value.userName = ''
+    }
   } else {
-    formErrors.value.name = ''
+    formErrors.value.userName = ''
   }
 }
 
 /**
- * 校验用户角色
+ * 校验密码
  */
-function validateRole() {
-  if (!userForm.value.role) {
-    formErrors.value.role = '请选择用户角色'
+function validatePassword() {
+  // 只在新增用户时（id为空）校验密码
+  if (!userForm.value.id) {
+    if (!userForm.value.password?.trim()) {
+      formErrors.value.password = '请输入密码'
+    } else if (userForm.value.password.trim().length < 6) {
+      formErrors.value.password = '密码至少需要6个字符'
+    } else {
+      formErrors.value.password = ''
+    }
   } else {
-    formErrors.value.role = ''
+    formErrors.value.password = ''
+  }
+}
+
+/**
+ * 校验真实姓名
+ */
+function validateRealName() {
+  if (!userForm.value.realName?.trim()) {
+    formErrors.value.realName = '请输入真实姓名'
+  } else if (userForm.value.realName.trim().length < 2) {
+    formErrors.value.realName = '真实姓名至少需要2个字符'
+  } else if (userForm.value.realName.trim().length > 20) {
+    formErrors.value.realName = '真实姓名不能超过20个字符'
+  } else {
+    formErrors.value.realName = ''
+  }
+}
+
+/**
+ * 校验手机号
+ */
+function validateMobile() {
+  const mobileRegex = /^1[3-9]\d{9}$/
+  if (!userForm.value.mobile?.trim()) {
+    formErrors.value.mobile = '请输入手机号'
+  } else if (!mobileRegex.test(userForm.value.mobile.trim())) {
+    formErrors.value.mobile = '请输入正确的手机号格式'
+  } else {
+    formErrors.value.mobile = ''
+  }
+}
+
+/**
+ * 校验邮箱
+ */
+function validateEmail() {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (
+    userForm.value.email?.trim() &&
+    !emailRegex.test(userForm.value.email.trim())
+  ) {
+    formErrors.value.email = '请输入正确的邮箱格式'
+  } else {
+    formErrors.value.email = ''
   }
 }
 
@@ -190,42 +321,40 @@ function validateRole() {
  * 校验所有表单字段
  */
 function validateForm() {
-  validateName()
-  validateRole()
+  validateUserName()
+  validatePassword()
+  validateRealName()
+  validateMobile()
+  validateEmail()
 }
 
 // 监听表单字段变化，实时校验
-watch(() => userForm.value.name, validateName)
-watch(() => userForm.value.role, validateRole)
-
-/**
- * 生成用户编号
- * @returns 用户编号
- */
-const generateUserId = (): string => {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const sequence = String(Date.now() % 10000).padStart(4, '0')
-  return `U${year}${month}${day}${sequence}`
-}
+watch(() => userForm.value.userName, validateUserName)
+watch(() => userForm.value.password, validatePassword)
+watch(() => userForm.value.realName, validateRealName)
+watch(() => userForm.value.mobile, validateMobile)
+watch(() => userForm.value.email, validateEmail)
 
 /**
  * 重置表单数据
  */
 const resetForm = (): void => {
   Object.assign(userForm.value, {
-    id: '',
-    name: '',
-    role: '',
-    createdAt: ''
+    id: 0,
+    userName: '',
+    password: '',
+    realName: '',
+    mobile: '',
+    email: ''
   })
 
   // 清空错误信息
   Object.assign(formErrors.value, {
-    name: '',
-    role: ''
+    userName: '',
+    password: '',
+    realName: '',
+    mobile: '',
+    email: ''
   })
 }
 
@@ -239,10 +368,12 @@ const open = (data?: SystemUser): void => {
   // 如果有初始数据，设置到表单中，否则重置表单
   if (data) {
     Object.assign(userForm.value, {
-      id: data.id || '',
-      name: data.name || '',
-      role: data.role || '',
-      createdAt: data.createdAt || ''
+      id: data.id || 0,
+      userName: data.userName || '',
+      password: data.password || '',
+      realName: data.realName || '',
+      mobile: data.mobile || '',
+      email: data.email || ''
     })
   }
 }
@@ -273,18 +404,21 @@ const createUser = async (): Promise<void> => {
   isSubmitting.value = true
 
   try {
-    const newUser: SystemUser = {
-      id: userForm.value.id || generateUserId(),
-      name: userForm.value.name.trim(),
-      role: userForm.value.role,
-      createdAt: userForm.value.createdAt || new Date().toISOString()
+    if (userForm.value.id) {
+      await api.loadAdminUsersEdit(userForm.value.id, {
+        realName: userForm.value.realName?.trim() || '',
+        mobile: userForm.value.mobile?.trim() || '',
+        email: userForm.value.email?.trim() || ''
+      })
+    } else {
+      await api.loadAdminUsersAdd({
+        userName: userForm.value.userName?.trim() || '',
+        password: userForm.value.password?.trim() || '',
+        realName: userForm.value.realName?.trim() || '',
+        mobile: userForm.value.mobile?.trim() || '',
+        email: userForm.value.email?.trim() || ''
+      })
     }
-
-    console.log('创建用户:', newUser)
-
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-
     // 触发刷新事件
     emit('refresh')
 
