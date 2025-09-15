@@ -2,6 +2,14 @@
 @tailwind components; // tailwind 组件样式（定义业务组件样式，默认为空）
 @tailwind utilities; // tailwind 工具样式（定义工具样式，默认包含绝大多数 atomic 样式）
 
+@layer base {
+  // 统一设置 input 和 select 的 placeholder 颜色
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-300;
+  }
+}
+
 @layer utilities {
   // 响应式：是否显示
   .md-hidden {
