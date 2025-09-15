@@ -360,23 +360,14 @@ const resetForm = (): void => {
 }
 
 /**
- * 加载角色列表
- */
-const loadRoleList = async (): Promise<void> => {
-  const res = await api.loadRoles()
-  roleList.value = isArray(res) ? res : []
-}
-
-/**
  * 对外暴露的 open 方法
  * @param data 可选的初始数据
  */
 const open = async (data?: SystemUser): Promise<void> => {
   visible.value = true
+  isSubmitting.value = false
+  roleList.value = []
   resetForm()
-
-  // 加载角色列表
-  await loadRoleList()
 
   // 如果有初始数据，设置到表单中，否则重置表单
   if (data) {
@@ -389,6 +380,9 @@ const open = async (data?: SystemUser): Promise<void> => {
       roleId: isArray(data.roles) ? data.roles[0].id : 0
     })
   }
+
+  const res = await api.loadRoles()
+  roleList.value = isArray(res) ? res : []
 }
 
 /**
