@@ -5,8 +5,8 @@
 /** 角色-可访问页面 */
 export const ROLE_PAGE: { [key: string]: string[] } = {
   // TODO: 更新角色 code
-  admin: ['/admin-dashboard', '/user-management'],
-  sales: [
+  SAMPLING_OPERATOR: ['/admin-dashboard', '/user-management'],
+  SALES_PERSON: [
     '/sales-dashboard',
     '/sales-detail',
     '/sales-form',
@@ -14,7 +14,7 @@ export const ROLE_PAGE: { [key: string]: string[] } = {
     '/customer-detail'
   ],
   review: ['/review-dashboard', '/review-detail'],
-  SAMPLING_OPERATOR: ['/sampling-dashboard', '/sampling-detail'],
+  SAMPLING_OPERATOR1: ['/sampling-dashboard', '/sampling-detail'],
   sampler: ['/sampler-dashboard', '/sampler-detail'],
   sample: ['/sample-dashboard', '/sample-detail']
 }

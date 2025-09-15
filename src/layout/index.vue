@@ -59,7 +59,7 @@
         >
           {{ userInitial }}
         </div>
-        <div class="md-hidden text-sm font-medium">{{ user.userName }}</div>
+        <div class="md-hidden text-sm font-medium">{{ user.realName }}</div>
         <svg
           class="transition-transform duration-300"
           :class="{ 'rotate-180': dropdownOpen }"
@@ -94,7 +94,7 @@
                 class="flex flex-auto flex-col flex-nowrap items-start justify-center gap-1"
               >
                 <div class="text-base font-semibold">
-                  {{ user.userName }}
+                  {{ user.realName }}
                 </div>
                 <div
                   class="inline-block rounded-xl bg-white/20 px-2 py-0.5 text-xs opacity-90"
@@ -158,7 +158,7 @@ const dropdownOpen = ref(false)
 const canBack = computed(() => route.path.indexOf('-dashboard') === -1)
 
 const userInitial = computed(() => {
-  return user.value.userName?.charAt(0).toUpperCase()
+  return user.value.realName?.charAt(0).toUpperCase()
 })
 
 // 监听当前路由 meta 中的 title 值

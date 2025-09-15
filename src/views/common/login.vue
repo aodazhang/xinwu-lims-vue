@@ -11,38 +11,60 @@
         <p class="text-sm text-gray-500">心吾检测实验室信息管理系统</p>
       </div>
       <form @submit.prevent="handleLogin">
-        <div class="mb-5">
+        <div class="relative mb-6">
           <label
             for="username"
             class="mb-2 block text-sm font-medium text-gray-700"
           >
-            用户名
+            用户名 <span class="text-red-500">*</span>
           </label>
           <input
             id="username"
             v-model="loginForm.username"
             type="text"
             placeholder="请输入用户名"
-            class="focus:ring-3 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all duration-300 focus:border-indigo-500 focus:outline-none focus:ring-indigo-100"
-            required
+            :class="[
+              'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+              formErrors.username
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+            ]"
+            @blur="validateUsername"
           />
+          <div
+            v-if="formErrors.username"
+            class="absolute -bottom-5 left-0 text-xs text-red-500"
+          >
+            {{ formErrors.username }}
+          </div>
         </div>
 
-        <div class="mb-8">
+        <div class="relative mb-8">
           <label
             for="password"
             class="mb-2 block text-sm font-medium text-gray-700"
           >
-            密码
+            密码 <span class="text-red-500">*</span>
           </label>
           <input
             id="password"
             v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
-            class="focus:ring-3 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all duration-300 focus:border-indigo-500 focus:outline-none focus:ring-indigo-100"
-            required
+            :class="[
+              'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+              formErrors.password
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+            ]"
+            @blur="validatePassword"
           />
+          <div
+            v-if="formErrors.password"
+            class="absolute -bottom-5 left-0 text-xs text-red-500"
+          >
+            {{ formErrors.password }}
+          </div>
         </div>
 
         <button
@@ -53,10 +75,6 @@
           <span v-if="isLoading" class="animate-pulse">登录中...</span>
           <span v-else>登录系统</span>
         </button>
-
-        <div v-if="errorMessage" class="mt-2 text-xs text-red-500">
-          {{ errorMessage }}
-        </div>
       </form>
     </div>
   </div>
@@ -81,34 +99,65 @@ const loginForm = ref({
 
 // 状态管理
 const isLoading = ref(false)
-const errorMessage = ref('')
-const showSuccessTip = ref(false)
+const formErrors = ref({
+  username: '',
+  password: ''
+})
+
+/**
+ * 校验用户名
+ */
+const validateUsername = () => {
+  if (!loginForm.value.username.trim()) {
+    formErrors.value.username = '请输入用户名'
+  } else if (loginForm.value.username.length < 2) {
+    formErrors.value.username = '用户名至少2个字符'
+  } else {
+    formErrors.value.username = ''
+  }
+}
+
+/**
+ * 校验密码
+ */
+const validatePassword = () => {
+  if (!loginForm.value.password.trim()) {
+    formErrors.value.password = '请输入密码'
+  } else if (loginForm.value.password.length < 6) {
+    formErrors.value.password = '密码至少6个字符'
+  } else {
+    formErrors.value.password = ''
+  }
+}
+
+/**
+ * 校验整个表单
+ */
+const validateForm = () => {
+  validateUsername()
+  validatePassword()
+  return !formErrors.value.username && !formErrors.value.password
+}
 
 /**
  * 处理登录
  */
 const handleLogin = async () => {
-  if (!loginForm.value.username || !loginForm.value.password) {
-    errorMessage.value = '请填写完整的登录信息'
+  // 先进行表单校验
+  if (!validateForm()) {
     return
   }
 
-  isLoading.value = true
-  errorMessage.value = ''
-
   try {
-    // 模拟登录请求
+    isLoading.value = true
+
     await user.login(loginForm.value.username, loginForm.value.password)
     await user.info()
-
-    // 登录成功
-    showSuccessTip.value = true
 
     // 根据用户角色跳转到对应的首页
     const pathList = ROLE_PAGE[user.role.roleCode] || []
     router.push(pathList[0] || '/')
   } catch (error) {
-    errorMessage.value = '登录失败，请检查用户名和密码'
   } finally {
     isLoading.value = false
   }
