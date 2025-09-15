@@ -30,7 +30,7 @@ export default defineConfig(env => ({
     proxy: {
       // 代理访问解决测试环境跨域
       '/api': {
-        target: 'http://47.96.82.12:8080/api',
+        target: 'http://8.153.90.189:8080',
         changeOrigin: true,
         ws: true,
         rewrite: path => path.replace(/^\/api/, '')

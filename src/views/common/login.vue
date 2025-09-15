@@ -65,11 +65,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { toolSleep } from '@/utils/tool'
+import { userStore } from '@/store'
+import { ROLE_PAGE } from '@/utils/constant'
 
 defineOptions({ name: 'Login' })
 
 const router = useRouter()
+const user = userStore()
 
 // 表单数据
 const loginForm = ref({
@@ -96,12 +98,15 @@ const handleLogin = async () => {
 
   try {
     // 模拟登录请求
-    await toolSleep(1000)
+    await user.login(loginForm.value.username, loginForm.value.password)
+    await user.info()
 
     // 登录成功
     showSuccessTip.value = true
 
-    router.push({ path: '/sales-dashboard' })
+    // 根据用户角色跳转到对应的首页
+    const pathList = ROLE_PAGE[user.role.roleCode] || []
+    router.push(pathList[0] || '/')
   } catch (error) {
     errorMessage.value = '登录失败，请检查用户名和密码'
   } finally {

@@ -4,7 +4,6 @@
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
-import { isString } from '@/utils/is'
 
 /** vue-router实例 */
 const router = createRouter({
@@ -14,6 +13,11 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/common/login.vue')
+    },
+    {
+      path: '/403',
+      name: 'Forbidden',
+      component: () => import('@/views/common/403.vue')
     },
     {
       path: '/',
@@ -147,15 +151,6 @@ const router = createRouter({
   scrollBehavior(_to, _from, savedPosition) {
     return savedPosition ? savedPosition : { top: 0, left: 0 }
   }
-})
-
-router.beforeEach(async (to, _from, next) => {
-  // 更新页面标题
-  document.title = isString(to.meta?.title)
-    ? to.meta.title
-    : import.meta.env.VITE_TITLE
-
-  next()
 })
 
 export default router

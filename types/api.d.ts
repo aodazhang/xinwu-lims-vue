@@ -3,18 +3,59 @@
  */
 
 declare global {
+  // ==================== 公共 ====================
+
+  interface CommonResponse<T = any> {
+    /** 是否成功 */
+    success: boolean
+    /** 是否失败 */
+    fail: boolean
+    /** 接口说明信息 */
+    message: string
+    /** 接口失败 code */
+    code: string
+    /** 数据 */
+    data: T
+    /** 时间戳 */
+    timestamp: number
+  }
+
   // ==================== 系统管理 ====================
 
   /** 系统用户 */
   interface SystemUser {
-    /** 用户ID/编号 */
-    id: string
-    /** 用户名称 */
-    name: string
-    /** 用户角色 */
-    role: string
+    /** 用户ID */
+    id: number
     /** 创建时间 */
-    createdAt?: string
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 用户名 */
+    userName: string
+    /** 手机号 */
+    mobile: string
+    /** 真实姓名 */
+    realName: string
+    /** 邮箱 */
+    email?: string | null
+    /** 用户角色列表 */
+    roles: SystemRole[]
+  }
+
+  /** 系统角色 */
+  interface SystemRole {
+    /** 角色ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 角色代码 */
+    roleCode: string
+    /** 角色名称 */
+    roleName: string
+    /** 备注 */
+    remark?: string | null
   }
 
   // ==================== 业务管理 ====================

@@ -8,6 +8,7 @@ import * as ElementPlusIcons from '@element-plus/icons-vue'
 import store from './store'
 import router from './router'
 import App from './App.vue'
+import './permission'
 import './tailwindcss.scss'
 import './element.scss'
 
