@@ -59,7 +59,7 @@
         >
           {{ userInitial }}
         </div>
-        <div class="md-hidden text-sm font-medium">{{ currentUser }}</div>
+        <div class="md-hidden text-sm font-medium">{{ user.userName }}</div>
         <svg
           class="transition-transform duration-300"
           :class="{ 'rotate-180': dropdownOpen }"
@@ -94,12 +94,12 @@
                 class="flex flex-auto flex-col flex-nowrap items-start justify-center gap-1"
               >
                 <div class="text-base font-semibold">
-                  {{ currentUser }}
+                  {{ user.userName }}
                 </div>
                 <div
                   class="inline-block rounded-xl bg-white/20 px-2 py-0.5 text-xs opacity-90"
                 >
-                  {{ getRoleDisplayName(currentRole) }}
+                  {{ role.roleName }}
                 </div>
               </div>
             </div>
@@ -143,21 +143,22 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { userStore } from '@/store/modules/user'
 
-const router = useRouter()
 const route = useRoute()
+const store = userStore()
+const { user, role } = storeToRefs(store)
 
 // 状态管理
 const dropdownOpen = ref(false)
-const currentUser = ref('王总')
-const currentRole = ref('admin')
 
 // 计算属性
 const canBack = computed(() => route.path.indexOf('-dashboard') === -1)
 
 const userInitial = computed(() => {
-  return currentUser.value.charAt(0).toUpperCase()
+  return user.value.userName?.charAt(0).toUpperCase()
 })
 
 // 监听当前路由 meta 中的 title 值
@@ -170,27 +171,9 @@ const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
 
-const getRoleDisplayName = (role: string) => {
-  const roleNames = {
-    sales: '销售人员',
-    reviewer: '订单审核员',
-    sampling_dispatcher: '采样调度员',
-    sampling_staff: '采样人员',
-    sample_manager: '样品管理员',
-    'lab-supervisor': '实验室主管',
-    'lab-technician': '检测员',
-    report_creator: '报告编制员',
-    report_reviewer: '报告审核员',
-    report_approver: '报告审批员',
-    admin: '系统管理员'
-  }
-  return roleNames[role as keyof typeof roleNames] || '用户'
-}
-
 const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {
-    // 跳转到登录页
-    router.replace('/login')
+    store.signout()
   }
   dropdownOpen.value = false
 }
