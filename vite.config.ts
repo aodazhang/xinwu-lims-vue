@@ -29,11 +29,11 @@ export default defineConfig(env => ({
     port: 8080,
     proxy: {
       // 代理访问解决测试环境跨域
-      '/api': {
+      '/xinwu-api': {
         target: 'http://8.153.90.189:8080',
         changeOrigin: true,
         ws: true,
-        rewrite: path => path.replace(/^\/api/, '')
+        rewrite: path => path.replace(/^\/xinwu-api/, '')
       }
     }
   },
