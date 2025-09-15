@@ -4,7 +4,7 @@
     <common-title title="用户管理" content="系统管理工作台 / 用户管理" />
 
     <!-- 统计卡片 -->
-    <common-stats :model="statsData" />
+    <!-- <common-stats :model="statsData" /> -->
 
     <!-- 操作按钮 -->
     <div class="mt-5 flex flex-wrap gap-4">
@@ -88,13 +88,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { isArray, isNumber, isString } from '@/utils/is'
 import { dateToString } from '@/utils/date'
 import Message from '@/utils/message'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
-import CommonStats from '@/components/common-stats.vue'
+// import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 import CommonModalUser from '@/components/common-modal-user.vue'
@@ -106,11 +106,11 @@ const searchKeyword = ref('')
 const createModalRef = ref<InstanceType<typeof CommonModalUser>>()
 
 // 统计数据
-const statsData = computed(() => [
-  { label: '当前用户数量', value: tableConfig.value.total },
-  { label: '活跃用户数量', value: 0 },
-  { label: '管理员数量', value: 0 }
-])
+// const statsData = computed(() => [
+//   { label: '当前用户数量', value: tableConfig.value.total },
+//   { label: '活跃用户数量', value: 0 },
+//   { label: '管理员数量', value: 0 }
+// ])
 
 // 用户数据
 const users = ref<SystemUser[]>([])
@@ -130,10 +130,11 @@ const tableColumns = [
   {
     label: '用户ID',
     props: 'id',
-    minWidth: 150,
+    minWidth: 100,
     slotName: 'userIdSlot'
   },
-  { label: '用户名称', props: 'userName', minWidth: 180 },
+  { label: '用户名', props: 'userName', minWidth: 180 },
+  { label: '真实姓名', props: 'realName', minWidth: 150 },
   { label: '用户角色', props: 'role', minWidth: 150, slotName: 'roleSlot' },
   {
     label: '创建时间',

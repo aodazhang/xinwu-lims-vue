@@ -41,8 +41,6 @@ declare global {
     updateTime: string
     /** 用户名 */
     userName: string
-    /** 密码 */
-    password: string
     /** 手机号 */
     mobile: string
     /** 真实姓名 */

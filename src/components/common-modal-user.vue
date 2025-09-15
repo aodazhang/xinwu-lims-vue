@@ -59,30 +59,6 @@
                   </div>
                 </div>
 
-                <!-- 密码 -->
-                <div class="relative flex flex-col gap-1" v-if="!userForm.id">
-                  <label class="text-sm font-medium text-gray-700">
-                    密码 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="userForm.password"
-                    type="text"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.password
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入密码"
-                  />
-                  <div
-                    v-if="formErrors.password"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.password }}
-                  </div>
-                </div>
-
                 <!-- 真实姓名 -->
                 <div class="relative flex flex-col gap-1">
                   <label class="text-sm font-medium text-gray-700">
@@ -194,10 +170,7 @@ import { ref, watch, computed } from 'vue'
 import api from '@/api'
 
 // 表单错误类型定义
-type FormErrors = Pick<
-  SystemUser,
-  'userName' | 'password' | 'realName' | 'mobile' | 'email'
->
+type FormErrors = Pick<SystemUser, 'userName' | 'realName' | 'mobile' | 'email'>
 
 // 定义 emits
 const emit = defineEmits<{ refresh: [] }>()
@@ -208,23 +181,19 @@ const isSubmitting = ref(false)
 
 // 用户表单数据
 const userForm = ref<
-  Pick<
-    SystemUser,
-    'id' | 'userName' | 'password' | 'realName' | 'mobile' | 'email'
-  >
+  Pick<SystemUser, 'id' | 'userName' | 'realName' | 'mobile' | 'email'>
 >({
   id: 0,
   userName: '',
-  password: '',
   realName: '',
   mobile: '',
   email: ''
+  // TODO: 增加角色选择
 })
 
 // 表单错误信息
 const formErrors = ref<FormErrors>({
   userName: '',
-  password: '',
   realName: '',
   mobile: '',
   email: ''
@@ -252,24 +221,6 @@ function validateUserName() {
     }
   } else {
     formErrors.value.userName = ''
-  }
-}
-
-/**
- * 校验密码
- */
-function validatePassword() {
-  // 只在新增用户时（id为空）校验密码
-  if (!userForm.value.id) {
-    if (!userForm.value.password?.trim()) {
-      formErrors.value.password = '请输入密码'
-    } else if (userForm.value.password.trim().length < 6) {
-      formErrors.value.password = '密码至少需要6个字符'
-    } else {
-      formErrors.value.password = ''
-    }
-  } else {
-    formErrors.value.password = ''
   }
 }
 
@@ -322,7 +273,6 @@ function validateEmail() {
  */
 function validateForm() {
   validateUserName()
-  validatePassword()
   validateRealName()
   validateMobile()
   validateEmail()
@@ -330,7 +280,6 @@ function validateForm() {
 
 // 监听表单字段变化，实时校验
 watch(() => userForm.value.userName, validateUserName)
-watch(() => userForm.value.password, validatePassword)
 watch(() => userForm.value.realName, validateRealName)
 watch(() => userForm.value.mobile, validateMobile)
 watch(() => userForm.value.email, validateEmail)
@@ -370,7 +319,6 @@ const open = (data?: SystemUser): void => {
     Object.assign(userForm.value, {
       id: data.id || 0,
       userName: data.userName || '',
-      password: data.password || '',
       realName: data.realName || '',
       mobile: data.mobile || '',
       email: data.email || ''
@@ -413,7 +361,6 @@ const createUser = async (): Promise<void> => {
     } else {
       await api.loadAdminUsersAdd({
         userName: userForm.value.userName?.trim() || '',
-        password: userForm.value.password?.trim() || '',
         realName: userForm.value.realName?.trim() || '',
         mobile: userForm.value.mobile?.trim() || '',
         email: userForm.value.email?.trim() || ''
