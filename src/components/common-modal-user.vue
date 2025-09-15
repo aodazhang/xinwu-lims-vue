@@ -130,6 +130,37 @@
                     {{ formErrors.email }}
                   </div>
                 </div>
+
+                <!-- 用户角色 -->
+                <div class="relative flex flex-col gap-1">
+                  <label class="text-sm font-medium text-gray-700">
+                    用户角色 <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    v-model="userForm.roleId"
+                    :class="[
+                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                      formErrors.roleId
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                    ]"
+                  >
+                    <option value="0" disabled>请选择用户角色</option>
+                    <option
+                      v-for="role in roleList"
+                      :key="role.id"
+                      :value="role.id"
+                    >
+                      {{ role.roleName }}
+                    </option>
+                  </select>
+                  <div
+                    v-if="formErrors.roleId"
+                    class="absolute -bottom-5 left-0 text-xs text-red-500"
+                  >
+                    {{ formErrors.roleId }}
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -167,10 +198,14 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { isArray } from '@/utils/is'
 import api from '@/api'
 
 // 表单错误类型定义
-type FormErrors = Pick<SystemUser, 'userName' | 'realName' | 'mobile' | 'email'>
+type FormErrors = Pick<
+  SystemUser,
+  'userName' | 'realName' | 'mobile' | 'email'
+> & { roleId: string }
 
 // 定义 emits
 const emit = defineEmits<{ refresh: [] }>()
@@ -178,17 +213,20 @@ const emit = defineEmits<{ refresh: [] }>()
 // 内部维护的状态
 const visible = ref(false)
 const isSubmitting = ref(false)
+const roleList = ref<SystemRole[]>([])
 
 // 用户表单数据
 const userForm = ref<
-  Pick<SystemUser, 'id' | 'userName' | 'realName' | 'mobile' | 'email'>
+  Pick<SystemUser, 'id' | 'userName' | 'realName' | 'mobile' | 'email'> & {
+    roleId: number
+  }
 >({
   id: 0,
   userName: '',
   realName: '',
   mobile: '',
-  email: ''
-  // TODO: 增加角色选择
+  email: '',
+  roleId: 0
 })
 
 // 表单错误信息
@@ -196,7 +234,8 @@ const formErrors = ref<FormErrors>({
   userName: '',
   realName: '',
   mobile: '',
-  email: ''
+  email: '',
+  roleId: ''
 })
 
 // 表单是否有效
@@ -269,6 +308,17 @@ function validateEmail() {
 }
 
 /**
+ * 校验角色选择
+ */
+function validateRoleId() {
+  if (!userForm.value.roleId || userForm.value.roleId === 0) {
+    formErrors.value.roleId = '请选择用户角色'
+  } else {
+    formErrors.value.roleId = ''
+  }
+}
+
+/**
  * 校验所有表单字段
  */
 function validateForm() {
@@ -276,6 +326,7 @@ function validateForm() {
   validateRealName()
   validateMobile()
   validateEmail()
+  validateRoleId()
 }
 
 // 监听表单字段变化，实时校验
@@ -283,6 +334,7 @@ watch(() => userForm.value.userName, validateUserName)
 watch(() => userForm.value.realName, validateRealName)
 watch(() => userForm.value.mobile, validateMobile)
 watch(() => userForm.value.email, validateEmail)
+watch(() => userForm.value.roleId, validateRoleId)
 
 /**
  * 重置表单数据
@@ -291,29 +343,41 @@ const resetForm = (): void => {
   Object.assign(userForm.value, {
     id: 0,
     userName: '',
-    password: '',
     realName: '',
     mobile: '',
-    email: ''
+    email: '',
+    roleId: 0
   })
 
   // 清空错误信息
   Object.assign(formErrors.value, {
     userName: '',
-    password: '',
     realName: '',
     mobile: '',
-    email: ''
+    email: '',
+    roleId: ''
   })
+}
+
+/**
+ * 加载角色列表
+ */
+const loadRoleList = async (): Promise<void> => {
+  const res = await api.loadRoles()
+  roleList.value = isArray(res) ? res : []
 }
 
 /**
  * 对外暴露的 open 方法
  * @param data 可选的初始数据
  */
-const open = (data?: SystemUser): void => {
+const open = async (data?: SystemUser): Promise<void> => {
   visible.value = true
   resetForm()
+
+  // 加载角色列表
+  await loadRoleList()
+
   // 如果有初始数据，设置到表单中，否则重置表单
   if (data) {
     Object.assign(userForm.value, {
@@ -321,7 +385,8 @@ const open = (data?: SystemUser): void => {
       userName: data.userName || '',
       realName: data.realName || '',
       mobile: data.mobile || '',
-      email: data.email || ''
+      email: data.email || '',
+      roleId: isArray(data.roles) ? data.roles[0].id : 0
     })
   }
 }
@@ -356,14 +421,16 @@ const createUser = async (): Promise<void> => {
       await api.loadAdminUsersEdit(userForm.value.id, {
         realName: userForm.value.realName?.trim() || '',
         mobile: userForm.value.mobile?.trim() || '',
-        email: userForm.value.email?.trim() || ''
+        email: userForm.value.email?.trim() || '',
+        roleId: userForm.value.roleId
       })
     } else {
       await api.loadAdminUsersAdd({
         userName: userForm.value.userName?.trim() || '',
         realName: userForm.value.realName?.trim() || '',
         mobile: userForm.value.mobile?.trim() || '',
-        email: userForm.value.email?.trim() || ''
+        email: userForm.value.email?.trim() || '',
+        roleId: userForm.value.roleId
       })
     }
     // 触发刷新事件

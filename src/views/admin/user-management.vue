@@ -17,7 +17,11 @@
     </div>
 
     <!-- 搜索栏 -->
-    <common-filter title="用户列表" @filter="loadDataList(true)">
+    <common-filter
+      title="用户列表"
+      @reset="onResetList"
+      @filter="loadDataList(true)"
+    >
       <input
         v-model="searchKeyword"
         type="text"
@@ -33,16 +37,6 @@
       :model="users"
       @current-change="loadDataList(false)"
     >
-      <!-- 用户ID插槽 -->
-      <template #userIdSlot="{ scope }">
-        <button
-          class="cursor-pointer font-medium text-indigo-600 transition-colors duration-200 hover:text-indigo-800 hover:underline"
-          @click="onClickEdit(scope)"
-        >
-          {{ scope.id }}
-        </button>
-      </template>
-
       <!-- 用户角色插槽 -->
       <template #roleSlot="{ scope }">
         <div class="flex flex-wrap gap-1">
@@ -60,6 +54,11 @@
       <!-- 创建时间插槽 -->
       <template #createTimeSlot="{ scope }">
         <div>{{ dateToString(scope.createTime) }}</div>
+      </template>
+
+      <!-- 更新时间插槽 -->
+      <template #updateTimeSlot="{ scope }">
+        <div>{{ dateToString(scope.updateTime) }}</div>
       </template>
 
       <!-- 操作插槽 -->
@@ -91,6 +90,7 @@
 import { ref, onMounted } from 'vue'
 import { isArray, isNumber, isString } from '@/utils/is'
 import { dateToString } from '@/utils/date'
+import { UserRole } from '@/utils/enum'
 import Message from '@/utils/message'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
@@ -127,12 +127,6 @@ const tableConfig = ref({
 
 // 表格列配置
 const tableColumns = [
-  {
-    label: '用户ID',
-    props: 'id',
-    minWidth: 100,
-    slotName: 'userIdSlot'
-  },
   { label: '用户名', props: 'userName', minWidth: 180 },
   { label: '真实姓名', props: 'realName', minWidth: 150 },
   { label: '用户角色', props: 'role', minWidth: 150, slotName: 'roleSlot' },
@@ -142,23 +136,29 @@ const tableColumns = [
     minWidth: 180,
     slotName: 'createTimeSlot'
   },
+  {
+    label: '更新时间',
+    props: 'updateTime',
+    minWidth: 180,
+    slotName: 'updateTimeSlot'
+  },
   { label: '操作', props: 'action', width: 150, slotName: 'actionSlot' }
 ]
 
 // 获取角色样式类
 const getRoleClass = (roleCode: string) => {
   const roleClasses = {
-    ADMIN: 'bg-red-100 text-red-800',
-    SALES_PERSON: 'bg-blue-100 text-blue-800',
-    ORDER_REVIEWER: 'bg-green-100 text-green-800',
-    SAMPLING_DISPATCHER: 'bg-purple-100 text-purple-800',
-    SAMPLING_OPERATOR: 'bg-yellow-100 text-yellow-800',
-    SAMPLE_MANAGER: 'bg-indigo-100 text-indigo-800',
-    LAB_SUPERVISOR: 'bg-pink-100 text-pink-800',
-    LAB_TECHNICIAN: 'bg-cyan-100 text-cyan-800',
-    REPORT_WRITER: 'bg-orange-100 text-orange-800',
-    REPORT_REVIEWER: 'bg-teal-100 text-teal-800',
-    REPORT_APPROVER: 'bg-emerald-100 text-emerald-800'
+    [UserRole.ADMIN]: 'bg-red-100 text-red-800',
+    [UserRole.SALES_PERSON]: 'bg-blue-100 text-blue-800',
+    [UserRole.ORDER_REVIEWER]: 'bg-green-100 text-green-800',
+    [UserRole.SAMPLING_DISPATCHER]: 'bg-purple-100 text-purple-800',
+    [UserRole.SAMPLING_OPERATOR]: 'bg-yellow-100 text-yellow-800',
+    [UserRole.SAMPLE_MANAGER]: 'bg-indigo-100 text-indigo-800',
+    [UserRole.LAB_SUPERVISOR]: 'bg-pink-100 text-pink-800',
+    [UserRole.LAB_TECHNICIAN]: 'bg-cyan-100 text-cyan-800',
+    [UserRole.REPORT_WRITER]: 'bg-orange-100 text-orange-800',
+    [UserRole.REPORT_REVIEWER]: 'bg-teal-100 text-teal-800',
+    [UserRole.REPORT_APPROVER]: 'bg-emerald-100 text-emerald-800'
   }
   return (
     roleClasses[roleCode as keyof typeof roleClasses] ||
@@ -180,6 +180,12 @@ const onClickEdit = (user: SystemUser) => {
 const onClickReset = async (user: SystemUser) => {
   await api.loadAdminUsersPasswordReset(user.id)
   Message.success('密码重置成功')
+}
+
+// 重置筛选条件
+const onResetList = () => {
+  searchKeyword.value = ''
+  loadDataList(true)
 }
 
 // 处理刷新事件

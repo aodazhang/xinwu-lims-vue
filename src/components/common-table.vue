@@ -23,6 +23,14 @@
         width="60"
         align="center"
       />
+      <!-- 序号列 -->
+      <el-table-column
+        type="index"
+        width="60"
+        label="序号"
+        align="center"
+        fixed="left"
+      />
       <!-- 普通、插槽列 -->
       <el-table-column
         v-for="(

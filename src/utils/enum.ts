@@ -51,3 +51,33 @@ export enum MimeType {
   /** 压缩包：zip */
   Zip = 'application/zip'
 }
+
+/** 用户角色 */
+export enum UserRole {
+  /** [系统管理]系统管理员 */
+  ADMIN = 'ADMIN',
+
+  /** [业务管理]销售人员 */
+  SALES_PERSON = 'SALES_PERSON',
+  /** [业务管理]订单审核员 */
+  ORDER_REVIEWER = 'ORDER_REVIEWER',
+
+  /** [现场作业]采样调度员 */
+  SAMPLING_DISPATCHER = 'SAMPLING_DISPATCHER',
+  /** [现场作业]采样人员 */
+  SAMPLING_OPERATOR = 'SAMPLING_OPERATOR',
+  /** [现场作业]样品管理员 */
+  SAMPLE_MANAGER = 'SAMPLE_MANAGER',
+
+  /** [实验室检测]实验室主管 */
+  LAB_SUPERVISOR = 'LAB_SUPERVISOR',
+  /** [实验室检测]实验室检测员 */
+  LAB_TECHNICIAN = 'LAB_TECHNICIAN',
+
+  /** [报告管理]报告编制员 */
+  REPORT_WRITER = 'REPORT_WRITER',
+  /** [报告管理]报告审核员 */
+  REPORT_REVIEWER = 'REPORT_REVIEWER',
+  /** [报告管理]报告批准人 */
+  REPORT_APPROVER = 'REPORT_APPROVER'
+}
