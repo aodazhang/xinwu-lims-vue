@@ -409,7 +409,9 @@ const loadDataDetail = async () => {
     loading.value = true
 
     const res = await api.loadCustomersDetail(+props.customerId)
-    customerData.value = isObject(res) ? res : customerData.value
+    customerData.value = isObject(res)
+      ? { ...customerData.value, ...res }
+      : customerData.value
   } catch (error) {
     console.error('加载客户数据失败:', error)
   } finally {

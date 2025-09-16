@@ -188,6 +188,12 @@ declare global {
 
     /** 附件列表 */
     attachmentList: string[]
+
+    /** 订单检测信息 */
+    orderDetectionItemList: {
+      detectionItemId: number
+      detectionItemStandardId: number
+    }[]
     /** 附件列表 */
     attachmentPayloadList: {
       url: string

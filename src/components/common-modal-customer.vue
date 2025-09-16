@@ -33,207 +33,205 @@
 
           <!-- 弹窗内容 -->
           <div class="max-h-[calc(90vh-300px)] overflow-y-auto p-6">
-            <form @submit.prevent="createCustomer">
-              <div class="space-y-6 pb-4">
-                <!-- 客户名称 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户名称 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="customerForm.customerName"
-                    type="text"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.customerName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入客户名称"
-                  />
-                  <div
-                    v-if="formErrors.customerName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.customerName }}
-                  </div>
-                </div>
-
-                <!-- 客户联系人 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户联系人 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="customerForm.contactPerson"
-                    type="text"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.contactPerson
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入联系人姓名"
-                  />
-                  <div
-                    v-if="formErrors.contactPerson"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.contactPerson }}
-                  </div>
-                </div>
-
-                <!-- 客户联系电话 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户联系电话 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="customerForm.contactPhone"
-                    type="tel"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.contactPhone
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入联系电话"
-                  />
-                  <div
-                    v-if="formErrors.contactPhone"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.contactPhone }}
-                  </div>
-                </div>
-
-                <!-- 客户地址 -->
-                <div class="flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700"
-                    >客户地址</label
-                  >
-                  <input
-                    v-model="customerForm.customerAddress"
-                    type="text"
-                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                    placeholder="请输入客户地址"
-                  />
-                </div>
-
-                <!-- 客户分类 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户分类 <span class="text-red-500">*</span>
-                  </label>
-                  <select
-                    v-model="customerForm.customerCategoryId"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.customerCategoryName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                  >
-                    <option value="0" disabled>请选择客户分类</option>
-                    <option
-                      v-for="item in customerCategoryList"
-                      :key="item.id"
-                      :value="item.id"
-                    >
-                      {{ item.dicValue }}
-                    </option>
-                  </select>
-                  <div
-                    v-if="formErrors.customerCategoryName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.customerCategoryName }}
-                  </div>
-                </div>
-
-                <!-- 客户来源 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户来源 <span class="text-red-500">*</span>
-                  </label>
-                  <select
-                    v-model="customerForm.customerSourceId"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.customerSourceName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                  >
-                    <option value="0" disabled>请选择客户来源</option>
-                    <option
-                      v-for="item in customerSourceList"
-                      :key="item.id"
-                      :value="item.id"
-                    >
-                      {{ item.dicValue }}
-                    </option>
-                  </select>
-                  <div
-                    v-if="formErrors.customerSourceName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.customerSourceName }}
-                  </div>
-                </div>
-
-                <!-- 客户状态 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    客户状态 <span class="text-red-500">*</span>
-                  </label>
-                  <select
-                    v-model="customerForm.customerStatusId"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.customerStatusName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                  >
-                    <option value="0" disabled>请选择客户状态</option>
-                    <option
-                      v-for="item in customerStatusList"
-                      :key="item.id"
-                      :value="item.id"
-                    >
-                      {{ item.dicValue }}
-                    </option>
-                  </select>
-                  <div
-                    v-if="formErrors.customerStatusName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.customerStatusName }}
-                  </div>
-                </div>
-
-                <!-- 所属行业 -->
-                <div class="flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    所属行业
-                  </label>
-                  <select
-                    v-model="customerForm.industryId"
-                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                  >
-                    <option value="0" disabled>请选择所属行业</option>
-                    <option
-                      v-for="item in industryList"
-                      :key="item.id"
-                      :value="item.id"
-                    >
-                      {{ item.dicValue }}
-                    </option>
-                  </select>
+            <div class="space-y-6 pb-4">
+              <!-- 客户名称 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户名称 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="customerForm.customerName"
+                  type="text"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.customerName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入客户名称"
+                />
+                <div
+                  v-if="formErrors.customerName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.customerName }}
                 </div>
               </div>
-            </form>
+
+              <!-- 客户联系人 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户联系人 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="customerForm.contactPerson"
+                  type="text"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.contactPerson
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入联系人姓名"
+                />
+                <div
+                  v-if="formErrors.contactPerson"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.contactPerson }}
+                </div>
+              </div>
+
+              <!-- 客户联系电话 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户联系电话 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="customerForm.contactPhone"
+                  type="tel"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.contactPhone
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入联系电话"
+                />
+                <div
+                  v-if="formErrors.contactPhone"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.contactPhone }}
+                </div>
+              </div>
+
+              <!-- 客户地址 -->
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700"
+                  >客户地址</label
+                >
+                <input
+                  v-model="customerForm.customerAddress"
+                  type="text"
+                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  placeholder="请输入客户地址"
+                />
+              </div>
+
+              <!-- 客户分类 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户分类 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  v-model="customerForm.customerCategoryId"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.customerCategoryName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                >
+                  <option value="0" disabled>请选择客户分类</option>
+                  <option
+                    v-for="item in customerCategoryList"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.dicValue }}
+                  </option>
+                </select>
+                <div
+                  v-if="formErrors.customerCategoryName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.customerCategoryName }}
+                </div>
+              </div>
+
+              <!-- 客户来源 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户来源 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  v-model="customerForm.customerSourceId"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.customerSourceName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                >
+                  <option value="0" disabled>请选择客户来源</option>
+                  <option
+                    v-for="item in customerSourceList"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.dicValue }}
+                  </option>
+                </select>
+                <div
+                  v-if="formErrors.customerSourceName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.customerSourceName }}
+                </div>
+              </div>
+
+              <!-- 客户状态 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  客户状态 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  v-model="customerForm.customerStatusId"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.customerStatusName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                >
+                  <option value="0" disabled>请选择客户状态</option>
+                  <option
+                    v-for="item in customerStatusList"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.dicValue }}
+                  </option>
+                </select>
+                <div
+                  v-if="formErrors.customerStatusName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.customerStatusName }}
+                </div>
+              </div>
+
+              <!-- 所属行业 -->
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  所属行业
+                </label>
+                <select
+                  v-model="customerForm.industryId"
+                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                >
+                  <option value="0" disabled>请选择所属行业</option>
+                  <option
+                    v-for="item in industryList"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.dicValue }}
+                  </option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <!-- 弹窗底部 -->
@@ -256,7 +254,7 @@
                   ? 'cursor-not-allowed bg-gray-400'
                   : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:-translate-y-0.5 hover:shadow-lg'
               ]"
-              @click="createCustomer"
+              @click="loadDataSubmit"
             >
               {{ isSubmitting ? '提交中...' : '确认提交' }}
             </button>
@@ -510,7 +508,7 @@ const close = (): void => {
 /**
  * 创建客户
  */
-const createCustomer = async (): Promise<void> => {
+const loadDataSubmit = async (): Promise<void> => {
   // 防止重复提交
   if (isSubmitting.value) return
 
