@@ -98,7 +98,7 @@ const createModalRef = ref<InstanceType<typeof CommonModalCustomer>>()
 const customers = ref<SalesCustomer[]>([])
 
 // 表格配置
-const tableConfig = ref({
+const tableConfig = ref<TableConfig>({
   rowKey: 'id',
   loading: false,
   selection: false,
@@ -108,7 +108,7 @@ const tableConfig = ref({
 })
 
 // 表格列配置
-const tableColumns = [
+const tableColumns: TableColumn[] = [
   { label: '客户编号', props: 'customerCode', minWidth: 150 },
   { label: '客户名称', props: 'customerName', minWidth: 180 },
   { label: '客户联系人', props: 'contactPerson', minWidth: 120 },
@@ -120,7 +120,7 @@ const tableColumns = [
     minWidth: 120,
     slotName: 'customerStatusNameSlot'
   },
-  { label: '操作', props: 'action', minWidth: 100, slotName: 'actionSlot' }
+  { label: '操作', props: 'action', width: 100, slotName: 'actionSlot' }
 ]
 
 // 获取状态样式类

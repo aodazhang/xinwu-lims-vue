@@ -137,3 +137,24 @@ export async function loadCustomersEdit(
 ): Promise<void> {
   return instance.post(`/customers/${id}`, data)
 }
+
+export async function loadOrders(
+  params: unknown
+): Promise<CommonList<SalesOrder>> {
+  return instance.get('/orders', { params })
+}
+
+export async function loadOrdersDetail(id: number): Promise<SalesOrder> {
+  return instance.get(`/orders/${id}`)
+}
+
+export async function loadOrdersAdd(data: unknown): Promise<void> {
+  return instance.post('/orders', data)
+}
+
+export async function loadOrdersStatusChanging(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.put(`/orders/${id}/status-changing`, data)
+}

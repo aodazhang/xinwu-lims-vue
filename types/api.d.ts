@@ -46,7 +46,7 @@ declare global {
     /** 真实姓名 */
     realName: string
     /** 邮箱 */
-    email?: string | null
+    email: string
     /** 用户角色列表 */
     roles: SystemRole[]
   }
@@ -64,7 +64,7 @@ declare global {
     /** 角色名称 */
     roleName: string
     /** 备注 */
-    remark?: string | null
+    remark: string
   }
 
   /** 系统字典 */
@@ -92,59 +92,108 @@ declare global {
   /** 销售订单 */
   interface SalesOrder {
     /** 订单ID */
-    id?: number
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+
     /** 项目编号 */
-    projectId?: string
-    /** 订单编号 */
-    orderNumber?: string
-    /** 是否紧急订单 */
-    urgent: boolean | 'yes' | 'no'
+    projectNumber: string
+    /** 紧急标志 */
+    urgentFlag: boolean
+    /** 进度和订单状态代码 */
+    progressAndOrderStatusCode: string
+    /** 进度和订单状态名称 */
+    progressAndOrderStatusName: string
+
+    /** 客户ID */
+    customerId: number
+    /** 客户代码 */
+    customerCode: string
     /** 客户名称 */
     customerName: string
-    /** 客户联系人 */
-    customerContact?: string
-    /** 客户联系电话 */
-    customerPhone?: string
-    /** 受检单位 */
-    inspectedUnit?: string
-    /** 受检单位 */
-    inspectionUnit?: string
-    /** 项目金额 */
-    amount?: number
-    /** 项目金额 */
-    projectAmount?: number | null
-    /** 实收金额 */
-    receivedAmount?: number | null
-    /** 创建时间 */
-    createTime?: string
-    /** 采样地址 */
-    samplingAddress?: string
-    /** 检测点数 */
-    testPoints: number | null
-    /** 检测类型 */
-    testType: string
-    /** 检测内容 */
-    testContent?: string
-    /** 服务类型 */
-    serviceType?: string
-    /** 订单类型 */
-    orderType?: string
-    /** 备注 */
-    remark?: string
+
+    /** 销售人员ID */
+    saleUserId: number
+    /** 销售人员真实姓名 */
+    saleUserRealName: string
     /** 销售备注 */
-    salesRemark?: string
-    /** 订单状态 */
-    status?: 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
-    /** 状态文本 */
-    statusText?: string
-    /** 状态详情 */
-    statusDetails?: StatusDetailItem[]
-    /** 时间轴项目 */
-    timelineItems?: TimelineItem[]
-    /** 相关人员 */
-    relatedPersons?: RelatedPerson[]
+    salesRemark: string
+    /** 项目金额 */
+    projectAmount: number
+    /** 实收金额 */
+    actualAmount: number
+
+    /** 服务类型ID */
+    serviceTypeId: number
+    /** 服务类型代码 */
+    serviceTypeCode: string
+    /** 服务类型名称 */
+    serviceTypeName: string
+
+    /** 订单类型ID */
+    orderTypeId: number
+    /** 订单类型代码 */
+    orderTypeCode: string
+    /** 订单类型名称 */
+    orderTypeName: string
+    /** 订单状态代码 */
+    orderStatusCode: string
+    /** 订单状态名称 */
+    orderStatusName: string
+    /** 订单状态备注 */
+    orderStatusRemark: string
+
+    /** 检测类型ID */
+    detectionTypeId: number
+    /** 检测类型名称 */
+    detectionTypeName: string
+    /** 检测点数 */
+    detectionPoints: number
+    /** 检测分包 */
+    detectionSubcontract: boolean
+    /** 分包项目 */
+    subcontractProject: string
+    /** 特殊要求 */
+    specialRequirements: string
+    /** 被检单位 */
+    inspectedUnit: string
+    /** 采样地址 */
+    samplingAddress: string
+
+    /** 样品存储ID */
+    sampleStorageId: number
+    /** 样品存储编码 */
+    sampleStorageCode: string
+    /** 样品存储名称 */
+    sampleStorageName: string
+    /** 样品处置ID */
+    sampleDisposalId: number
+    /** 样品处置编码 */
+    sampleDisposalCode: string
+    /** 样品处置名称 */
+    sampleDisposalName: string
+    /** 样品处置其他说明 */
+    sampleDisposalOther: string
+
+    /** 报告交付ID */
+    reportDeliveryId: number
+    /** 报告交付编码 */
+    reportDeliveryCode: string
+    /** 报告交付名称 */
+    reportDeliveryName: string
+    /** 报告交付其他说明 */
+    reportDeliveryOther: string
+
     /** 附件列表 */
-    attachments?: AttachmentInfo[]
+    attachmentList: string[]
+    /** 附件列表 */
+    attachmentPayloadList: {
+      url: string
+      fileName: string
+      fileSizeByte: number
+    }[]
   }
 
   /** 销售客户 */

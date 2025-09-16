@@ -116,7 +116,7 @@ const createModalRef = ref<InstanceType<typeof CommonModalUser>>()
 const users = ref<SystemUser[]>([])
 
 // 表格配置
-const tableConfig = ref({
+const tableConfig = ref<TableConfig>({
   rowKey: 'id',
   loading: false,
   selection: false,
@@ -126,7 +126,7 @@ const tableConfig = ref({
 })
 
 // 表格列配置
-const tableColumns = [
+const tableColumns: TableColumn[] = [
   { label: '用户名', props: 'userName', minWidth: 180 },
   { label: '真实姓名', props: 'realName', minWidth: 150 },
   { label: '用户角色', props: 'role', minWidth: 150, slotName: 'roleSlot' },
@@ -160,10 +160,7 @@ const getRoleClass = (roleCode: string) => {
     [UserRole.REPORT_REVIEWER]: 'bg-teal-100 text-teal-800',
     [UserRole.REPORT_APPROVER]: 'bg-emerald-100 text-emerald-800'
   }
-  return (
-    roleClasses[roleCode as keyof typeof roleClasses] ||
-    'bg-gray-100 text-gray-800'
-  )
+  return roleClasses[roleCode as keyof typeof roleClasses] || 'text-gray-800'
 }
 
 // 打开创建用户弹窗
