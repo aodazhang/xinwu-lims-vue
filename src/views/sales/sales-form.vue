@@ -494,28 +494,36 @@ const formData = ref<
 >({
   id: 0,
   projectNumber: '',
-  orderTypeId: 0,
+  orderTypeId: 0, // DictType.ORDER_TYPE
   urgentFlag: false,
   customerId: 0,
   inspectedUnit: '',
   samplingAddress: '',
-  detectionTypeId: 0,
-  serviceTypeId: 0,
+  detectionTypeId: 0, // 检测类型列表：id、
+  // 检测项目：id、detectionItemName
+  orderDetectionItemList: [], // 检测项目（标准、多选）：detectionItemStandardList -> detectionItemId、id
+  serviceTypeId: 0, // DictType.SERVICE_TYPE
   detectionPoints: 0,
+  sampleStorageId: 0, // 样品存储*：DictType.SAMPLE_STORAGE
+  sampleDisposalId: 0, // 样品处置*：DictType.SAMPLE_DISPOSAL
+  sampleDisposalOther: '', // 样品处置其他：输入框
+  detectionSubcontract: false, // 检测分包：单选
+  subcontractProject: '', // 分包项目：输入框
+  specialRequirements: '', // 特殊要求：输入框（跟上面一行）
+  reportDeliveryId: 0, // 报告交付*：REPORT_DELIVERY
+  reportDeliveryOther: '', // 报告交付其他：输入框（跟上面一行）
   projectAmount: 0,
   actualAmount: 0,
   salesRemark: '',
-  attachmentPayloadList: [],
-  sampleStorageId: 0,
-  sampleDisposalId: 0,
-  sampleDisposalOther: '',
-  detectionSubcontract: false,
-  subcontractProject: '',
-  specialRequirements: '',
-  reportDeliveryId: 0,
-  reportDeliveryOther: '',
-  orderDetectionItemList: []
+  attachmentPayloadList: [] // TODO: 后续开发
 })
+
+/**
+ * 订单进度
+ * 一级列表：阶段
+ * 二级列表：statusChangeTraceList，有值代表进行到这个阶段
+ * - createTime、changeUserRoleName、changeUserRealName、changedStatusCode
+ */
 
 // 表单验证错误
 const errors = ref<FormErrors>({

@@ -156,5 +156,6 @@ export async function loadOrdersStatusChanging(
   id: number,
   data: unknown
 ): Promise<void> {
+  // DictType.ORDER_STATUS
   return instance.put(`/orders/${id}/status-changing`, data)
 }
