@@ -147,11 +147,11 @@
                   >
                     <option value="0" disabled>请选择用户角色</option>
                     <option
-                      v-for="role in roleList"
-                      :key="role.id"
-                      :value="role.id"
+                      v-for="item in roleList"
+                      :key="item.id"
+                      :value="item.id"
                     >
-                      {{ role.roleName }}
+                      {{ item.roleName }}
                     </option>
                   </select>
                   <div
@@ -427,6 +427,7 @@ const createUser = async (): Promise<void> => {
         roleId: userForm.value.roleId
       })
     }
+
     // 触发刷新事件
     emit('refresh')
 

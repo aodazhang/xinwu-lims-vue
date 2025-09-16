@@ -29,9 +29,11 @@
                 class="cursor-pointer rounded-md border border-gray-200 p-3 transition-all hover:border-indigo-500 hover:bg-gray-50"
                 @click="handleSelect(customer)"
               >
-                <div class="font-medium text-gray-800">{{ customer.name }}</div>
+                <div class="font-medium text-gray-800">
+                  {{ customer.customerName }}
+                </div>
                 <div class="text-xs text-gray-500">
-                  联系人：{{ customer.contactName }} | 电话：{{
+                  联系人：{{ customer.contactPerson }} | 电话：{{
                     customer.contactPhone
                   }}
                 </div>
@@ -74,54 +76,114 @@ const fetchCustomers = async (): Promise<SalesCustomer[]> => {
   // 模拟返回客户数据
   return [
     {
-      id: '1',
-      name: '广州环保科技有限公司',
-      contactName: '王经理',
+      id: 1,
+      createTime: '2024-01-01 10:00:00',
+      updateTime: '2024-01-01 10:00:00',
+      customerCode: 'C001',
+      customerName: '广州环保科技有限公司',
+      contactPerson: '王经理',
       contactPhone: '13800138001',
-      address: '广州市天河区科技园',
-      category: '个体户',
-      source: '网络推广',
-      status: 'active'
+      customerAddress: '广州市天河区科技园',
+      customerCategoryId: 1,
+      customerCategoryCode: 'INDIVIDUAL',
+      customerSourceId: 1,
+      customerSourceCode: 'WEB',
+      customerStatusId: 1,
+      customerStatusCode: 'ACTIVE',
+      industryId: 1,
+      industryCode: 'ENV',
+      customerSourceName: '网络推广',
+      customerCategoryName: '个体户',
+      customerStatusName: 'active',
+      industryName: '环保科技'
     },
     {
-      id: '2',
-      name: '深圳创新工业园',
-      contactName: '李主任',
+      id: 2,
+      createTime: '2024-01-01 10:00:00',
+      updateTime: '2024-01-01 10:00:00',
+      customerCode: 'C002',
+      customerName: '深圳创新工业园',
+      contactPerson: '李主任',
       contactPhone: '13800138002',
-      address: '深圳市南山区科技园B区',
-      category: '渠道',
-      source: '渠道',
-      status: 'active'
+      customerAddress: '深圳市南山区科技园B区',
+      customerCategoryId: 2,
+      customerCategoryCode: 'CHANNEL',
+      customerSourceId: 2,
+      customerSourceCode: 'CHANNEL',
+      customerStatusId: 1,
+      customerStatusCode: 'ACTIVE',
+      industryId: 2,
+      industryCode: 'TECH',
+      customerSourceName: '渠道',
+      customerCategoryName: '渠道',
+      customerStatusName: 'active',
+      industryName: '科技园区'
     },
     {
-      id: '3',
-      name: '佛山制造企业',
-      contactName: '张总',
+      id: 3,
+      createTime: '2024-01-01 10:00:00',
+      updateTime: '2024-01-01 10:00:00',
+      customerCode: 'C003',
+      customerName: '佛山制造企业',
+      contactPerson: '张总',
       contactPhone: '13800138003',
-      address: '佛山市顺德区工业园',
-      category: '个体户',
-      source: '转介绍',
-      status: 'following'
+      customerAddress: '佛山市顺德区工业园',
+      customerCategoryId: 1,
+      customerCategoryCode: 'INDIVIDUAL',
+      customerSourceId: 3,
+      customerSourceCode: 'REFERRAL',
+      customerStatusId: 2,
+      customerStatusCode: 'FOLLOWING',
+      industryId: 3,
+      industryCode: 'MANUFACTURING',
+      customerSourceName: '转介绍',
+      customerCategoryName: '个体户',
+      customerStatusName: 'following',
+      industryName: '制造业'
     },
     {
-      id: '4',
-      name: '东莞电子厂',
-      contactName: '刘经理',
+      id: 4,
+      createTime: '2024-01-01 10:00:00',
+      updateTime: '2024-01-01 10:00:00',
+      customerCode: 'C004',
+      customerName: '东莞电子厂',
+      contactPerson: '刘经理',
       contactPhone: '13800138004',
-      address: '东莞市松山湖高新区',
-      category: '个体户',
-      source: '电话营销',
-      status: 'active'
+      customerAddress: '东莞市松山湖高新区',
+      customerCategoryId: 1,
+      customerCategoryCode: 'INDIVIDUAL',
+      customerSourceId: 4,
+      customerSourceCode: 'TELEMARKETING',
+      customerStatusId: 1,
+      customerStatusCode: 'ACTIVE',
+      industryId: 4,
+      industryCode: 'ELECTRONICS',
+      customerSourceName: '电话营销',
+      customerCategoryName: '个体户',
+      customerStatusName: 'active',
+      industryName: '电子制造'
     },
     {
-      id: '5',
-      name: '惠州化工园区',
-      contactName: '陈主管',
+      id: 5,
+      createTime: '2024-01-01 10:00:00',
+      updateTime: '2024-01-01 10:00:00',
+      customerCode: 'C005',
+      customerName: '惠州化工园区',
+      contactPerson: '陈主管',
       contactPhone: '13800138005',
-      address: '惠州市大亚湾石化区',
-      category: '渠道',
-      source: '展会',
-      status: 'public'
+      customerAddress: '惠州市大亚湾石化区',
+      customerCategoryId: 2,
+      customerCategoryCode: 'CHANNEL',
+      customerSourceId: 5,
+      customerSourceCode: 'EXHIBITION',
+      customerStatusId: 3,
+      customerStatusCode: 'PUBLIC',
+      industryId: 5,
+      industryCode: 'CHEMICAL',
+      customerSourceName: '展会',
+      customerCategoryName: '渠道',
+      customerStatusName: 'public',
+      industryName: '化工'
     }
   ]
 }

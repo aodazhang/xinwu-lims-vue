@@ -67,6 +67,26 @@ declare global {
     remark?: string | null
   }
 
+  /** 系统字典 */
+  interface SystemDict {
+    /** 字典ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 字典类型编码 */
+    dicTypeCode: string
+    /** 字典类型名称 */
+    dicTypeName: string
+    /** 字典编码 */
+    dicCode: string
+    /** 字典值 */
+    dicValue: string
+    /** 序号 */
+    serialNumber: number
+  }
+
   // ==================== 业务管理 ====================
 
   /** 销售订单 */
@@ -129,30 +149,46 @@ declare global {
 
   /** 销售客户 */
   interface SalesCustomer {
-    /** 客户ID/编号 */
-    id: string
-    /** 客户ID（别名，兼容 customer-management.vue） */
-    customerId?: string
+    /** 客户ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 客户编码 */
+    customerCode: string
     /** 客户名称 */
-    name: string
-    /** 客户名称（别名，兼容 customer-management.vue） */
-    customerName?: string
+    customerName: string
     /** 联系人姓名 */
-    contactName: string
+    contactPerson: string
     /** 联系人电话 */
     contactPhone: string
     /** 客户地址 */
-    address?: string
-    /** 客户分类 */
-    category?: string
-    /** 客户来源 */
-    source: string
-    /** 客户状态：active-已成交 | public-公海 | following-跟进中 */
-    status: 'active' | 'public' | 'following' | string
-    /** 所属行业 */
-    industry?: string
-    /** 创建时间 */
-    createdAt?: string
+    customerAddress: string
+    /** 客户分类ID */
+    customerCategoryId: number
+    /** 客户分类编码 */
+    customerCategoryCode: string
+    /** 客户分类名称 */
+    customerCategoryName: string
+    /** 客户来源ID */
+    customerSourceId: number
+    /** 客户来源编码 */
+    customerSourceCode: string
+    /** 客户来源名称 */
+    customerSourceName: string
+    /** 客户状态ID */
+    customerStatusId: number
+    /** 客户状态编码 */
+    customerStatusCode: string
+    /** 客户状态名称 */
+    customerStatusName: string
+    /** 行业ID */
+    industryId: number
+    /** 行业编码 */
+    industryCode: string
+    /** 行业名称 */
+    industryName: string
   }
 
   /** 审核订单 */

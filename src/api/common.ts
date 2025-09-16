@@ -70,6 +70,10 @@ instance.interceptors.response.use(
   }
 )
 
+export async function loadDictionaries(params: unknown): Promise<SystemDict[]> {
+  return instance.get('/dictionaries', { params })
+}
+
 export async function loadLogin(data: unknown): Promise<{ token: string }> {
   return instance.post('/login', data)
 }
@@ -111,4 +115,25 @@ export async function loadAdminUsersPasswordChanging(
   data: unknown
 ): Promise<void> {
   return instance.post('/password-changing', data)
+}
+
+export async function loadCustomers(
+  params: unknown
+): Promise<CommonList<SalesCustomer>> {
+  return instance.get('/customers', { params })
+}
+
+export async function loadCustomersDetail(id: number): Promise<SalesCustomer> {
+  return instance.get(`/customers/${id}`)
+}
+
+export async function loadCustomersAdd(data: unknown): Promise<void> {
+  return instance.post('/customers', data)
+}
+
+export async function loadCustomersEdit(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.post(`/customers/${id}`, data)
 }

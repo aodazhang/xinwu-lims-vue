@@ -572,7 +572,7 @@ function updateTestItems() {
  * @param customer 客户信息
  */
 function selectCustomer(customer: SalesCustomer) {
-  formData.value.customerName = customer.name
+  formData.value.customerName = customer.customerName
   delete errors.value.customerName
 }
 

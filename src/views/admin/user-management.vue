@@ -189,7 +189,7 @@ const onResetList = () => {
 }
 
 // 处理刷新事件
-const loadDataList = async (reset: boolean) => {
+const loadDataList = async (reset: boolean = false) => {
   try {
     if (reset) {
       tableConfig.value.current = 1

@@ -81,3 +81,37 @@ export enum UserRole {
   /** [报告管理]报告批准人 */
   REPORT_APPROVER = 'REPORT_APPROVER'
 }
+
+/** 字典类型 */
+export enum DictType {
+  /** 客户分类 */
+  CUSTOMER_CATEGORY = 'CUSTOMER_CATEGORY',
+  /** 客户来源 */
+  CUSTOMER_SOURCE = 'CUSTOMER_SOURCE',
+  /** 客户状态 */
+  CUSTOMER_STATUS = 'CUSTOMER_STATUS',
+  /**  */
+  DETECTION_TASK_STATUS = 'DETECTION_TASK_STATUS',
+  /** 检测类型 */
+  DETECTION_TYPE = 'DETECTION_TYPE',
+  /** 宿主类型 */
+  HOST_TYPE = 'HOST_TYPE',
+  /** 所属行业 */
+  INDUSTRY = 'INDUSTRY',
+  /** 订单状态 */
+  ORDER_STATUS = 'ORDER_STATUS',
+  /** 订单类型 */
+  ORDER_TYPE = 'ORDER_TYPE',
+  /** 报告交付 */
+  REPORT_DELIVERY = 'REPORT_DELIVERY',
+  /** 报告状态 */
+  REPORT_STATUS = 'REPORT_STATUS',
+  /** 样品处置 */
+  SAMPLE_DISPOSAL = 'SAMPLE_DISPOSAL',
+  /** 样品储存 */
+  SAMPLE_STORAGE = 'SAMPLE_STORAGE',
+  /**  */
+  SAMPLING_TASK_STATUS = 'SAMPLING_TASK_STATUS',
+  /** 服务类型 */
+  SERVICE_TYPE = 'SERVICE_TYPE'
+}

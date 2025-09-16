@@ -42,7 +42,6 @@
                   </label>
                   <input
                     v-model="customerForm.customerName"
-                    @input="customerForm.name = customerForm.customerName"
                     type="text"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
@@ -66,21 +65,21 @@
                     客户联系人 <span class="text-red-500">*</span>
                   </label>
                   <input
-                    v-model="customerForm.contactName"
+                    v-model="customerForm.contactPerson"
                     type="text"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.contactName
+                      formErrors.contactPerson
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
                     placeholder="请输入联系人姓名"
                   />
                   <div
-                    v-if="formErrors.contactName"
+                    v-if="formErrors.contactPerson"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.contactName }}
+                    {{ formErrors.contactPerson }}
                   </div>
                 </div>
 
@@ -114,7 +113,7 @@
                     >客户地址</label
                   >
                   <input
-                    v-model="customerForm.address"
+                    v-model="customerForm.customerAddress"
                     type="text"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                     placeholder="请输入客户地址"
@@ -127,23 +126,28 @@
                     客户分类 <span class="text-red-500">*</span>
                   </label>
                   <select
-                    v-model="customerForm.category"
+                    v-model="customerForm.customerCategoryId"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.category
+                      formErrors.customerCategoryName
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
                   >
-                    <option value="">请选择</option>
-                    <option value="individual">个体户</option>
-                    <option value="channel">渠道</option>
+                    <option value="0" disabled>请选择客户分类</option>
+                    <option
+                      v-for="item in customerCategoryList"
+                      :key="item.id"
+                      :value="item.id"
+                    >
+                      {{ item.dicValue }}
+                    </option>
                   </select>
                   <div
-                    v-if="formErrors.category"
+                    v-if="formErrors.customerCategoryName"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.category }}
+                    {{ formErrors.customerCategoryName }}
                   </div>
                 </div>
 
@@ -153,31 +157,28 @@
                     客户来源 <span class="text-red-500">*</span>
                   </label>
                   <select
-                    v-model="customerForm.source"
+                    v-model="customerForm.customerSourceId"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.source
+                      formErrors.customerSourceName
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
                   >
-                    <option value="">请选择</option>
-                    <option value="self">自己开发</option>
-                    <option value="channel">渠道</option>
-                    <option value="referral">转介绍</option>
-                    <option value="old">老客户</option>
-                    <option value="meituan">美团点评</option>
-                    <option value="tmall">天猫</option>
-                    <option value="baidu">百度</option>
-                    <option value="douyin">抖音</option>
-                    <option value="tencent">腾讯地图</option>
-                    <option value="agent">代理商</option>
+                    <option value="0" disabled>请选择客户来源</option>
+                    <option
+                      v-for="item in customerSourceList"
+                      :key="item.id"
+                      :value="item.id"
+                    >
+                      {{ item.dicValue }}
+                    </option>
                   </select>
                   <div
-                    v-if="formErrors.source"
+                    v-if="formErrors.customerSourceName"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.source }}
+                    {{ formErrors.customerSourceName }}
                   </div>
                 </div>
 
@@ -187,41 +188,48 @@
                     客户状态 <span class="text-red-500">*</span>
                   </label>
                   <select
-                    v-model="customerForm.status"
+                    v-model="customerForm.customerStatusId"
                     :class="[
                       'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.status
+                      formErrors.customerStatusName
                         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
                     ]"
                   >
-                    <option value="">请选择</option>
-                    <option value="active">已成交</option>
-                    <option value="public">公海</option>
-                    <option value="following">跟进中</option>
+                    <option value="0" disabled>请选择客户状态</option>
+                    <option
+                      v-for="item in customerStatusList"
+                      :key="item.id"
+                      :value="item.id"
+                    >
+                      {{ item.dicValue }}
+                    </option>
                   </select>
                   <div
-                    v-if="formErrors.status"
+                    v-if="formErrors.customerStatusName"
                     class="absolute -bottom-5 left-0 text-xs text-red-500"
                   >
-                    {{ formErrors.status }}
+                    {{ formErrors.customerStatusName }}
                   </div>
                 </div>
 
                 <!-- 所属行业 -->
                 <div class="flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700"
-                    >所属行业</label
-                  >
+                  <label class="text-sm font-medium text-gray-700">
+                    所属行业
+                  </label>
                   <select
-                    v-model="customerForm.industry"
+                    v-model="customerForm.industryId"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   >
-                    <option value="">请选择</option>
-                    <option value="indoor">室内净化</option>
-                    <option value="ac">空调清洗</option>
-                    <option value="testing">检测行业</option>
-                    <option value="env">环保设备</option>
+                    <option value="0" disabled>请选择所属行业</option>
+                    <option
+                      v-for="item in industryList"
+                      :key="item.id"
+                      :value="item.id"
+                    >
+                      {{ item.dicValue }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -261,16 +269,19 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { DictType } from '@/utils/enum'
+import { isArray } from '@/utils/is'
+import api from '@/api'
 
 // 使用工具类型从 SalesCustomer 中提取 FormErrors 类型
 type FormErrors = Pick<
   SalesCustomer,
   | 'customerName'
-  | 'contactName'
+  | 'contactPerson'
   | 'contactPhone'
-  | 'category'
-  | 'source'
-  | 'status'
+  | 'customerCategoryName'
+  | 'customerSourceName'
+  | 'customerStatusName'
 >
 
 // 定义 emits
@@ -279,31 +290,45 @@ const emit = defineEmits<{ refresh: [] }>()
 // 内部维护的状态
 const visible = ref(false)
 const isSubmitting = ref(false)
+const customerCategoryList = ref<SystemDict[]>([])
+const customerSourceList = ref<SystemDict[]>([])
+const customerStatusList = ref<SystemDict[]>([])
+const industryList = ref<SystemDict[]>([])
 
 // 客户表单数据
-const customerForm = ref<SalesCustomer>({
-  id: '',
-  customerId: '',
-  name: '',
+const customerForm = ref<
+  Pick<
+    SalesCustomer,
+    | 'id'
+    | 'customerName'
+    | 'contactPerson'
+    | 'contactPhone'
+    | 'customerAddress'
+    | 'customerCategoryId'
+    | 'customerSourceId'
+    | 'customerStatusId'
+    | 'industryId'
+  >
+>({
+  id: 0,
   customerName: '',
-  contactName: '',
+  contactPerson: '',
   contactPhone: '',
-  address: '',
-  category: '',
-  source: '',
-  status: '',
-  industry: '',
-  createdAt: ''
+  customerAddress: '',
+  customerCategoryId: 0,
+  customerSourceId: 0,
+  customerStatusId: 0,
+  industryId: 0
 })
 
 // 表单错误信息
 const formErrors = ref<FormErrors>({
   customerName: '',
-  contactName: '',
+  contactPerson: '',
   contactPhone: '',
-  category: '',
-  source: '',
-  status: ''
+  customerCategoryName: '',
+  customerSourceName: '',
+  customerStatusName: ''
 })
 
 // 表单是否有效
@@ -329,15 +354,15 @@ function validateCustomerName() {
 /**
  * 校验联系人姓名
  */
-function validateContactName() {
-  if (!customerForm.value.contactName.trim()) {
-    formErrors.value.contactName = '请输入联系人姓名'
-  } else if (customerForm.value.contactName.trim().length < 2) {
-    formErrors.value.contactName = '联系人姓名至少需要2个字符'
-  } else if (customerForm.value.contactName.trim().length > 20) {
-    formErrors.value.contactName = '联系人姓名不能超过20个字符'
+function validateContactPerson() {
+  if (!customerForm.value.contactPerson.trim()) {
+    formErrors.value.contactPerson = '请输入联系人姓名'
+  } else if (customerForm.value.contactPerson.trim().length < 2) {
+    formErrors.value.contactPerson = '联系人姓名至少需要2个字符'
+  } else if (customerForm.value.contactPerson.trim().length > 20) {
+    formErrors.value.contactPerson = '联系人姓名不能超过20个字符'
   } else {
-    formErrors.value.contactName = ''
+    formErrors.value.contactPerson = ''
   }
 }
 
@@ -349,7 +374,7 @@ function validateContactPhone() {
   if (!customerForm.value.contactPhone.trim()) {
     formErrors.value.contactPhone = '请输入联系电话'
   } else if (!phoneRegex.test(customerForm.value.contactPhone.trim())) {
-    formErrors.value.contactPhone = '请输入正确的手机号码或固定电话'
+    formErrors.value.contactPhone = '请输入正确的联系电话格式'
   } else {
     formErrors.value.contactPhone = ''
   }
@@ -358,33 +383,33 @@ function validateContactPhone() {
 /**
  * 校验客户分类
  */
-function validateCategory() {
-  if (!customerForm.value.category) {
-    formErrors.value.category = '请选择客户分类'
+function validateCustomerCategoryId() {
+  if (!customerForm.value.customerCategoryId) {
+    formErrors.value.customerCategoryName = '请选择客户分类'
   } else {
-    formErrors.value.category = ''
+    formErrors.value.customerCategoryName = ''
   }
 }
 
 /**
  * 校验客户来源
  */
-function validateSource() {
-  if (!customerForm.value.source) {
-    formErrors.value.source = '请选择客户来源'
+function validateCustomerSourceId() {
+  if (!customerForm.value.customerSourceId) {
+    formErrors.value.customerSourceName = '请选择客户来源'
   } else {
-    formErrors.value.source = ''
+    formErrors.value.customerSourceName = ''
   }
 }
 
 /**
  * 校验客户状态
  */
-function validateStatus() {
-  if (!customerForm.value.status) {
-    formErrors.value.status = '请选择客户状态'
+function validateCustomerStatusId() {
+  if (!customerForm.value.customerStatusId) {
+    formErrors.value.customerStatusName = '请选择客户状态'
   } else {
-    formErrors.value.status = ''
+    formErrors.value.customerStatusName = ''
   }
 }
 
@@ -393,60 +418,45 @@ function validateStatus() {
  */
 function validateForm() {
   validateCustomerName()
-  validateContactName()
+  validateContactPerson()
   validateContactPhone()
-  validateCategory()
-  validateSource()
-  validateStatus()
+  validateCustomerCategoryId()
+  validateCustomerSourceId()
+  validateCustomerStatusId()
 }
 
 // 监听表单字段变化，实时校验
 watch(() => customerForm.value.customerName, validateCustomerName)
-watch(() => customerForm.value.contactName, validateContactName)
+watch(() => customerForm.value.contactPerson, validateContactPerson)
 watch(() => customerForm.value.contactPhone, validateContactPhone)
-watch(() => customerForm.value.category, validateCategory)
-watch(() => customerForm.value.source, validateSource)
-watch(() => customerForm.value.status, validateStatus)
-
-/**
- * 生成客户编号
- * @returns 客户编号
- */
-const generateCustomerId = (): string => {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const sequence = String(Date.now() % 10000).padStart(4, '0')
-  return `KH${year}${month}${day}${sequence}`
-}
+watch(() => customerForm.value.customerCategoryId, validateCustomerCategoryId)
+watch(() => customerForm.value.customerSourceId, validateCustomerSourceId)
+watch(() => customerForm.value.customerStatusId, validateCustomerStatusId)
 
 /**
  * 重置表单数据
  */
 const resetForm = (): void => {
   Object.assign(customerForm.value, {
-    id: '',
-    customerId: '',
+    id: 0,
     customerName: '',
-    contactName: '',
+    contactPerson: '',
     contactPhone: '',
-    address: '',
-    category: '',
-    source: '',
-    status: '',
-    industry: '',
-    createdAt: ''
+    customerAddress: '',
+    customerCategoryId: 0,
+    customerSourceId: 0,
+    customerStatusId: 0,
+    industryId: 0
   })
 
   // 清空错误信息
   Object.assign(formErrors.value, {
     customerName: '',
-    contactName: '',
+    contactPerson: '',
     contactPhone: '',
-    category: '',
-    source: '',
-    status: ''
+    customerCategoryName: '',
+    customerSourceName: '',
+    customerStatusName: ''
   })
 }
 
@@ -454,23 +464,39 @@ const resetForm = (): void => {
  * 对外暴露的 open 方法
  * @param data 可选的初始数据
  */
-const open = (data?: SalesCustomer): void => {
+const open = async (data?: SalesCustomer): Promise<void> => {
   visible.value = true
+  customerCategoryList.value = []
+  customerSourceList.value = []
+  customerStatusList.value = []
+  industryList.value = []
   resetForm()
+
   // 如果有初始数据，设置到表单中，否则重置表单
-  Object.assign(customerForm.value, {
-    id: data?.id || '',
-    customerId: data?.customerId || '',
-    customerName: data?.customerName || '',
-    contactName: data?.contactName || '',
-    contactPhone: data?.contactPhone || '',
-    address: data?.address || '',
-    category: data?.category || '',
-    industry: data?.industry || '',
-    source: data?.source || '',
-    status: data?.status || '',
-    createdAt: data?.createdAt || ''
-  })
+  if (data) {
+    Object.assign(customerForm.value, {
+      id: data.id || 0,
+      customerName: data.customerName || '',
+      contactPerson: data.contactPerson || '',
+      contactPhone: data.contactPhone || '',
+      customerAddress: data.customerAddress || '',
+      customerCategoryId: data.customerCategoryId || 0,
+      customerSourceId: data.customerSourceId || 0,
+      customerStatusId: data.customerStatusId || 0,
+      industryId: data.industryId || 0
+    })
+  }
+
+  const [res1, res2, res3, res4] = await Promise.all([
+    api.loadDictionaries({ dicTypeCode: DictType.CUSTOMER_CATEGORY }),
+    api.loadDictionaries({ dicTypeCode: DictType.CUSTOMER_SOURCE }),
+    api.loadDictionaries({ dicTypeCode: DictType.CUSTOMER_STATUS }),
+    api.loadDictionaries({ dicTypeCode: DictType.INDUSTRY })
+  ])
+  customerCategoryList.value = isArray(res1) ? res1 : []
+  customerSourceList.value = isArray(res2) ? res2 : []
+  customerStatusList.value = isArray(res3) ? res3 : []
+  industryList.value = isArray(res4) ? res4 : []
 }
 
 /**
@@ -499,27 +525,21 @@ const createCustomer = async (): Promise<void> => {
   isSubmitting.value = true
 
   try {
-    const newCustomer = {
-      id: generateCustomerId(),
-      customerId: generateCustomerId(),
-      name:
-        customerForm.value.name.trim() ||
-        customerForm.value.customerName.trim(),
-      customerName: customerForm.value.customerName.trim(),
-      contactName: customerForm.value.contactName.trim(),
-      contactPhone: customerForm.value.contactPhone.trim(),
-      address: customerForm.value.address?.trim(),
-      category: customerForm.value.category,
-      source: customerForm.value.source,
-      status: customerForm.value.status,
-      industry: customerForm.value.industry,
-      createdAt: new Date().toISOString()
+    const data = {
+      customerName: customerForm.value.customerName.trim() || '',
+      contactPerson: customerForm.value.contactPerson.trim() || '',
+      contactPhone: customerForm.value.contactPhone.trim() || '',
+      customerAddress: customerForm.value.customerAddress.trim() || '',
+      customerCategoryId: customerForm.value.customerCategoryId || null,
+      customerSourceId: customerForm.value.customerSourceId || null,
+      customerStatusId: customerForm.value.customerStatusId || null,
+      industryId: customerForm.value.industryId || null
     }
-
-    console.log('创建客户:', newCustomer)
-
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    if (customerForm.value.id) {
+      await api.loadCustomersEdit(customerForm.value.id, data)
+    } else {
+      await api.loadCustomersAdd(data)
+    }
 
     // 触发刷新事件
     emit('refresh')

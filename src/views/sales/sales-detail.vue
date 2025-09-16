@@ -176,6 +176,30 @@ const router = useRouter()
 // 加载状态
 const loading = ref(false)
 
+// 客户数据
+const customerData = ref({
+  id: 1,
+  createTime: '2024-01-01 10:00:00',
+  updateTime: '2024-01-01 10:00:00',
+  customerCode: 'C001',
+  customerName: '上海科技有限公司',
+  contactPerson: '张三',
+  contactPhone: '13800138000',
+  customerAddress: '上海市浦东新区张江高科技园区',
+  customerCategoryId: 1,
+  customerCategoryCode: 'TECH',
+  customerSourceId: 1,
+  customerSourceCode: 'WEB',
+  customerStatusId: 1,
+  customerStatusCode: 'ACTIVE',
+  industryId: 1,
+  industryCode: 'IT',
+  customerSourceName: '网络推广',
+  customerCategoryName: '科技企业',
+  customerStatusName: '活跃',
+  industryName: '信息技术'
+})
+
 // 订单数据
 const orderData = ref<SalesOrder>({
   orderNumber: 'XW250903-100',
