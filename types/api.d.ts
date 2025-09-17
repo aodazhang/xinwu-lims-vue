@@ -210,8 +210,6 @@ declare global {
 
     /** 附件列表 */
     attachmentPayloadList: SystemAttachment[]
-    /** 附件列表 */
-    attachmentList: SystemAttachment[]
 
     /** 订单类型ID */
     orderTypeId: number

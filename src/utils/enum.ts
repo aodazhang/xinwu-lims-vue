@@ -127,3 +127,21 @@ export enum OrderStatus {
   /** 已取消 */
   CANCELLED = 'CANCELLED'
 }
+
+/** 进度和订单状态 */
+export enum ProgressAndOrderStatus {
+  /** 待审核 */
+  PENDING_REVIEW = 'ORDER:PENDING_REVIEW',
+  /** 审核通过 */
+  APPROVED = 'ORDER:APPROVED',
+  /** 审核驳回 */
+  REJECTED = 'ORDER:REJECTED',
+  /** 已取消 */
+  CANCELLED = 'ORDER:CANCELLED',
+  /** 采样中 */
+  SAMPLING_TASK = 'SAMPLING_TASK',
+  /** 检测中 */
+  DETECTION_TASK = 'DETECTION_TASK',
+  /** 报告中 */
+  REPORT = 'REPORT'
+}

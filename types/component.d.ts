@@ -38,6 +38,14 @@ declare global {
     /** 插槽名 */
     slotName?: string
   }
+
+  /** 标签值 */
+  interface LabelValue {
+    /** 标签 */
+    label: string
+    /** 值 */
+    value: string
+  }
 }
 
 export {}

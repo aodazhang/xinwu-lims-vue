@@ -72,13 +72,13 @@
         class="w-48 cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
       >
         <option value="0" disabled>全部状态</option>
-        <option value="ORDER:PENDING_REVIEW">待审核</option>
-        <option value="ORDER:APPROVED">审核通过</option>
-        <option value="ORDER:REJECTED">审核驳回</option>
-        <option value="ORDER:CANCELLED">已取消</option>
-        <option value="SAMPLING_TASK">采样中</option>
-        <option value="DETECTION_TASK">检测中</option>
-        <option value="REPORT">报告中</option>
+        <option :value="ProgressAndOrderStatus.PENDING_REVIEW">待审核</option>
+        <option :value="ProgressAndOrderStatus.APPROVED">审核通过</option>
+        <option :value="ProgressAndOrderStatus.REJECTED">审核驳回</option>
+        <option :value="ProgressAndOrderStatus.CANCELLED">已取消</option>
+        <option :value="ProgressAndOrderStatus.SAMPLING_TASK">采样中</option>
+        <option :value="ProgressAndOrderStatus.DETECTION_TASK">检测中</option>
+        <option :value="ProgressAndOrderStatus.REPORT">报告中</option>
       </select>
     </common-filter>
 
@@ -159,7 +159,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { OrderStatus } from '@/utils/enum'
+import { OrderStatus, ProgressAndOrderStatus } from '@/utils/enum'
 import { isArray, isNumber, isString } from '@/utils/is'
 import { dateToString } from '@/utils/date'
 import api from '@/api'

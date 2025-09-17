@@ -1,8 +1,9 @@
 <template>
   <!-- [公共]详情-附件列表 -->
   <div class="space-y-2">
+    <!-- 附件列表 -->
     <div
-      v-for="(attachment, index) in attachments"
+      v-for="(attachment, index) in attachmentPayloadList"
       :key="index"
       class="flex cursor-pointer items-center gap-2.5 rounded-md bg-gray-50 p-2.5 transition-colors duration-200 hover:bg-gray-100"
       @click="handleFileClick(attachment)"
@@ -24,6 +25,36 @@
         </div>
       </div>
     </div>
+
+    <!-- 空状态 -->
+    <div
+      v-if="!attachmentPayloadList || attachmentPayloadList.length === 0"
+      class="flex flex-col items-center justify-center rounded-lg bg-gray-50 p-6 text-center"
+    >
+      <!-- 空状态图标 -->
+      <div
+        class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
+      >
+        <svg
+          class="h-8 w-8 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+      </div>
+
+      <!-- 空状态文字 -->
+      <h3 class="mb-2 text-sm font-medium text-gray-900">暂无附件</h3>
+      <p class="text-xs text-gray-500">当前没有上传任何附件文件</p>
+    </div>
   </div>
 </template>
 
@@ -32,7 +63,7 @@ import { toolDownloadUrl } from '@/utils/tool'
 import Message from '@/utils/message'
 
 defineProps<{
-  attachments: SystemAttachment[]
+  attachmentPayloadList: SystemAttachment[]
 }>()
 
 /**

@@ -37,13 +37,13 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">客户联系人</span>
               <span class="text-sm font-medium text-gray-900">
-                {{ orderData.customer.contactPerson }}
+                {{ orderData.customer?.contactPerson }}
               </span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">客户联系电话</span>
               <span class="text-sm font-medium text-gray-900">
-                {{ orderData.customer.contactPhone }}
+                {{ orderData.customer?.contactPhone }}
               </span>
             </div>
             <div class="flex flex-col gap-1">
@@ -82,7 +82,9 @@
               <span class="text-xs text-gray-600">是否加急</span>
               <span
                 class="text-sm font-medium"
-                :class="orderData.urgentFlag ? 'text-red-500' : 'text-gray-900'"
+                :class="
+                  orderData.urgentFlag ? 'text-red-500' : 'text-emerald-600'
+                "
               >
                 {{ orderData.urgentFlag ? '是' : '否' }}
               </span>
@@ -129,8 +131,8 @@
                 class="text-sm font-medium"
                 :class="
                   orderData.detectionSubcontract
-                    ? 'text-emerald-600'
-                    : 'text-gray-900'
+                    ? 'text-red-500'
+                    : 'text-emerald-600'
                 "
               >
                 {{ orderData.detectionSubcontract ? '是' : '否' }}
@@ -182,7 +184,7 @@
           <div class="mt-4">
             <span class="text-xs text-gray-600">备注</span>
             <div class="mt-2 rounded-md bg-gray-50 p-3 text-xs text-gray-600">
-              {{ orderData.salesRemark }}
+              {{ orderData.salesRemark || '暂无' }}
             </div>
           </div>
         </common-detail-card>
@@ -196,11 +198,11 @@
       <!-- 右侧辅助区 -->
       <div class="space-y-5">
         <!-- 状态指示器 -->
-        <!-- <common-detail-status
-          :status="orderData.status"
-          :status-text="orderData.statusText"
-          :details="orderData.statusDetails"
-        /> -->
+        <common-detail-status
+          :progress-and-order-status-code="orderData.progressAndOrderStatusCode"
+          :progress-and-order-status-name="orderData.progressAndOrderStatusName"
+          :details="statusDetails"
+        />
 
         <!-- 相关人员 -->
         <!-- <common-detail-card title="相关人员">
@@ -209,7 +211,9 @@
 
         <!-- 相关附件 -->
         <common-detail-card title="相关附件">
-          <common-detail-attachment :attachments="orderData.attachmentList" />
+          <common-detail-attachment
+            :attachment-payload-list="orderData.attachmentPayloadList"
+          />
         </common-detail-card>
       </div>
     </div>
@@ -226,7 +230,7 @@ import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
 // import CommonDetailTimeline from '@/components/common-detail-timeline.vue'
-// import CommonDetailStatus from '@/components/common-detail-status.vue'
+import CommonDetailStatus from '@/components/common-detail-status.vue'
 // import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonDetailAttachment from '@/components/common-detail-attachment.vue'
 
@@ -286,7 +290,6 @@ const orderData = ref<SalesOrder>({
   actualAmount: 0,
   salesRemark: '',
   attachmentPayloadList: [],
-  attachmentList: [],
   orderTypeId: 0,
   orderTypeCode: '',
   orderTypeName: '',
@@ -297,6 +300,18 @@ const orderData = ref<SalesOrder>({
   progressAndOrderStatusName: '',
   detectionProject: {} as any
 })
+const progressData = ref<SalesDetectionProgress>({
+  id: 0,
+  createTime: '',
+  updateTime: '',
+  projectId: 0,
+  nodeCode: '',
+  nodeName: '',
+  serialNumber: 0,
+  completedStatusCode: '',
+  statusChangeTraceList: []
+})
+const statusDetails = ref<LabelValue[]>([{ label: '当前阶段', value: '' }])
 
 // 编辑订单
 const onClickEdit = () => {
@@ -325,10 +340,20 @@ const loadDataDetail = async () => {
   try {
     loading.value = true
 
-    const res = await api.loadOrdersDetail(+props.orderId)
-    orderData.value = isObject(res)
-      ? { ...orderData.value, ...res }
+    const res1 = await api.loadOrdersDetail(+props.orderId)
+    orderData.value = isObject(res1)
+      ? { ...orderData.value, ...res1 }
       : orderData.value
+
+    if (res1.detectionProject?.id) {
+      const res2 = await api.loadDetectionProgress(res1.detectionProject.id)
+      progressData.value = isObject(res2)
+        ? { ...progressData.value, ...res2 }
+        : progressData.value
+    }
+
+    statusDetails.value[0].value =
+      orderData.value.detectionProject?.currentProgressName || ''
   } catch (error) {
     console.error('加载订单数据失败:', error)
   } finally {
