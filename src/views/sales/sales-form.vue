@@ -924,7 +924,7 @@ function handleFileInput() {
  * 处理文件拖拽上传
  * @param event 拖拽事件
  */
-function handleFileDrop(event: DragEvent) {
+function handleFileDrop(_event: DragEvent) {
   // const files = event.dataTransfer?.files
   // if (files) {
   //   const validFiles = Array.from(files).filter(file => {
@@ -943,7 +943,7 @@ function handleFileDrop(event: DragEvent) {
  * 处理文件上传
  * @param event 文件选择事件
  */
-function handleFileChange(event: Event) {
+function handleFileChange(_event: Event) {
   // const target = event.target as HTMLInputElement
   // if (target.files) {
   //   const validFiles = Array.from(target.files).filter(file => {

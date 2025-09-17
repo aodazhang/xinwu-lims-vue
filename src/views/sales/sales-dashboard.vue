@@ -144,7 +144,7 @@
           </button>
 
           <button
-            v-if="scope.orderStatusName === '待审核'"
+            v-if="scope.orderStatusCode === OrderStatus.PENDING_REVIEW"
             class="rounded border border-indigo-500 px-2 py-1 text-xs text-indigo-600 transition-all duration-200 hover:bg-indigo-500 hover:text-white"
             @click="onClickEdit(scope.id)"
           >
@@ -159,13 +159,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { OrderStatus } from '@/utils/enum'
 import { isArray, isNumber, isString } from '@/utils/is'
+import { dateToString } from '@/utils/date'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 // import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
-import { dateToString } from '@/utils/date'
 
 defineOptions({ name: 'SalesDashboard' })
 

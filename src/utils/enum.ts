@@ -115,3 +115,15 @@ export enum DictType {
   /** 服务类型 */
   SERVICE_TYPE = 'SERVICE_TYPE'
 }
+
+/** 订单状态 */
+export enum OrderStatus {
+  /** 待审核 */
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  /** 审核通过 */
+  APPROVED = 'APPROVED',
+  /** 审核驳回 */
+  REJECTED = 'REJECTED',
+  /** 已取消 */
+  CANCELLED = 'CANCELLED'
+}
