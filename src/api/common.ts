@@ -70,92 +70,98 @@ instance.interceptors.response.use(
   }
 )
 
-export async function loadDictionaries(params: unknown): Promise<SystemDict[]> {
+export function loadDictionaries(params: unknown): Promise<SystemDict[]> {
   return instance.get('/dictionaries', { params })
 }
 
-export async function loadLogin(data: unknown): Promise<{ token: string }> {
+export function loadLogin(data: unknown): Promise<{ token: string }> {
   return instance.post('/login', data)
 }
 
-export async function loadCurrentUser(): Promise<SystemUser> {
+export function loadCurrentUser(): Promise<SystemUser> {
   return instance.get('/current-user')
 }
 
-export async function loadRoles(): Promise<SystemRole[]> {
+export function loadRoles(): Promise<SystemRole[]> {
   return instance.get('/roles')
 }
 
-export async function loadAdminUsers(
+export function loadAdminUsers(
   params: unknown
 ): Promise<CommonList<SystemUser>> {
   return instance.get('/admin/users', { params })
 }
 
-export async function loadAdminUsersDetail(id: number): Promise<SystemUser> {
+export function loadAdminUsersDetail(id: number): Promise<SystemUser> {
   return instance.get(`/admin/users/${id}`)
 }
 
-export async function loadAdminUsersAdd(data: unknown): Promise<void> {
+export function loadAdminUsersAdd(data: unknown): Promise<void> {
   return instance.post('/admin/users', data)
 }
 
-export async function loadAdminUsersEdit(
-  id: number,
-  data: unknown
-): Promise<void> {
+export function loadAdminUsersEdit(id: number, data: unknown): Promise<void> {
   return instance.post(`/admin/users/${id}`, data)
 }
 
-export async function loadAdminUsersPasswordReset(id: number): Promise<void> {
+export function loadAdminUsersPasswordReset(id: number): Promise<void> {
   return instance.post(`/admin/users/${id}/password-reset`)
 }
 
-export async function loadAdminUsersPasswordChanging(
-  data: unknown
-): Promise<void> {
+export function loadAdminUsersPasswordChanging(data: unknown): Promise<void> {
   return instance.post('/password-changing', data)
 }
 
-export async function loadCustomers(
+export function loadCustomers(
   params: unknown
 ): Promise<CommonList<SalesCustomer>> {
   return instance.get('/customers', { params })
 }
 
-export async function loadCustomersDetail(id: number): Promise<SalesCustomer> {
+export function loadCustomersDetail(id: number): Promise<SalesCustomer> {
   return instance.get(`/customers/${id}`)
 }
 
-export async function loadCustomersAdd(data: unknown): Promise<void> {
+export function loadCustomersAdd(data: unknown): Promise<void> {
   return instance.post('/customers', data)
 }
 
-export async function loadCustomersEdit(
-  id: number,
-  data: unknown
-): Promise<void> {
+export function loadCustomersEdit(id: number, data: unknown): Promise<void> {
   return instance.post(`/customers/${id}`, data)
 }
 
-export async function loadOrders(
-  params: unknown
-): Promise<CommonList<SalesOrder>> {
+export function loadOrders(params: unknown): Promise<CommonList<SalesOrder>> {
   return instance.get('/orders', { params })
 }
 
-export async function loadOrdersDetail(id: number): Promise<SalesOrder> {
+export function loadOrdersDetail(id: number): Promise<SalesOrder> {
   return instance.get(`/orders/${id}`)
 }
 
-export async function loadOrdersAdd(data: unknown): Promise<void> {
+export function loadOrdersAdd(data: unknown): Promise<void> {
   return instance.post('/orders', data)
 }
 
-export async function loadOrdersStatusChanging(
+export function loadOrdersStatusChanging(
   id: number,
   data: unknown
 ): Promise<void> {
   // DictType.ORDER_STATUS
   return instance.put(`/orders/${id}/status-changing`, data)
+}
+
+export function loadDetectionTypes(): Promise<SalesDetectionType[]> {
+  return instance.get('/detection-types')
+}
+
+export function loadDetectionItems(
+  params: unknown
+): Promise<SalesDetectionProject[]> {
+  return instance.get('/detection-items', { params })
+}
+
+export function loadDetectionProgress(
+  id: number
+): Promise<SalesDetectionProgress[]> {
+  return instance.get(`/detection-projects/${id}/progress`)
 }

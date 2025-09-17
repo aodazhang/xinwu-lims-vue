@@ -246,6 +246,104 @@ declare global {
     industryName: string
   }
 
+  /** 销售检测类型 */
+  interface SalesDetectionType {
+    /** 检测类型ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 检测类型名称 */
+    detectionTypeName: string
+    /** 样品类别 */
+    sampleCategory: string
+  }
+
+  /** 销售检测项目 */
+  interface SalesDetectionProject {
+    /** 检测项目ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 检测类型ID */
+    detectionTypeId: number
+    /** 检测项目名称 */
+    detectionItemName: string
+    /** 检测项目标准列表 */
+    detectionItemStandardList: {
+      /** 标准ID */
+      id: number
+      /** 创建时间 */
+      createTime: string
+      /** 更新时间 */
+      updateTime: string
+      /** 检测项目ID */
+      detectionItemId: number
+      /** 标准方法 */
+      standardMethod: string
+      /** 标准编号 */
+      standardNumber: string
+      /** 备注 */
+      remark: string | null
+    }[]
+  }
+
+  /** 销售检测进度 */
+  interface SalesDetectionProgress {
+    /** 进度ID */
+    id: number
+    /** 创建时间 */
+    createTime: string
+    /** 更新时间 */
+    updateTime: string
+    /** 项目ID */
+    projectId: number
+    /** 节点代码 */
+    nodeCode: string
+    /** 节点名称 */
+    nodeName: string
+    /** 序列号 */
+    serialNumber: number
+    /** 完成状态代码 */
+    completedStatusCode: string
+    /** 状态变更跟踪列表 */
+    statusChangeTraceList: {
+      /** 跟踪ID */
+      id: number
+      /** 创建时间 */
+      createTime: string
+      /** 更新时间 */
+      updateTime: string
+      /** 项目ID */
+      projectId: number
+      /** 项目编号 */
+      projectNumber: string
+      /** 主机类型代码 */
+      hostTypeCode: string
+      /** 主机ID */
+      hostId: number
+      /** 原状态代码 */
+      origStatusCode: string
+      /** 变更用户ID */
+      changeUserId: number
+      /** 变更用户角色 */
+      changeUserRole: string
+      /** 变更用户角色名称 */
+      changeUserRoleName: string
+      /** 备注 */
+      remark: string
+      /** 变更后状态代码 */
+      changedStatusCode: string
+      /** 变更用户真实姓名 */
+      changeUserRealName: string
+      /** 变更后状态名称 */
+      changedStatusName: string
+    }[]
+  }
+
   /** 审核订单 */
   interface ReviewOrder {
     /** 订单ID */

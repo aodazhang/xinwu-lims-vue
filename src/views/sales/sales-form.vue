@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <!-- 页面头部 -->
     <common-title title="销售订单" content="销售工作台 / 销售订单" />
 
@@ -11,8 +11,9 @@
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >订单类型</label
             >
+              订单类型
+            </label>
             <select
               v-model="formData.orderTypeId"
               :class="[
@@ -25,20 +26,26 @@
               @change="handleOrderTypeChange"
               @blur="validateOrderTypeId"
             >
-              <option value="">请选择</option>
-              <option value="sampling">委托检测（采样）</option>
-              <option value="delivery">委托检测（送样）</option>
+              <option value="0" disabled>请选择订单类型</option>
+              <option
+                v-for="item in orderTypeList"
+                :key="item.id"
+                :value="item.id"
+              >
+                {{ item.dicValue }}
+              </option>
             </select>
             <span
               v-if="errors.orderTypeName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.orderTypeName }}</span
             >
+              {{ errors.orderTypeName }}
+            </span>
           </div>
           <div class="flex flex-col">
-            <label class="mb-2 text-sm font-medium text-gray-700"
-              >是否加急</label
-            >
+            <label class="mb-2 text-sm font-medium text-gray-700">
+              是否加急
+            </label>
             <div class="flex gap-5 py-2.5">
               <label class="flex cursor-pointer items-center">
                 <input
@@ -91,14 +98,16 @@
             <span
               v-if="errors.customerName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.customerName }}</span
             >
+              {{ errors.customerName }}
+            </span>
           </div>
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >受检单位</label
             >
+              受检单位
+            </label>
             <input
               v-model="formData.inspectedUnit"
               type="text"
@@ -115,8 +124,9 @@
             <span
               v-if="errors.inspectedUnit"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.inspectedUnit }}</span
             >
+              {{ errors.inspectedUnit }}
+            </span>
           </div>
         </div>
       </common-form-section>
@@ -127,8 +137,9 @@
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >采样地址</label
             >
+              采样地址
+            </label>
             <input
               v-model="formData.samplingAddress"
               type="text"
@@ -145,14 +156,16 @@
             <span
               v-if="errors.samplingAddress"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.samplingAddress }}</span
             >
+              {{ errors.samplingAddress }}
+            </span>
           </div>
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >检测类型</label
             >
+              检测类型
+            </label>
             <select
               v-model="formData.detectionTypeId"
               :class="[
@@ -165,15 +178,21 @@
               @change="handleDetectionTypeChange"
               @blur="validateDetectionTypeId"
             >
-              <option value="">请选择</option>
-              <option value="50325-2020">50325-2020</option>
-              <option value="18883-2022">18883-2022</option>
+              <option value="0" disabled>请选择检测类型</option>
+              <option
+                v-for="item in detectionTypeList"
+                :key="item.id"
+                :value="item.id"
+              >
+                {{ item.detectionTypeName }}
+              </option>
             </select>
             <span
               v-if="errors.detectionTypeName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.detectionTypeName }}</span
             >
+              {{ errors.detectionTypeName }}
+            </span>
           </div>
         </div>
         <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -224,8 +243,9 @@
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >服务类型</label
             >
+              服务类型
+            </label>
             <select
               v-model="formData.serviceTypeId"
               :class="[
@@ -238,27 +258,30 @@
               @change="handleServiceTypeChange"
               @blur="validateServiceTypeId"
             >
-              <option value="">请选择</option>
-              <option value="initial">初测</option>
-              <option value="retest">复测</option>
-              <option value="actual">实测</option>
-              <option value="yl3">YL3</option>
-              <option value="yl5">YL5</option>
-              <option value="yl8">YL8</option>
+              <option value="0" disabled>请选择服务类型</option>
+              <option
+                v-for="item in serviceTypeList"
+                :key="item.id"
+                :value="item.id"
+              >
+                {{ item.dicValue }}
+              </option>
             </select>
             <span
               v-if="errors.serviceTypeName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.serviceTypeName }}</span
             >
+              {{ errors.serviceTypeName }}
+            </span>
           </div>
         </div>
         <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >检测点数</label
             >
+              检测点数
+            </label>
             <input
               v-model.number="formData.detectionPoints"
               type="number"
@@ -276,8 +299,9 @@
             <span
               v-if="errors.detectionPointsName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.detectionPointsName }}</span
             >
+              {{ errors.detectionPointsName }}
+            </span>
           </div>
         </div>
       </common-form-section>
@@ -288,8 +312,9 @@
           <div class="relative flex flex-col">
             <label
               class="mb-2 text-sm font-medium text-gray-700 after:text-red-500 after:content-['_*']"
-              >项目金额</label
             >
+              项目金额
+            </label>
             <input
               v-model.number="formData.projectAmount"
               type="number"
@@ -308,13 +333,14 @@
             <span
               v-if="errors.projectAmountName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
-              >{{ errors.projectAmountName }}</span
             >
+              {{ errors.projectAmountName }}
+            </span>
           </div>
           <div class="flex flex-col">
-            <label class="mb-2 text-sm font-medium text-gray-700"
-              >实收金额</label
-            >
+            <label class="mb-2 text-sm font-medium text-gray-700">
+              实收金额
+            </label>
             <input
               v-model.number="formData.actualAmount"
               type="number"
@@ -331,9 +357,9 @@
       <common-form-section title="备注信息">
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div class="flex flex-col md:col-span-2">
-            <label class="mb-2 text-sm font-medium text-gray-700"
-              >销售备注</label
-            >
+            <label class="mb-2 text-sm font-medium text-gray-700">
+              销售备注
+            </label>
             <textarea
               v-model="formData.salesRemark"
               placeholder="请输入备注信息"
@@ -344,9 +370,9 @@
         </div>
         <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
           <div class="flex flex-col md:col-span-2">
-            <label class="mb-2 text-sm font-medium text-gray-700"
-              >附件上传</label
-            >
+            <label class="mb-2 text-sm font-medium text-gray-700">
+              附件上传
+            </label>
             <div
               class="relative cursor-pointer"
               @click="triggerFileInput"
@@ -397,28 +423,23 @@
       <div class="flex justify-end gap-3 pt-6">
         <button
           type="button"
-          class="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          class="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
           @click="$router.go(-1)"
-          :disabled="loading"
         >
           取消
         </button>
         <button
-          type="submit"
+          type="button"
           :class="[
-            'flex items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium text-white transition-all',
-            !isFormValid || loading
-              ? 'cursor-not-allowed bg-gray-400 opacity-50'
-              : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-400/40'
+            'rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200',
+            !isFormValid || isSubmitting
+              ? 'cursor-not-allowed bg-gray-400'
+              : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:-translate-y-0.5 hover:shadow-lg'
           ]"
-          :disabled="!isFormValid || loading"
+          :disabled="!isFormValid || isSubmitting"
           @click="loadDataSubmit"
         >
-          <span
-            v-if="loading"
-            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"
-          ></span>
-          {{ loading ? '提交中...' : '提交订单' }}
+          {{ isSubmitting ? '提交中...' : '提交订单' }}
         </button>
       </div>
     </div>
@@ -437,6 +458,7 @@ import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonFormSection from '@/components/common-form-section.vue'
 import CommonModalSelect from '@/components/common-modal-select.vue'
+import { DictType } from '@/utils/enum'
 
 defineOptions({ name: 'SalesForm' })
 
@@ -449,7 +471,14 @@ type FormErrors = Pick<
   | 'samplingAddress'
   | 'detectionTypeName'
   | 'serviceTypeName'
-> & { detectionPointsName: string; projectAmountName: string }
+  | 'reportDeliveryName'
+> & {
+  orderDetectionItemName: string
+  detectionPointsName: string
+  sampleStorageName: string
+  sampleDisposalName: string
+  projectAmountName: string
+}
 
 // Props
 const props = defineProps<{ orderId?: number | string }>()
@@ -457,11 +486,17 @@ const props = defineProps<{ orderId?: number | string }>()
 // 路由相关
 const router = useRouter()
 
-// 加载状态
+// 内部维护的状态
 const loading = ref(false)
-
-// 客户选择弹窗引用
+const isSubmitting = ref(false)
 const selectModalRef = ref<InstanceType<typeof CommonModalSelect>>()
+const orderTypeList = ref<SystemDict[]>([])
+const serviceTypeList = ref<SystemDict[]>([])
+const sampleStorageList = ref<SystemDict[]>([])
+const sampleDisposalList = ref<SystemDict[]>([])
+const reportDeliveryList = ref<SystemDict[]>([])
+const detectionTypeList = ref<SalesDetectionType[]>([])
+const detectionItemMap = ref<{ [key: number]: SalesDetectionProject[] }>({})
 
 // 表单数据
 const formData = ref<
@@ -494,26 +529,30 @@ const formData = ref<
 >({
   id: 0,
   projectNumber: '',
-  orderTypeId: 0, // DictType.ORDER_TYPE
+  // 基本信息
+  orderTypeId: 0, // 订单类型*：DictType.ORDER_TYPE
   urgentFlag: false,
-  customerId: 0,
-  inspectedUnit: '',
-  samplingAddress: '',
-  detectionTypeId: 0, // 检测类型列表：id、
-  // 检测项目：id、detectionItemName
-  orderDetectionItemList: [], // 检测项目（标准、多选）：detectionItemStandardList -> detectionItemId、id
-  serviceTypeId: 0, // DictType.SERVICE_TYPE
-  detectionPoints: 0,
+  // 客户信息
+  customerId: 0, // 客户*
+  inspectedUnit: '', // 受检单位*
+  // 检测信息
+  samplingAddress: '', // 采样地址*
+  detectionTypeId: 0, // 检测类型列表*：id、detectionTypeName
+  orderDetectionItemList: [], // 检测项目（标准、多选）：id、detectionItemName、detectionItemStandardList -> detectionItemId、id
+  serviceTypeId: 0, // 服务类型*：DictType.SERVICE_TYPE
+  detectionPoints: 0, // 检测点数*
   sampleStorageId: 0, // 样品存储*：DictType.SAMPLE_STORAGE
   sampleDisposalId: 0, // 样品处置*：DictType.SAMPLE_DISPOSAL
   sampleDisposalOther: '', // 样品处置其他：输入框
   detectionSubcontract: false, // 检测分包：单选
   subcontractProject: '', // 分包项目：输入框
   specialRequirements: '', // 特殊要求：输入框（跟上面一行）
-  reportDeliveryId: 0, // 报告交付*：REPORT_DELIVERY
+  reportDeliveryId: 0, // 报告交付*：DictType.REPORT_DELIVERY
   reportDeliveryOther: '', // 报告交付其他：输入框（跟上面一行）
+  // 财务信息
   projectAmount: 0,
   actualAmount: 0,
+  // 备注信息
   salesRemark: '',
   attachmentPayloadList: [] // TODO: 后续开发
 })
@@ -532,8 +571,12 @@ const errors = ref<FormErrors>({
   inspectedUnit: '',
   samplingAddress: '',
   detectionTypeName: '',
+  orderDetectionItemName: '',
   serviceTypeName: '',
   detectionPointsName: '',
+  sampleStorageName: '',
+  sampleDisposalName: '',
+  reportDeliveryName: '',
   projectAmountName: ''
 })
 
@@ -821,7 +864,7 @@ watch(() => formData.value.projectAmount, validateProjectAmount)
 // 处理数据提交
 const loadDataSubmit = async () => {
   // 防止重复提交
-  if (loading.value) return
+  if (isSubmitting.value) return
 
   // 校验表单
   validateForm()
@@ -831,31 +874,25 @@ const loadDataSubmit = async () => {
     return
   }
 
-  loading.value = true
+  isSubmitting.value = true
 
   try {
     const data = {
-      // customerName: customerForm.value.customerName.trim() || '',
-      // contactPerson: customerForm.value.contactPerson.trim() || '',
-      // contactPhone: customerForm.value.contactPhone.trim() || '',
-      // customerAddress: customerForm.value.customerAddress.trim() || '',
-      // customerCategoryId: customerForm.value.customerCategoryId || null,
-      // customerSourceId: customerForm.value.customerSourceId || null,
-      // customerStatusId: customerForm.value.customerStatusId || null,
-      // industryId: customerForm.value.industryId || null
-
       projectNumber: formData.value.projectNumber.trim() || '',
+      // 基本信息
       orderTypeId: formData.value.orderTypeId || null,
       urgentFlag: formData.value.urgentFlag === true,
+      // 客户信息
       customerId: formData.value.customerId || null,
       inspectedUnit: formData.value.inspectedUnit.trim() || '',
+      // 检测信息
       samplingAddress: formData.value.samplingAddress.trim() || '',
       detectionTypeId: formData.value.detectionTypeId || null,
+      orderDetectionItemList: isArray(formData.value.orderDetectionItemList)
+        ? formData.value.orderDetectionItemList
+        : [],
       serviceTypeId: formData.value.serviceTypeId || null,
       detectionPoints: formData.value.detectionPoints || null,
-      projectAmount: formData.value.projectAmount || null,
-      actualAmount: formData.value.actualAmount || null,
-      salesRemark: formData.value.salesRemark.trim() || '',
       sampleStorageId: formData.value.sampleStorageId || null,
       sampleDisposalId: formData.value.sampleDisposalId || null,
       sampleDisposalOther: formData.value.sampleDisposalOther.trim() || '',
@@ -864,9 +901,11 @@ const loadDataSubmit = async () => {
       specialRequirements: formData.value.specialRequirements.trim() || '',
       reportDeliveryId: formData.value.reportDeliveryId || null,
       reportDeliveryOther: formData.value.reportDeliveryOther.trim() || '',
-      orderDetectionItemList: isArray(formData.value.orderDetectionItemList)
-        ? formData.value.orderDetectionItemList
-        : [],
+      // 财务信息
+      projectAmount: formData.value.projectAmount || null,
+      actualAmount: formData.value.actualAmount || null,
+      // 备注信息
+      salesRemark: formData.value.salesRemark.trim() || '',
       attachmentPayloadList: isArray(formData.value.attachmentPayloadList)
         ? formData.value.attachmentPayloadList
         : []
@@ -882,22 +921,45 @@ const loadDataSubmit = async () => {
   } catch (error) {
     console.error('创建订单失败:', error)
   } finally {
-    loading.value = false
+    isSubmitting.value = false
   }
 }
 
 // 处理数据请求
 const loadDataDetail = async () => {
-  if (!props.orderId) {
-    return
-  }
-
   try {
     loading.value = true
-    const res = await api.loadOrdersDetail(+props.orderId)
-    formData.value = isObject(res)
-      ? { ...formData.value, ...res }
-      : formData.value
+
+    const [res1, res2, res3, res4, res5, res6] = await Promise.all([
+      api.loadDictionaries({ dicTypeCode: DictType.ORDER_TYPE }),
+      api.loadDictionaries({ dicTypeCode: DictType.SERVICE_TYPE }),
+      api.loadDictionaries({ dicTypeCode: DictType.SAMPLE_STORAGE }),
+      api.loadDictionaries({ dicTypeCode: DictType.SAMPLE_DISPOSAL }),
+      api.loadDictionaries({ dicTypeCode: DictType.REPORT_DELIVERY }),
+      api.loadDetectionTypes()
+    ])
+    orderTypeList.value = isArray(res1) ? res1 : []
+    serviceTypeList.value = isArray(res2) ? res2 : []
+    sampleStorageList.value = isArray(res3) ? res3 : []
+    sampleDisposalList.value = isArray(res4) ? res4 : []
+    reportDeliveryList.value = isArray(res5) ? res5 : []
+    detectionTypeList.value = isArray(res6) ? res6 : []
+
+    if (isArray(res6)) {
+      const res7 = await Promise.all(
+        res6.map(({ id }) => api.loadDetectionItems({ detectionTypeId: id }))
+      )
+      res7.forEach((item, index) => {
+        detectionItemMap.value[res6[index].id] = item
+      })
+    }
+
+    if (props.orderId) {
+      const res8 = await api.loadOrdersDetail(+props.orderId)
+      formData.value = isObject(res8)
+        ? { ...formData.value, ...res8 }
+        : formData.value
+    }
   } catch (error) {
     console.error('加载订单数据失败:', error)
   } finally {
