@@ -142,6 +142,10 @@ export function loadOrdersAdd(data: unknown): Promise<void> {
   return instance.post('/orders', data)
 }
 
+export function loadOrdersEdit(id: number, data: unknown): Promise<void> {
+  return instance.put(`/orders/${id}`, data)
+}
+
 export function loadOrdersStatusChanging(
   id: number,
   data: unknown

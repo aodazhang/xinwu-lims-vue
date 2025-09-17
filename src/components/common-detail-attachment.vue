@@ -11,16 +11,16 @@
       <div
         class="flex h-8 w-8 items-center justify-center rounded bg-gray-200 text-xs text-gray-600"
       >
-        {{ getFileTypeIcon(attachment.name) }}
+        {{ getFileTypeIcon(attachment.fileName) }}
       </div>
 
       <!-- 文件信息 -->
       <div class="flex-1">
         <div class="text-sm text-gray-900">
-          {{ attachment.name }}
+          {{ attachment.fileName }}
         </div>
         <div class="text-xs text-gray-600">
-          {{ attachment.size }}
+          {{ formatFileSize(attachment.fileSizeByte) }}
         </div>
       </div>
     </div>
@@ -28,21 +28,11 @@
 </template>
 
 <script setup lang="ts">
+import { toolDownloadUrl } from '@/utils/tool'
 import Message from '@/utils/message'
 
-interface Attachment {
-  name: string
-  size: string
-  url?: string
-}
-
 defineProps<{
-  attachments: Attachment[]
-}>()
-
-defineEmits<{
-  download: [attachment: Attachment]
-  preview: [attachment: Attachment]
+  attachments: SystemAttachment[]
 }>()
 
 /**
@@ -72,15 +62,27 @@ function getFileTypeIcon(fileName: string): string {
 }
 
 /**
- * 处理文件点击事件
- * @param attachment 附件信息
+ * 格式化文件大小
+ * @param bytes 文件大小（字节）
+ * @returns 格式化后的文件大小
  */
-function handleFileClick(attachment: Attachment): void {
-  if (!attachment.url) {
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+/**
+ * 处理文件点击事件
+ * @param file 附件信息
+ */
+function handleFileClick(file: SystemAttachment): void {
+  if (!file.url) {
     Message.warning('文件URL不存在，无法下载或预览')
     return
   }
-
-  window.open(attachment.url, '_blank')
+  toolDownloadUrl(file.url, file.fileName)
 }
 </script>

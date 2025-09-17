@@ -37,13 +37,13 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">客户联系人</span>
               <span class="text-sm font-medium text-gray-900">
-                {{ orderData.saleUserRealName }}
+                {{ orderData.customer.contactPerson }}
               </span>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">客户联系电话</span>
               <span class="text-sm font-medium text-gray-900">
-                {{ 'TODO' }}
+                {{ orderData.customer.contactPhone }}
               </span>
             </div>
             <div class="flex flex-col gap-1">
@@ -112,12 +112,6 @@
               </span>
             </div>
             <div class="flex flex-col gap-1">
-              <span class="text-xs text-gray-600">检测内容</span>
-              <span class="text-sm font-medium text-emerald-600">
-                {{ 'TODO' }}
-              </span>
-            </div>
-            <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">服务类型</span>
               <span class="text-sm font-medium text-gray-900">
                 {{ orderData.serviceTypeName }}
@@ -135,7 +129,7 @@
                 class="text-sm font-medium"
                 :class="
                   orderData.detectionSubcontract
-                    ? 'text-red-500'
+                    ? 'text-emerald-600'
                     : 'text-gray-900'
                 "
               >
@@ -215,7 +209,7 @@
 
         <!-- 相关附件 -->
         <common-detail-card title="相关附件">
-          <common-detail-attachment :attachments="[]" />
+          <common-detail-attachment :attachments="orderData.attachmentList" />
         </common-detail-card>
       </div>
     </div>
@@ -225,7 +219,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { OrderStatus } from '@/utils/enum'
 import { isObject } from '@/utils/is'
+import Message from '@/utils/message'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
@@ -233,8 +229,6 @@ import CommonDetailCard from '@/components/common-detail-card.vue'
 // import CommonDetailStatus from '@/components/common-detail-status.vue'
 // import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonDetailAttachment from '@/components/common-detail-attachment.vue'
-import { OrderStatus } from '@/utils/enum'
-import Message from '@/utils/message'
 
 /**
  * 订单进度
@@ -259,33 +253,19 @@ const orderData = ref<SalesOrder>({
   updateTime: '',
   projectNumber: '',
   urgentFlag: false,
-  progressAndOrderStatusCode: '',
-  progressAndOrderStatusName: '',
   customerId: 0,
   customerCode: '',
   customerName: '',
-  saleUserId: 0,
-  saleUserRealName: '',
-  salesRemark: '',
-  projectAmount: 0,
-  actualAmount: 0,
+  customer: {} as SalesCustomer,
+  inspectedUnit: '',
+  samplingAddress: '',
+  detectionTypeId: 0,
+  detectionTypeName: '',
+  orderDetectionItemList: [],
   serviceTypeId: 0,
   serviceTypeCode: '',
   serviceTypeName: '',
-  orderTypeId: 0,
-  orderTypeCode: '',
-  orderTypeName: '',
-  orderStatusCode: '',
-  orderStatusName: '',
-  orderStatusRemark: '',
-  detectionTypeId: 0,
-  detectionTypeName: '',
   detectionPoints: 0,
-  detectionSubcontract: false,
-  subcontractProject: '',
-  specialRequirements: '',
-  inspectedUnit: '',
-  samplingAddress: '',
   sampleStorageId: 0,
   sampleStorageCode: '',
   sampleStorageName: '',
@@ -293,14 +273,29 @@ const orderData = ref<SalesOrder>({
   sampleDisposalCode: '',
   sampleDisposalName: '',
   sampleDisposalOther: '',
+  detectionSubcontract: false,
+  subcontractProject: '',
+  specialRequirements: '',
   reportDeliveryId: 0,
   reportDeliveryCode: '',
   reportDeliveryName: '',
   reportDeliveryOther: '',
+  saleUserId: 0,
+  saleUserRealName: '',
+  projectAmount: 0,
+  actualAmount: 0,
+  salesRemark: '',
+  attachmentPayloadList: [],
   attachmentList: [],
-
-  orderDetectionItemList: [],
-  attachmentPayloadList: []
+  orderTypeId: 0,
+  orderTypeCode: '',
+  orderTypeName: '',
+  orderStatusCode: '',
+  orderStatusName: '',
+  orderStatusRemark: '',
+  progressAndOrderStatusCode: '',
+  progressAndOrderStatusName: '',
+  detectionProject: {} as any
 })
 
 // 编辑订单

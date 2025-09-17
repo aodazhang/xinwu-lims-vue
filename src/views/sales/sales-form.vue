@@ -532,12 +532,10 @@
             </label>
             <div
               class="relative cursor-pointer"
-              @click="handleFileInput"
               @drop.prevent="handleFileDrop"
               @dragover.prevent
             >
               <input
-                ref="fileInputRef"
                 type="file"
                 multiple
                 accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
@@ -666,7 +664,6 @@ const detectionItemList = computed(() => {
       : []
   }))
 })
-const fileInputRef = ref<HTMLInputElement>()
 
 // 表单数据
 const formData = ref<
@@ -724,7 +721,7 @@ const formData = ref<
   actualAmount: 0,
   // 备注信息
   salesRemark: '',
-  attachmentPayloadList: [] // TODO: 后续开发
+  attachmentPayloadList: []
 })
 
 // 表单验证错误
@@ -914,48 +911,61 @@ function validateForm() {
 }
 
 /**
- * 触发文件选择
- */
-function handleFileInput() {
-  fileInputRef.value?.click()
-}
-
-/**
- * 处理文件拖拽上传
+ * 处理拖拽文件上传
  * @param event 拖拽事件
  */
-function handleFileDrop(_event: DragEvent) {
-  // const files = event.dataTransfer?.files
-  // if (files) {
-  //   const validFiles = Array.from(files).filter(file => {
-  //     const maxSize = 10 * 1024 * 1024 // 10MB
-  //     if (file.size > maxSize) {
-  //       alert(`文件 ${file.name} 超过10MB限制`)
-  //       return false
-  //     }
-  //     return true
-  //   })
-  //   formData.value.attachmentPayloadList.push(...validFiles)
-  // }
+function handleFileDrop(event: DragEvent) {
+  const files = event.dataTransfer?.files
+  if (!files || files.length === 0) {
+    return
+  }
+  const validFiles = Array.from(files).filter(file => {
+    const maxSize = 20 * 1024 * 1024 // 20MB
+    if (file.size > maxSize) {
+      Message.warning(`文件 ${file.name} 超过20MB限制`)
+      return false
+    }
+    return true
+  })
+
+  // TODO: 上传文件到 OSS
+
+  formData.value.attachmentPayloadList.push(
+    ...validFiles.map(file => ({
+      url: '',
+      fileName: file.name,
+      fileSizeByte: file.size
+    }))
+  )
 }
 
 /**
- * 处理文件上传
- * @param event 文件选择事件
+ * 处理选择文件上传
+ * @param event 选择事件
  */
-function handleFileChange(_event: Event) {
-  // const target = event.target as HTMLInputElement
-  // if (target.files) {
-  //   const validFiles = Array.from(target.files).filter(file => {
-  //     const maxSize = 10 * 1024 * 1024 // 10MB
-  //     if (file.size > maxSize) {
-  //       alert(`文件 ${file.name} 超过10MB限制`)
-  //       return false
-  //     }
-  //     return true
-  //   })
-  //   formData.value.attachmentPayloadList.push(...validFiles)
-  // }
+function handleFileChange(event: Event) {
+  const files = (event.target as HTMLInputElement).files
+  if (!files || files.length === 0) {
+    return
+  }
+  const validFiles = Array.from(files).filter(file => {
+    const maxSize = 20 * 1024 * 1024 // 20MB
+    if (file.size > maxSize) {
+      Message.warning(`文件 ${file.name} 超过20MB限制`)
+      return false
+    }
+    return true
+  })
+
+  // TODO: 上传文件到 OSS
+
+  formData.value.attachmentPayloadList.push(
+    ...validFiles.map(file => ({
+      url: '',
+      fileName: file.name,
+      fileSizeByte: file.size
+    }))
+  )
 }
 
 /**
@@ -1043,8 +1053,7 @@ const loadDataSubmit = async () => {
         : []
     }
     if (formData.value.id) {
-      // TODO: 编辑接口
-      // await api.loadCustomersEdit(formData.value.id, data)
+      await api.loadOrdersEdit(formData.value.id, data)
     } else {
       await api.loadOrdersAdd(data)
     }
@@ -1095,7 +1104,15 @@ const loadDataDetail = async () => {
         ? { ...formData.value, ...res9 }
         : formData.value
 
-      // TODO: orderDetectionItemList 转换
+      formData.value.customerId = res9.customer.id || null
+      formData.value.orderDetectionItemList = isArray(
+        res9.orderDetectionItemList
+      )
+        ? res9.orderDetectionItemList.map(
+            item =>
+              `${(item as any).detectionItemId},${(item as any).detectionItemStandardId}`
+          )
+        : []
     }
   } catch (error) {
     console.error('加载订单数据失败:', error)

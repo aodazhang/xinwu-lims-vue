@@ -285,12 +285,12 @@ export function toolImportFile(exts: string[], size?: number): Promise<File> {
 }
 
 /**
- * 导出文件
+ * 导出 blob 文件
  * @param blob 二进制数据
  * @param name 文件名
  * @returns 无
  */
-export function toolDownloadFile(blob: unknown, name: string): void {
+export function toolDownloadBlob(blob: unknown, name: string): void {
   if (!isBlob(blob) || !isString(name)) {
     return
   }
@@ -305,6 +305,25 @@ export function toolDownloadFile(blob: unknown, name: string): void {
   a.remove()
   // 使用完毕后需要释放内存占用
   URL.revokeObjectURL(url)
+}
+
+/**
+ * 导出 url 文件
+ * @param url 文件 url
+ * @param name 文件名
+ * @returns 无
+ */
+export function toolDownloadUrl(url: string, name: string): void {
+  if (!isString(url) || !isString(name)) {
+    return
+  }
+  // 创建 a 标签下载文件
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${name}`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
 }
 
 /**

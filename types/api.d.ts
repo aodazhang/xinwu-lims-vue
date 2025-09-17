@@ -87,6 +87,28 @@ declare global {
     serialNumber: number
   }
 
+  /** 系统附件 */
+  interface SystemAttachment {
+    /** 附件ID */
+    id?: number
+    /** 创建时间 */
+    createTime?: string
+    /** 更新时间 */
+    updateTime?: string
+    /** 附件所属类型 */
+    hostType?: string
+    /** 附件所属ID */
+    hostId?: number
+    /** 附件备注 */
+    remark?: string
+    /** 附件URL地址 */
+    url: string
+    /** 附件文件名 */
+    fileName: string
+    /** 附件文件大小(字节) */
+    fileSizeByte: number
+  }
+
   // ==================== 业务管理 ====================
 
   /** 销售订单 */
@@ -102,10 +124,6 @@ declare global {
     projectNumber: string
     /** 紧急标志 */
     urgentFlag: boolean
-    /** 进度和订单状态代码 */
-    progressAndOrderStatusCode: string
-    /** 进度和订单状态名称 */
-    progressAndOrderStatusName: string
 
     /** 客户ID */
     customerId: number
@@ -113,55 +131,43 @@ declare global {
     customerCode: string
     /** 客户名称 */
     customerName: string
+    /** 客户信息 */
+    customer: SalesCustomer
+    /** 被检单位 */
+    inspectedUnit: string
 
-    /** 销售人员ID */
-    saleUserId: number
-    /** 销售人员真实姓名 */
-    saleUserRealName: string
-    /** 销售备注 */
-    salesRemark: string
-    /** 项目金额 */
-    projectAmount: number
-    /** 实收金额 */
-    actualAmount: number
-
+    /** 采样地址 */
+    samplingAddress: string
+    /** 检测类型ID */
+    detectionTypeId: number
+    /** 检测类型名称 */
+    detectionTypeName: string
+    /** 检测项目标准 */
+    orderDetectionItemList: (
+      | {
+          /** 检测项目标准 id */
+          id?: number
+          /** 关联订单 id */
+          orderId?: number
+          /** 创建时间 */
+          createTime?: string
+          /** 更新时间 */
+          updateTime?: string
+          /** 检测项目 id */
+          detectionItemId: number
+          /** 检测标准 id */
+          detectionItemStandardId: number
+        }
+      | string
+    )[]
     /** 服务类型ID */
     serviceTypeId: number
     /** 服务类型代码 */
     serviceTypeCode: string
     /** 服务类型名称 */
     serviceTypeName: string
-
-    /** 订单类型ID */
-    orderTypeId: number
-    /** 订单类型代码 */
-    orderTypeCode: string
-    /** 订单类型名称 */
-    orderTypeName: string
-    /** 订单状态代码 */
-    orderStatusCode: string
-    /** 订单状态名称 */
-    orderStatusName: string
-    /** 订单状态备注 */
-    orderStatusRemark: string
-
-    /** 检测类型ID */
-    detectionTypeId: number
-    /** 检测类型名称 */
-    detectionTypeName: string
     /** 检测点数 */
     detectionPoints: number
-    /** 检测分包 */
-    detectionSubcontract: boolean
-    /** 分包项目 */
-    subcontractProject: string
-    /** 特殊要求 */
-    specialRequirements: string
-    /** 被检单位 */
-    inspectedUnit: string
-    /** 采样地址 */
-    samplingAddress: string
-
     /** 样品存储ID */
     sampleStorageId: number
     /** 样品存储编码 */
@@ -176,7 +182,12 @@ declare global {
     sampleDisposalName: string
     /** 样品处置其他说明 */
     sampleDisposalOther: string
-
+    /** 检测分包 */
+    detectionSubcontract: boolean
+    /** 分包项目 */
+    subcontractProject: string
+    /** 特殊要求 */
+    specialRequirements: string
     /** 报告交付ID */
     reportDeliveryId: number
     /** 报告交付编码 */
@@ -186,23 +197,62 @@ declare global {
     /** 报告交付其他说明 */
     reportDeliveryOther: string
 
-    /** 附件列表 */
-    attachmentList: string[]
+    /** 销售人员ID */
+    saleUserId: number
+    /** 销售人员真实姓名 */
+    saleUserRealName: string
+    /** 项目金额 */
+    projectAmount: number
+    /** 实收金额 */
+    actualAmount: number
+    /** 销售备注 */
+    salesRemark: string
 
-    /** 订单检测信息 */
-    orderDetectionItemList: (
-      | {
-          detectionItemId: number
-          detectionItemStandardId: number
-        }
-      | string
-    )[]
     /** 附件列表 */
-    attachmentPayloadList: {
-      url: string
-      fileName: string
-      fileSizeByte: number
-    }[]
+    attachmentPayloadList: SystemAttachment[]
+    /** 附件列表 */
+    attachmentList: SystemAttachment[]
+
+    /** 订单类型ID */
+    orderTypeId: number
+    /** 订单类型代码 */
+    orderTypeCode: string
+    /** 订单类型名称 */
+    orderTypeName: string
+    /** 订单状态代码 */
+    orderStatusCode: string
+    /** 订单状态名称 */
+    orderStatusName: string
+    /** 订单状态备注 */
+    orderStatusRemark: string
+    /** 进度和订单状态代码 */
+    progressAndOrderStatusCode: string
+    /** 进度和订单状态名称 */
+    progressAndOrderStatusName: string
+
+    /** 检测项目信息 */
+    detectionProject: {
+      /** 项目ID */
+      id: number
+      /** 创建时间 */
+      createTime: string
+      /** 更新时间 */
+      updateTime: string
+      /** 项目编号 */
+      projectNumber: string
+      /** 客户ID */
+      customerId: number
+      /** 当前进度代码 */
+      currentProgressCode: string
+      /** 当前进度名称 */
+      currentProgressName: string
+      /** 订单类型代码 */
+      orderTypeCode: string
+      /** 订单类型名称 */
+      orderTypeName: string
+      /** 紧急标志 */
+      urgentFlag: boolean
+    }
   }
 
   /** 销售客户 */
