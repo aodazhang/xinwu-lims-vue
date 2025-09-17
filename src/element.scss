@@ -15,7 +15,7 @@
       'base': #e800cd
     ),
     'error': (
-      'base': #e80000
+      'base': #ef4444
     ),
     'info': (
       'base': #909399
@@ -24,3 +24,41 @@
 );
 
 @use 'element-plus/theme-chalk/src/index.scss' as *;
+
+// 普通选择框
+.el-select {
+  .el-select__wrapper {
+    @apply rounded-md px-3 py-[9px];
+  }
+
+  .el-select__suffix .el-icon {
+    @apply translate-x-2.5 text-black;
+  }
+
+  .el-select__placeholder.is-transparent {
+    @apply text-gray-300;
+  }
+
+  &.error .el-select__wrapper {
+    box-shadow: 0 0 0 1px #fca5a5 inset;
+  }
+}
+
+// 级联选择框
+.el-cascader {
+  .el-input__wrapper {
+    @apply rounded-md px-3 py-1.5;
+  }
+
+  .el-input__suffix .el-icon {
+    @apply translate-x-2.5 text-black;
+  }
+
+  .el-input__inner::placeholder {
+    @apply text-gray-300;
+  }
+
+  &.error .el-input__wrapper {
+    box-shadow: 0 0 0 1px #fca5a5 inset;
+  }
+}

@@ -190,10 +190,13 @@ declare global {
     attachmentList: string[]
 
     /** 订单检测信息 */
-    orderDetectionItemList: {
-      detectionItemId: number
-      detectionItemStandardId: number
-    }[]
+    orderDetectionItemList: (
+      | {
+          detectionItemId: number
+          detectionItemStandardId: number
+        }
+      | string
+    )[]
     /** 附件列表 */
     attachmentPayloadList: {
       url: string

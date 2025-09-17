@@ -167,6 +167,13 @@ import CommonDetailStatus from '@/components/common-detail-status.vue'
 import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonDetailAttachment from '@/components/common-detail-attachment.vue'
 
+/**
+ * 订单进度
+ * 一级列表：阶段
+ * 二级列表：statusChangeTraceList，有值代表进行到这个阶段
+ * - createTime、changeUserRoleName、changeUserRealName、changedStatusCode
+ */
+
 defineOptions({ name: 'SalesDetail' })
 
 const props = defineProps<{ orderId?: string }>()
