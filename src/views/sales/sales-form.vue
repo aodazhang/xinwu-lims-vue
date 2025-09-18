@@ -660,7 +660,7 @@ const detectionItemList = computed(() => {
     key: item.id,
     children: isArray(item.detectionItemStandardList)
       ? item.detectionItemStandardList.map(subItem => ({
-          label: subItem.standardMethod,
+          label: subItem.standardNumber,
           value: `${subItem.detectionItemId},${subItem.id}`
         }))
       : []
