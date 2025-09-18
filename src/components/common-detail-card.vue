@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]详情-卡片 -->
+  <!-- [公共]详情-卡片* -->
   <div class="rounded-xl bg-white p-5 shadow-sm">
     <!-- 标题 -->
     <div

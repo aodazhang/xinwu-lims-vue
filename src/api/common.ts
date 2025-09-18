@@ -164,8 +164,6 @@ export function loadDetectionItems(
   return instance.get('/detection-items', { params })
 }
 
-export function loadDetectionProgress(
-  id: number
-): Promise<SalesDetectionProgress[]> {
+export function loadDetectionProgress(id: number): Promise<SalesProgress[]> {
   return instance.get(`/detection-projects/${id}/progress`)
 }

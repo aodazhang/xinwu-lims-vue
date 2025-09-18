@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]页面-标题 -->
+  <!-- [公共]页面-标题* -->
   <header
     class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
   >

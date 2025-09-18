@@ -300,7 +300,7 @@ const orderData = ref<SalesOrder>({
   progressAndOrderStatusName: '',
   detectionProject: {} as any
 })
-const progressData = ref<SalesDetectionProgress>({
+const progressData = ref<SalesProgress>({
   id: 0,
   createTime: '',
   updateTime: '',

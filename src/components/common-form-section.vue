@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]表单-分组 -->
+  <!-- [公共]表单-分组* -->
   <div class="mb-8 border-b border-gray-200 pb-6">
     <h3 class="mb-5 flex items-center text-lg font-semibold text-gray-800">
       <div

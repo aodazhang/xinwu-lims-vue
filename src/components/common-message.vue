@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]页面-消息提示 -->
+  <!-- [公共]页面-消息提示* -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition-all duration-300 ease-out"

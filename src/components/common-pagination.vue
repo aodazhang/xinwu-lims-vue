@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]列表-分页器 -->
+  <!-- [公共]列表-分页器* -->
   <div
     class="mt-5 flex flex-col flex-wrap items-center gap-4 rounded-xl bg-white px-5 py-3 shadow-sm md:flex-row"
   >

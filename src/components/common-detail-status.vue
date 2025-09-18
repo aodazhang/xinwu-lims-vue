@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]详情-状态指示器 -->
+  <!-- [公共]详情-状态指示器* -->
   <div class="rounded-xl bg-white p-5 shadow-sm">
     <!-- 状态 -->
     <div

@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]列表-表格 + 分页器 -->
+  <!-- [公共]列表-表格 + 分页器* -->
   <section
     class="mt-5 overflow-hidden rounded-xl"
     v-loading="config.loading === true"

@@ -1,9 +1,9 @@
 <template>
-  <!-- [公共]列表-统计卡片 -->
+  <!-- [公共]列表-统计卡片* -->
   <ul class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-3">
     <li
       class="rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-      v-for="(item, index) of model"
+      v-for="(item, index) of details"
       :key="index"
     >
       <div class="mb-2 text-sm text-gray-500">{{ item.label }}</div>
@@ -13,7 +13,5 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  model: { label: string; value: string | number }[]
-}>()
+defineProps<{ details: LabelValue[] }>()
 </script>

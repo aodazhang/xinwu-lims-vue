@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]弹窗-创建、编辑用户 -->
+  <!-- [公共]弹窗-创建、编辑用户* -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition-all duration-300 ease-out"
@@ -33,136 +33,132 @@
 
           <!-- 弹窗内容 -->
           <div class="max-h-[calc(90vh-300px)] overflow-y-auto p-6">
-            <form @submit.prevent="createUser">
-              <div class="space-y-6 pb-4">
-                <!-- 用户名 -->
-                <div class="relative flex flex-col gap-1" v-if="!userForm.id">
-                  <label class="text-sm font-medium text-gray-700">
-                    用户名 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="userForm.userName"
-                    type="text"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.userName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入用户名"
-                  />
-                  <div
-                    v-if="formErrors.userName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.userName }}
-                  </div>
-                </div>
-
-                <!-- 真实姓名 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    真实姓名 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="userForm.realName"
-                    type="text"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.realName
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入真实姓名"
-                  />
-                  <div
-                    v-if="formErrors.realName"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.realName }}
-                  </div>
-                </div>
-
-                <!-- 手机号 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    手机号 <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    v-model="userForm.mobile"
-                    type="tel"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.mobile
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入手机号"
-                  />
-                  <div
-                    v-if="formErrors.mobile"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.mobile }}
-                  </div>
-                </div>
-
-                <!-- 邮箱 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    邮箱
-                  </label>
-                  <input
-                    v-model="userForm.email"
-                    type="email"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.email
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                    placeholder="请输入邮箱（可选）"
-                  />
-                  <div
-                    v-if="formErrors.email"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.email }}
-                  </div>
-                </div>
-
-                <!-- 用户角色 -->
-                <div class="relative flex flex-col gap-1">
-                  <label class="text-sm font-medium text-gray-700">
-                    用户角色 <span class="text-red-500">*</span>
-                  </label>
-                  <select
-                    v-model="userForm.roleId"
-                    :class="[
-                      'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
-                      formErrors.roleId
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
-                    ]"
-                  >
-                    <option value="0" disabled>请选择用户角色</option>
-                    <option
-                      v-for="item in roleList"
-                      :key="item.id"
-                      :value="item.id"
-                    >
-                      {{ item.roleName }}
-                    </option>
-                  </select>
-                  <div
-                    v-if="formErrors.roleId"
-                    class="absolute -bottom-5 left-0 text-xs text-red-500"
-                  >
-                    {{ formErrors.roleId }}
-                  </div>
+            <div class="space-y-6 pb-4">
+              <!-- 用户名 -->
+              <div class="relative flex flex-col gap-1" v-if="!userForm.id">
+                <label class="text-sm font-medium text-gray-700">
+                  用户名 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="userForm.userName"
+                  type="text"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.userName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入用户名"
+                />
+                <div
+                  v-if="formErrors.userName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.userName }}
                 </div>
               </div>
-            </form>
+
+              <!-- 真实姓名 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  真实姓名 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="userForm.realName"
+                  type="text"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.realName
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入真实姓名"
+                />
+                <div
+                  v-if="formErrors.realName"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.realName }}
+                </div>
+              </div>
+
+              <!-- 手机号 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  手机号 <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="userForm.mobile"
+                  type="tel"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.mobile
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入手机号"
+                />
+                <div
+                  v-if="formErrors.mobile"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.mobile }}
+                </div>
+              </div>
+
+              <!-- 邮箱 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700"> 邮箱 </label>
+                <input
+                  v-model="userForm.email"
+                  type="email"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.email
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                  placeholder="请输入邮箱（可选）"
+                />
+                <div
+                  v-if="formErrors.email"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.email }}
+                </div>
+              </div>
+
+              <!-- 用户角色 -->
+              <div class="relative flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700">
+                  用户角色 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  v-model="userForm.roleId"
+                  :class="[
+                    'w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm transition-all duration-200 focus:outline-none focus:ring-2',
+                    formErrors.roleId
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                      : 'border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-indigo-100'
+                  ]"
+                >
+                  <option value="0" disabled>请选择用户角色</option>
+                  <option
+                    v-for="item in roleList"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.roleName }}
+                  </option>
+                </select>
+                <div
+                  v-if="formErrors.roleId"
+                  class="absolute -bottom-5 left-0 text-xs text-red-500"
+                >
+                  {{ formErrors.roleId }}
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- 弹窗底部 -->
@@ -185,7 +181,7 @@
                   ? 'cursor-not-allowed bg-gray-400'
                   : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:-translate-y-0.5 hover:shadow-lg'
               ]"
-              @click="createUser"
+              @click="loadDataSubmit"
             >
               {{ isSubmitting ? '提交中...' : '确认提交' }}
             </button>
@@ -396,7 +392,7 @@ const close = (): void => {
 /**
  * 创建用户
  */
-const createUser = async (): Promise<void> => {
+const loadDataSubmit = async (): Promise<void> => {
   // 防止重复提交
   if (isSubmitting.value) return
 

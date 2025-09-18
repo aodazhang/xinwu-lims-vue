@@ -342,8 +342,8 @@ declare global {
     }[]
   }
 
-  /** 销售检测进度 */
-  interface SalesDetectionProgress {
+  /** 销售进度 */
+  interface SalesProgress {
     /** 进度ID */
     id: number
     /** 创建时间 */
