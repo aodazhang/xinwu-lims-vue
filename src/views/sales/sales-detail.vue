@@ -266,6 +266,8 @@ const orderData = ref<SalesOrder>({
   samplingAddress: '',
   detectionTypeId: 0,
   detectionTypeName: '',
+  detectionTypeStandardId: 0,
+  detectionTypeStandard: {} as any,
   orderDetectionItemList: [],
   serviceTypeId: 0,
   serviceTypeCode: '',
