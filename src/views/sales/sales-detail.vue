@@ -191,7 +191,7 @@
 
         <!-- 订单进度 -->
         <common-detail-card title="订单进度">
-          <!-- <common-detail-timeline :items="orderData.timelineItems" /> -->
+          <common-detail-timeline :progress-list="progressList" />
         </common-detail-card>
       </div>
 
@@ -224,12 +224,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { OrderStatus } from '@/utils/enum'
-import { isObject } from '@/utils/is'
+import { isArray, isObject } from '@/utils/is'
 import Message from '@/utils/message'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
-// import CommonDetailTimeline from '@/components/common-detail-timeline.vue'
+import CommonDetailTimeline from '@/components/common-detail-timeline.vue'
 import CommonDetailStatus from '@/components/common-detail-status.vue'
 // import CommonDetailPerson from '@/components/common-detail-person.vue'
 import CommonDetailAttachment from '@/components/common-detail-attachment.vue'
@@ -300,17 +300,7 @@ const orderData = ref<SalesOrder>({
   progressAndOrderStatusName: '',
   detectionProject: {} as any
 })
-const progressData = ref<SalesProgress>({
-  id: 0,
-  createTime: '',
-  updateTime: '',
-  projectId: 0,
-  nodeCode: '',
-  nodeName: '',
-  serialNumber: 0,
-  completedStatusCode: '',
-  statusChangeTraceList: []
-})
+const progressList = ref<SalesProgress[]>([])
 const statusDetails = ref<LabelValue[]>([{ label: '当前阶段', value: '' }])
 
 // 编辑订单
@@ -347,9 +337,7 @@ const loadDataDetail = async () => {
 
     if (res1.detectionProject?.id) {
       const res2 = await api.loadDetectionProgress(res1.detectionProject.id)
-      progressData.value = isObject(res2)
-        ? { ...progressData.value, ...res2 }
-        : progressData.value
+      progressList.value = isArray(res2) ? res2 : []
     }
 
     statusDetails.value[0].value =
