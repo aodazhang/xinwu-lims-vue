@@ -436,71 +436,47 @@ declare global {
   /** 采样调度任务 */
   interface SamplingTask {
     /** 任务ID */
-    id: string
-    /** 项目编号 */
-    projectNumber?: string
-    /** 委托单位名称 */
-    company: string
-    /** 客户名称 */
-    customerName?: string
-    /** 联系人姓名 */
-    contactPerson?: string
-    /** 联系人电话 */
-    contactPhone?: string
-    /** 检验单位 */
-    inspectionUnit?: string
-    /** 采样地址 */
-    address: string
-    /** 采样地址（详情页字段名） */
-    samplingAddress?: string
-    /** 采样点数量 */
-    points?: number
-    /** 采样点数量（详情页字段名） */
-    samplingPoints?: string
-    /** 检测类型 */
-    testType?: string
-    /** 检测内容 */
-    testContent?: string
-    /** 检测项目列表 */
-    testItems?: string[]
-    /** 特殊要求 */
-    specialRequirements?: string
-    /** 任务优先级：紧急 | 普通 */
-    priority?: 'urgent' | 'normal'
-    /** 是否紧急任务 */
-    isUrgent?: boolean
-    /** 任务创建时间 */
+    id: number
+    /** 创建时间 */
     createTime: string
-    /** 截止时间 */
-    deadline?: string
-    /** 分派人员姓名 */
-    assignedStaff?: string
-    /** 分派日期 */
-    assignedDate?: string
-    /** 分派时间段 */
-    assignedTime?: string
-    /** 预计耗时 */
-    duration?: string
-    /** 任务状态：今日任务 | 已安排 | 待处理 | 已审批 | 采样中 | 检测中 | 已完成 */
-    status?:
-      | 'today'
-      | 'scheduled'
-      | 'pending'
-      | 'approved'
-      | 'sampling'
-      | 'testing'
-      | 'completed'
-    /** 状态文本描述 */
-    statusText?: string
-    /** 状态详情 */
-    statusDetails?: {
-      /** 标签 */
-      label: string
-      /** 值 */
-      value: string
-      /** 类型 */
-      type?: string
-    }[]
+    /** 更新时间 */
+    updateTime: string
+    /** 项目ID */
+    projectId: number
+    /** 项目编号 */
+    projectNumber: string
+    /** 采样人员用户ID */
+    samplingUserId: number
+    /** 采样人员真实姓名 */
+    samplingUserRealName: string
+    /** 采样日期 */
+    samplingDate: string
+    /** 采样开始时间 */
+    samplingStartTime: string
+    /** 采样结束时间 */
+    samplingEndTime: string
+    /** 备注 */
+    remark: string
+    /** 采样状态代码 */
+    samplingStatusCode: string
+    /** 采样状态名称 */
+    samplingStatusName: string
+    /** 订单信息 */
+    order: SalesOrder
+    /** 客户信息 */
+    customer: SalesCustomer
+  }
+
+  /** 采样操作员 */
+  interface SamplingOperator {
+    /** 用户ID */
+    userId: number
+    /** 用户真实姓名 */
+    userRealName: string
+    /** 今日任务数量 */
+    todayTaskCount: number
+    /** 空闲标志 */
+    idleFlag: boolean
   }
 
   /** 采样任务 */

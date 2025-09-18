@@ -110,22 +110,10 @@ export enum DictType {
   SAMPLE_DISPOSAL = 'SAMPLE_DISPOSAL',
   /** 样品储存 */
   SAMPLE_STORAGE = 'SAMPLE_STORAGE',
-  /**  */
+  /** 采样任务状态 */
   SAMPLING_TASK_STATUS = 'SAMPLING_TASK_STATUS',
   /** 服务类型 */
   SERVICE_TYPE = 'SERVICE_TYPE'
-}
-
-/** 订单状态 */
-export enum OrderStatus {
-  /** 待审核 */
-  PENDING_REVIEW = 'PENDING_REVIEW',
-  /** 审核通过 */
-  APPROVED = 'APPROVED',
-  /** 审核驳回 */
-  REJECTED = 'REJECTED',
-  /** 已取消 */
-  CANCELLED = 'CANCELLED'
 }
 
 /** 进度和订单状态 // TODO: 枚举及其相关 UI 逻辑统一化 */
@@ -144,4 +132,30 @@ export enum ProgressAndOrderStatus {
   DETECTION_TASK = 'DETECTION_TASK',
   /** 报告中 */
   REPORT = 'REPORT'
+}
+
+/** 订单状态 */
+export enum OrderStatus {
+  /** 待审核 */
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  /** 审核通过 */
+  APPROVED = 'APPROVED',
+  /** 审核驳回 */
+  REJECTED = 'REJECTED',
+  /** 已取消 */
+  CANCELLED = 'CANCELLED'
+}
+
+/** 采样任务状态 */
+export enum SamplingTaskStatus {
+  /** 待分派 */
+  TO_BE_ASSIGNED = 'TO_BE_ASSIGNED',
+  /** 已分派 */
+  ASSIGNED = 'ASSIGNED',
+  /** 采样中 */
+  SAMPLING = 'SAMPLING',
+  /** 已完成 */
+  COMPLETED = 'COMPLETED',
+  /** 已取消 */
+  CANCELLED = 'CANCELLED'
 }

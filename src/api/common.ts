@@ -166,3 +166,44 @@ export function loadDetectionItems(
 export function loadDetectionProgress(id: number): Promise<SalesProgress[]> {
   return instance.get(`/detection-projects/${id}/progress`)
 }
+
+export function loadSamplingTasks(
+  params: unknown
+): Promise<CommonList<SamplingTask>> {
+  return instance.get('/sampling-tasks', { params })
+}
+
+export function loadSamplingTasksDetail(id: number): Promise<SalesOrder> {
+  return instance.get(`/sampling-tasks/${id}`)
+}
+
+export function loadSamplingTasksSamplingOperator(): Promise<
+  SamplingOperator[]
+> {
+  return instance.get('/sampling-tasks/sampling-operator')
+}
+
+export function loadSamplingTasksAssignment(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.put(`/sampling-tasks/${id}/assignment`, data)
+}
+
+export function loadSamplingTasksStarting(id: number): Promise<void> {
+  return instance.put(`/sampling-tasks/${id}/starting`)
+}
+
+export function loadSamplingTasksDone(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.put(`/sampling-tasks/${id}/done`, data)
+}
+
+export function loadSamplingTasksSampleReception(
+  id: number,
+  data: unknown
+): Promise<void> {
+  return instance.put(`/sampling-tasks/${id}/sample-reception`, data)
+}

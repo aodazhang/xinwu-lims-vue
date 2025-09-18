@@ -519,7 +519,7 @@ const resetForm = (): void => {
 const open = (
   type: 'assign' | 'adjust',
   task: TaskData,
-  staff: Staff[]
+  staff?: Staff[]
 ): void => {
   visible.value = true
   modalType.value = type
