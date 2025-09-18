@@ -220,7 +220,7 @@ const tableColumns: TableColumn[] = [
   {
     label: '状态',
     props: 'orderStatusName',
-    minWidth: 80,
+    minWidth: 100,
     align: 'center',
     slotName: 'orderStatusName'
   },
