@@ -4,7 +4,7 @@
     <common-title title="采样工作台" content="首页 / 采样工作台" />
 
     <!-- 统计卡片 -->
-    <common-stats class="md:!grid-cols-3" :model="statsData" />
+    <!-- <common-stats class="md:!grid-cols-3" :model="statsData" /> -->
 
     <!-- 搜索和筛选栏 -->
     <common-filter title="任务列表" @filter="loadTasks">
@@ -94,7 +94,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
-import CommonStats from '@/components/common-stats.vue'
+// import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 
@@ -110,20 +110,20 @@ const statistics = ref({
 })
 
 // 统计数据配置
-const statsData = computed(() => [
-  {
-    label: '今日任务',
-    value: statistics.value.today
-  },
-  {
-    label: '未完成任务',
-    value: statistics.value.pending
-  },
-  {
-    label: '本月总任务',
-    value: statistics.value.total
-  }
-])
+// const statsData = computed(() => [
+//   {
+//     label: '今日任务',
+//     value: statistics.value.today
+//   },
+//   {
+//     label: '未完成任务',
+//     value: statistics.value.pending
+//   },
+//   {
+//     label: '本月总任务',
+//     value: statistics.value.total
+//   }
+// ])
 
 // 表格配置
 const tableConfig = ref({

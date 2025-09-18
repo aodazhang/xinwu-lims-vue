@@ -4,7 +4,7 @@
     <common-title title="采样调度工作台" content="首页 / 采样调度工作台" />
 
     <!-- 统计卡片 -->
-    <common-stats class="md:!grid-cols-4" :model="statsData" />
+    <!-- <common-stats class="md:!grid-cols-4" :model="statsData" /> -->
 
     <!-- 搜索和筛选栏 -->
     <common-filter title="订单列表" @filter="loadTasks">
@@ -172,7 +172,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommonTitle from '@/components/common-title.vue'
-import CommonStats from '@/components/common-stats.vue'
+// import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 import CommonModalTask from '@/components/common-modal-task.vue'
@@ -273,24 +273,24 @@ const staffList = ref<SamplerStaff[]>([
 ])
 
 // 统计数据
-const statsData = computed(() => [
-  {
-    label: '待分派任务',
-    value: allTasks.value.filter(t => !t.assignedStaff).length
-  },
-  {
-    label: '已分派任务',
-    value: allTasks.value.filter(t => t.assignedStaff).length
-  },
-  {
-    label: '加急任务',
-    value: allTasks.value.filter(t => t.priority === 'urgent').length
-  },
-  {
-    label: '今日待采样',
-    value: allTasks.value.filter(t => t.status === 'today').length
-  }
-])
+// const statsData = computed(() => [
+//   {
+//     label: '待分派任务',
+//     value: allTasks.value.filter(t => !t.assignedStaff).length
+//   },
+//   {
+//     label: '已分派任务',
+//     value: allTasks.value.filter(t => t.assignedStaff).length
+//   },
+//   {
+//     label: '加急任务',
+//     value: allTasks.value.filter(t => t.priority === 'urgent').length
+//   },
+//   {
+//     label: '今日待采样',
+//     value: allTasks.value.filter(t => t.status === 'today').length
+//   }
+// ])
 
 // 加载任务列表
 const loadTasks = async () => {

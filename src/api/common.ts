@@ -160,7 +160,7 @@ export function loadDetectionTypes(): Promise<SalesDetectionType[]> {
 
 export function loadDetectionItems(
   params: unknown
-): Promise<SalesDetectionProject[]> {
+): Promise<SalesDetectionProjectStandard[]> {
   return instance.get('/detection-items', { params })
 }
 

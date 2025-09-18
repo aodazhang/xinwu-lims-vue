@@ -178,11 +178,11 @@
       <!-- 右侧辅助区 -->
       <div class="space-y-5">
         <!-- 状态指示器 -->
-        <common-detail-status
+        <!-- <common-detail-status
           :status="detailStatus"
           :status-text="taskData.statusText"
           :details="taskData.statusDetails"
-        />
+        /> -->
       </div>
     </div>
 
@@ -197,11 +197,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
-import CommonDetailStatus from '@/components/common-detail-status.vue'
+// import CommonDetailStatus from '@/components/common-detail-status.vue'
 import CommonModalSampler, {
   type SamplingLocation
 } from '@/components/common-modal-sampler.vue'
@@ -248,14 +248,14 @@ const taskData = ref<SamplerTask>({
 })
 
 // 计算属性：将采样员状态转换为详情页状态
-const detailStatus = computed(() => {
-  const status = taskData.value.status
-  // 将采样员状态映射为详情状态
-  if (status === 'ongoing') {
-    return 'sampling'
-  }
-  return status as 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
-})
+// const detailStatus = computed(() => {
+//   const status = taskData.value.status
+//   // 将采样员状态映射为详情状态
+//   if (status === 'ongoing') {
+//     return 'sampling'
+//   }
+//   return status as 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
+// })
 
 // 组件引用
 const samplerModalRef = ref<InstanceType<typeof CommonModalSampler>>()

@@ -650,7 +650,9 @@ const sampleStorageList = ref<SystemDict[]>([])
 const sampleDisposalList = ref<SystemDict[]>([])
 const reportDeliveryList = ref<SystemDict[]>([])
 const detectionTypeList = ref<SalesDetectionType[]>([])
-const detectionItemMap = ref<{ [key: number]: SalesDetectionProject[] }>({})
+const detectionItemMap = ref<{
+  [key: number]: SalesDetectionProjectStandard[]
+}>({})
 const detectionItemList = computed(() => {
   const list = detectionItemMap.value[formData.value.detectionTypeId] || []
   return list.map(item => ({

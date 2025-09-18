@@ -311,8 +311,8 @@ declare global {
     sampleCategory: string
   }
 
-  /** 销售检测项目 */
-  interface SalesDetectionProject {
+  /** 销售检测项目标准 */
+  interface SalesDetectionProjectStandard {
     /** 检测项目ID */
     id: number
     /** 创建时间 */
@@ -393,51 +393,6 @@ declare global {
       /** 变更后状态名称 */
       changedStatusName: string
     }[]
-  }
-
-  /** 审核订单 */
-  interface ReviewOrder {
-    /** 订单ID */
-    id: string
-    /** 订单编号 */
-    orderNumber: string
-    /** 是否紧急订单 */
-    isUrgent: boolean
-    /** 销售人员 */
-    salesperson: string
-    /** 提交时间 */
-    submitTime: string
-    /** 客户信息 */
-    customer: {
-      /** 客户名称 */
-      name: string
-      /** 联系人 */
-      contact: string
-      /** 联系电话 */
-      phone: string
-    }
-    /** 检测信息 */
-    testing: {
-      /** 委托单位 */
-      unit: string
-      /** 检测地址 */
-      address: string
-      /** 服务类型 */
-      serviceType: string
-      /** 检测类型 */
-      testType: string
-      /** 检测内容 */
-      testContent: string
-    }
-    /** 财务信息 */
-    finance: {
-      /** 总金额 */
-      totalAmount: number
-      /** 已付金额 */
-      paidAmount: number
-      /** 待付金额 */
-      pendingAmount: number
-    }
   }
 
   // ==================== 现场作业 ====================

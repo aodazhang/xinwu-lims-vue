@@ -4,7 +4,7 @@
     <common-title title="样品管理工作台" content="首页 / 样品管理工作台" />
 
     <!-- 统计卡片 -->
-    <common-stats :model="statsData" />
+    <!-- <common-stats :model="statsData" /> -->
 
     <!-- 搜索和筛选栏 -->
     <common-filter title="待接收样品订单" @filter="loadOrders">
@@ -86,11 +86,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
-import CommonStats from '@/components/common-stats.vue'
+// import CommonStats from '@/components/common-stats.vue'
 import CommonFilter from '@/components/common-filter.vue'
 import CommonTable from '@/components/common-table.vue'
 
@@ -128,27 +128,27 @@ const tableColumns = [
 ]
 
 // 统计数据
-const statsData = computed(() => [
-  {
-    label: '待接收样品',
-    value: allOrders.value.filter(order => order.status === 'waiting').length,
-    trend: '↑ 12% 较昨日',
-    trendUp: true
-  },
-  {
-    label: '今日已接收',
-    value: 156, // 模拟数据
-    trend: '↑ 8% 较昨日',
-    trendUp: true
-  },
-  {
-    label: '待处理订单',
-    value: allOrders.value.filter(order => order.status === 'processing')
-      .length,
-    trend: '↓ 5% 较昨日',
-    trendUp: false
-  }
-])
+// const statsData = computed(() => [
+//   {
+//     label: '待接收样品',
+//     value: allOrders.value.filter(order => order.status === 'waiting').length,
+//     trend: '↑ 12% 较昨日',
+//     trendUp: true
+//   },
+//   {
+//     label: '今日已接收',
+//     value: 156, // 模拟数据
+//     trend: '↑ 8% 较昨日',
+//     trendUp: true
+//   },
+//   {
+//     label: '待处理订单',
+//     value: allOrders.value.filter(order => order.status === 'processing')
+//       .length,
+//     trend: '↓ 5% 较昨日',
+//     trendUp: false
+//   }
+// ])
 
 // 过滤订单数据
 const filterOrders = () => {

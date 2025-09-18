@@ -116,11 +116,11 @@
       <!-- 右侧辅助区 -->
       <div class="space-y-5">
         <!-- 状态指示器 -->
-        <common-detail-status
+        <!-- <common-detail-status
           :status="detailStatus"
           :status-text="taskData.statusText"
           :details="taskData.statusDetails"
-        />
+        /> -->
       </div>
     </div>
 
@@ -130,11 +130,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toolSleep } from '@/utils/tool'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
-import CommonDetailStatus from '@/components/common-detail-status.vue'
+// import CommonDetailStatus from '@/components/common-detail-status.vue'
 import CommonModalTask from '@/components/common-modal-task.vue'
 
 // Props
@@ -180,14 +180,14 @@ const staffList = ref<SamplerStaff[]>([
 const taskModalRef = ref<InstanceType<typeof CommonModalTask> | null>(null)
 
 // 计算属性：将调度状态转换为详情页状态
-const detailStatus = computed(() => {
-  const status = taskData.value.status
-  // 将调度状态映射为详情状态
-  if (status === 'today' || status === 'scheduled') {
-    return 'pending'
-  }
-  return status as 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
-})
+// const detailStatus = computed(() => {
+//   const status = taskData.value.status
+//   // 将调度状态映射为详情状态
+//   if (status === 'today' || status === 'scheduled') {
+//     return 'pending'
+//   }
+//   return status as 'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
+// })
 
 const loadTaskData = async () => {
   // 从测试数据中获取任务信息，如果不存在则生成默认数据

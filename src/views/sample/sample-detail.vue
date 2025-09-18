@@ -152,11 +152,11 @@
       <!-- 右侧状态区 -->
       <div class="space-y-5">
         <!-- 任务状态 -->
-        <common-detail-status
+        <!-- <common-detail-status
           :status="mappedStatus"
           :status-text="'采样中'"
           :details="orderInfo.statusDetails || []"
-        />
+        /> -->
 
         <!-- 待接收样品 -->
         <common-detail-card title="待接收样品">
@@ -190,7 +190,7 @@
 
         <!-- 相关人员 -->
         <common-detail-card title="相关人员">
-          <common-detail-person :persons="orderInfo.relatedPersons || []" />
+          <!-- <common-detail-person :persons="orderInfo.relatedPersons || []" /> -->
         </common-detail-card>
       </div>
     </div>
@@ -203,8 +203,8 @@ import { useRouter } from 'vue-router'
 import Message from '@/utils/message'
 import CommonTitle from '@/components/common-title.vue'
 import CommonDetailCard from '@/components/common-detail-card.vue'
-import CommonDetailStatus from '@/components/common-detail-status.vue'
-import CommonDetailPerson from '@/components/common-detail-person.vue'
+// import CommonDetailStatus from '@/components/common-detail-status.vue'
+// import CommonDetailPerson from '@/components/common-detail-person.vue'
 
 defineOptions({ name: 'SampleDetail' })
 
@@ -252,20 +252,20 @@ const orderInfo = ref<SampleOrder>({
 })
 
 // 状态映射：将SampleOrder的status映射为common-detail-status组件支持的类型
-const mappedStatus = computed(() => {
-  const statusMap: Record<
-    string,
-    'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
-  > = {
-    waiting: 'pending',
-    received: 'approved',
-    processing: 'sampling',
-    sampling: 'sampling',
-    testing: 'testing',
-    completed: 'completed'
-  }
-  return statusMap[orderInfo.value.status] || 'pending'
-})
+// const mappedStatus = computed(() => {
+//   const statusMap: Record<
+//     string,
+//     'pending' | 'approved' | 'sampling' | 'testing' | 'completed'
+//   > = {
+//     waiting: 'pending',
+//     received: 'approved',
+//     processing: 'sampling',
+//     sampling: 'sampling',
+//     testing: 'testing',
+//     completed: 'completed'
+//   }
+//   return statusMap[orderInfo.value.status] || 'pending'
+// })
 
 // 统计数据
 const stats = computed(() => {
