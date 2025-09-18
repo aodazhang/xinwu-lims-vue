@@ -93,6 +93,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { OrderStatus } from '@/utils/enum'
+import Message from '@/utils/message'
 import api from '@/api'
 
 // 事件定义
@@ -206,6 +207,8 @@ const loadDataSubmit = async (): Promise<void> => {
       remark: formData.value.remark.trim() || ''
     }
     await api.loadOrdersStatusChanging(formData.value.orderId, data)
+
+    Message.success('订单审核驳回')
 
     // 触发刷新事件
     emit('refresh')

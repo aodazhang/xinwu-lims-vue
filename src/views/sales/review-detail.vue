@@ -2,7 +2,7 @@
   <div v-loading="loading">
     <!-- 订单头部信息 -->
     <common-title
-      :title="orderData.orderNumber"
+      :title="orderData.projectNumber"
       content="订单审核工作台 / 订单审核详情"
     />
 
@@ -21,15 +21,15 @@
         <div class="space-y-3">
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">销售人员</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.salesperson
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.saleUserRealName }}
+            </span>
           </div>
           <div class="flex justify-between py-2">
-            <span class="text-sm text-gray-600">提交时间</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.submitTime
-            }}</span>
+            <span class="text-sm text-gray-600">创建时间</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ dateToString(orderData.createTime) }}
+            </span>
           </div>
         </div>
       </div>
@@ -47,21 +47,21 @@
         <div class="space-y-3">
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">客户名称</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.customer.name
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.customerName }}
+            </span>
           </div>
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">客户联系人</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.customer.contact
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.customer?.contactPerson }}
+            </span>
           </div>
           <div class="flex justify-between py-2">
             <span class="text-sm text-gray-600">客户联系电话</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.customer.phone
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.customer?.contactPhone }}
+            </span>
           </div>
         </div>
       </div>
@@ -79,33 +79,33 @@
         <div class="space-y-3">
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">受检单位</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.testing.unit
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.inspectedUnit }}
+            </span>
           </div>
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">采样地址</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.testing.address
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.samplingAddress }}
+            </span>
           </div>
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">服务类型</span>
-            <span class="text-sm font-medium text-gray-900">{{
-              orderData.testing.serviceType
-            }}</span>
+            <span class="text-sm font-medium text-gray-900">
+              {{ orderData.serviceTypeName }}
+            </span>
           </div>
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">检测类型</span>
-            <span class="text-sm font-semibold text-green-600">{{
-              orderData.testing.testType
-            }}</span>
+            <span class="text-sm font-semibold text-green-600">
+              {{ orderData.detectionTypeName }}
+            </span>
           </div>
           <div class="flex justify-between py-2">
-            <span class="text-sm text-gray-600">检测内容</span>
-            <span class="text-sm font-medium text-green-600">{{
-              orderData.testing.testContent
-            }}</span>
+            <span class="text-sm text-gray-600">检测点数</span>
+            <span class="text-sm font-medium text-green-600">
+              {{ orderData.detectionPoints }}
+            </span>
           </div>
         </div>
       </div>
@@ -123,21 +123,29 @@
         <div class="space-y-3">
           <div class="flex justify-between border-b border-gray-100 py-2">
             <span class="text-sm text-gray-600">项目金额</span>
-            <span class="text-base font-bold text-green-600"
-              >¥{{ orderData.finance.totalAmount.toLocaleString() }}</span
-            >
+            <span class="text-base font-bold text-green-600">
+              {{
+                orderData.projectAmount
+                  ? `¥${orderData.projectAmount?.toLocaleString()}`
+                  : ''
+              }}
+            </span>
           </div>
           <div class="flex justify-between border-b border-gray-100 py-2">
-            <span class="text-sm text-gray-600">已支付金额</span>
-            <span class="text-base font-bold text-green-600"
-              >¥{{ orderData.finance.paidAmount.toLocaleString() }}</span
-            >
+            <span class="text-sm text-gray-600">实收金额</span>
+            <span class="text-base font-bold text-green-600">
+              {{
+                orderData.actualAmount
+                  ? `¥${orderData.actualAmount?.toLocaleString()}`
+                  : ''
+              }}
+            </span>
           </div>
           <div class="flex justify-between py-2">
-            <span class="text-sm text-gray-600">待收金额</span>
-            <span class="text-base font-medium text-orange-600"
-              >¥{{ orderData.finance.pendingAmount.toLocaleString() }}</span
-            >
+            <span class="text-sm text-gray-600">订单状态</span>
+            <span class="text-base font-medium text-orange-600">
+              {{ orderData.orderStatusName }}
+            </span>
           </div>
         </div>
       </div>
@@ -146,132 +154,134 @@
     <!-- 操作按钮 -->
     <div
       class="mt-5 flex justify-center gap-5 rounded-xl bg-white p-5 shadow-sm"
+      v-if="orderData.orderStatusCode === OrderStatus.PENDING_REVIEW"
     >
       <button
         class="max-w-xs flex-1 rounded-lg bg-gradient-to-r from-green-400 to-green-500 px-8 py-3 text-base font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/30"
-        @click="approveOrder"
+        @click="onClickApprove"
       >
         审核通过
       </button>
       <button
         class="max-w-xs flex-1 rounded-lg border-2 border-red-500 bg-white px-8 py-3 text-base font-medium text-red-500 transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-lg hover:shadow-red-500/20"
-        @click="showRejectModal"
+        @click="onClickReject"
       >
-        审核未通过
+        审核驳回
       </button>
     </div>
 
     <!-- 驳回弹窗 -->
-    <common-modal-reject ref="rejectModalRef" @refresh="handleRefresh" />
+    <common-modal-reject ref="rejectModalRef" @refresh="$router.go(-1)" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { OrderStatus } from '@/utils/enum'
+import { isObject } from '@/utils/is'
+import { dateToString } from '@/utils/date'
+import Message from '@/utils/message'
+import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
 import CommonModalReject from '@/components/common-modal-reject.vue'
 
-defineOptions({ name: 'OrderReview' })
+defineOptions({ name: 'ReviewDetail' })
 
 // Props
-const props = defineProps<{ orderId?: string }>()
+const props = defineProps<{ orderId?: number | string }>()
 
+// 路由相关
 const router = useRouter()
 
 // 响应式数据
-const loading = ref(true)
-const rejectModalRef = ref<InstanceType<typeof CommonModalReject> | null>(null)
-
-// 订单数据
-const orderData = reactive<ReviewOrder>({
-  id: '',
-  orderNumber: '',
-  isUrgent: false,
-  salesperson: '',
-  submitTime: '',
-  customer: {
-    name: '',
-    contact: '',
-    phone: ''
-  },
-  testing: {
-    unit: '',
-    address: '',
-    serviceType: '',
-    testType: '',
-    testContent: ''
-  },
-  finance: {
-    totalAmount: 0,
-    paidAmount: 0,
-    pendingAmount: 0
-  }
+const loading = ref(false)
+const rejectModalRef = ref<InstanceType<typeof CommonModalReject>>()
+const orderData = ref<SalesOrder>({
+  id: 0,
+  createTime: '',
+  updateTime: '',
+  projectNumber: '',
+  urgentFlag: false,
+  customerId: 0,
+  customerCode: '',
+  customerName: '',
+  customer: {} as SalesCustomer,
+  inspectedUnit: '',
+  samplingAddress: '',
+  detectionTypeId: 0,
+  detectionTypeName: '',
+  orderDetectionItemList: [],
+  serviceTypeId: 0,
+  serviceTypeCode: '',
+  serviceTypeName: '',
+  detectionPoints: 0,
+  sampleStorageId: 0,
+  sampleStorageCode: '',
+  sampleStorageName: '',
+  sampleDisposalId: 0,
+  sampleDisposalCode: '',
+  sampleDisposalName: '',
+  sampleDisposalOther: '',
+  detectionSubcontract: false,
+  subcontractProject: '',
+  specialRequirements: '',
+  reportDeliveryId: 0,
+  reportDeliveryCode: '',
+  reportDeliveryName: '',
+  reportDeliveryOther: '',
+  saleUserId: 0,
+  saleUserRealName: '',
+  projectAmount: 0,
+  actualAmount: 0,
+  salesRemark: '',
+  attachmentPayloadList: [],
+  orderTypeId: 0,
+  orderTypeCode: '',
+  orderTypeName: '',
+  orderStatusCode: '',
+  orderStatusName: '',
+  orderStatusRemark: '',
+  progressAndOrderStatusCode: '',
+  progressAndOrderStatusName: '',
+  detectionProject: {} as any
 })
 
-// 获取订单数据
-const fetchOrderData = async () => {
+// 审核通过
+const onClickApprove = async () => {
+  if (confirm('确定要通过此订单吗？')) {
+    await api.loadOrdersStatusChanging(+props.orderId, {
+      statusCode: OrderStatus.APPROVED,
+      remark: ''
+    })
+    Message.success('订单审核通过')
+    router.go(-1)
+  }
+}
+
+// 审核驳回
+const onClickReject = () => {
+  rejectModalRef.value?.open(+props.orderId)
+}
+
+// 处理数据请求
+const loadDataDetail = async () => {
   try {
     loading.value = true
 
-    // 模拟API请求
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟根据orderId获取不同的数据
-    const mockData: ReviewOrder = {
-      id: props.orderId,
-      orderNumber: `XW250903-${props.orderId}`,
-      isUrgent: true,
-      salesperson: '张三',
-      submitTime: '2025-09-03 14:30',
-      customer: {
-        name: '深圳科技创新中心',
-        contact: '林总监',
-        phone: '13900139001'
-      },
-      testing: {
-        unit: '创新中心A栋实验室',
-        address: '深圳市南山区科技园A栋5楼',
-        serviceType: '初测',
-        testType: '50325-2020',
-        testContent: '三苯五项：甲醛、苯、甲苯、二甲苯、TVOC'
-      },
-      finance: {
-        totalAmount: 28000,
-        paidAmount: 10000,
-        pendingAmount: 18000
-      }
-    }
-
-    // 更新订单数据
-    Object.assign(orderData, mockData)
+    const res = await api.loadOrdersDetail(+props.orderId)
+    orderData.value = isObject(res)
+      ? { ...orderData.value, ...res }
+      : orderData.value
   } catch (error) {
-    console.error('获取订单数据失败:', error)
-    alert('获取订单数据失败，请重试！')
+    console.error('加载订单数据失败:', error)
   } finally {
     loading.value = false
   }
 }
 
-// 方法
-const approveOrder = () => {
-  if (confirm('确定要通过该订单的审核吗？')) {
-    alert('订单审核已通过！')
-    router.go(-1)
-  }
-}
-
-const showRejectModal = () => {
-  rejectModalRef.value?.open(props.orderId)
-}
-
-const handleRefresh = () => {
-  // 可以在这里添加刷新逻辑，比如重新获取数据
-  router.go(-1)
-}
-
-// 生命周期
+// 初始化加载数据
 onMounted(() => {
-  fetchOrderData()
+  loadDataDetail()
 })
 </script>

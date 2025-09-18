@@ -75,7 +75,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs text-gray-600">创建时间</span>
               <span class="text-sm font-medium text-gray-900">
-                {{ orderData.createTime }}
+                {{ dateToString(orderData.createTime) }}
               </span>
             </div>
             <div class="flex flex-col gap-1">
@@ -225,6 +225,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { OrderStatus } from '@/utils/enum'
 import { isArray, isObject } from '@/utils/is'
+import { dateToString } from '@/utils/date'
 import Message from '@/utils/message'
 import api from '@/api'
 import CommonTitle from '@/components/common-title.vue'
@@ -249,7 +250,7 @@ const props = defineProps<{ orderId?: number | string }>()
 // 路由相关
 const router = useRouter()
 
-// 内部维护的状态
+// 响应式数据
 const loading = ref(false)
 const orderData = ref<SalesOrder>({
   id: 0,
