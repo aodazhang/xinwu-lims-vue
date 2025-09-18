@@ -128,7 +128,7 @@ export enum OrderStatus {
   CANCELLED = 'CANCELLED'
 }
 
-/** 进度和订单状态 */
+/** 进度和订单状态 // TODO: 枚举及其相关 UI 逻辑统一化 */
 export enum ProgressAndOrderStatus {
   /** 待审核 */
   PENDING_REVIEW = 'ORDER:PENDING_REVIEW',

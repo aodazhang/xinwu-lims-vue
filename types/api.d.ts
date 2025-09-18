@@ -142,6 +142,25 @@ declare global {
     detectionTypeId: number
     /** 检测类型名称 */
     detectionTypeName: string
+    /** 检测类型标准 id */
+    detectionTypeStandardId: number | string
+    /** 检测类型标准 */
+    detectionTypeStandard: {
+      /** 标准ID */
+      id: number
+      /** 创建时间 */
+      createTime: string
+      /** 更新时间 */
+      updateTime: string
+      /** 检测类型ID */
+      detectionTypeId: number
+      /** 标准方法 */
+      standardMethod: string
+      /** 标准编号 */
+      standardNumber: string
+      /** 描述 */
+      description: string
+    }
     /** 检测项目标准 */
     orderDetectionItemList: (
       | {
@@ -297,8 +316,8 @@ declare global {
     industryName: string
   }
 
-  /** 销售检测类型 */
-  interface SalesDetectionType {
+  /** 销售检测类型标准 */
+  interface SalesDetectionTypeStandard {
     /** 检测类型ID */
     id: number
     /** 创建时间 */
@@ -309,6 +328,23 @@ declare global {
     detectionTypeName: string
     /** 样品类别 */
     sampleCategory: string
+    /** 检测类型标准列表 */
+    detectionTypeStandardList: {
+      /** 标准ID */
+      id: number
+      /** 创建时间 */
+      createTime: string
+      /** 更新时间 */
+      updateTime: string
+      /** 检测类型ID */
+      detectionTypeId: number
+      /** 标准方法 */
+      standardMethod: string
+      /** 标准编号 */
+      standardNumber: string
+      /** 描述 */
+      description: string
+    }[]
   }
 
   /** 销售检测项目标准 */
@@ -338,7 +374,7 @@ declare global {
       /** 标准编号 */
       standardNumber: string
       /** 备注 */
-      remark: string | null
+      remark: string
     }[]
   }
 

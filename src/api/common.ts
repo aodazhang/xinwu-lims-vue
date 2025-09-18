@@ -150,11 +150,10 @@ export function loadOrdersStatusChanging(
   id: number,
   data: unknown
 ): Promise<void> {
-  // DictType.ORDER_STATUS
   return instance.put(`/orders/${id}/status-changing`, data)
 }
 
-export function loadDetectionTypes(): Promise<SalesDetectionType[]> {
+export function loadDetectionTypes(): Promise<SalesDetectionTypeStandard[]> {
   return instance.get('/detection-types')
 }
 

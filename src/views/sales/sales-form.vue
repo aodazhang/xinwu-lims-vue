@@ -163,27 +163,23 @@
             >
               检测类型
             </label>
-            <select
-              v-model="formData.detectionTypeId"
-              :class="[
-                'rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100',
-                {
-                  'border-red-300 focus:border-red-500 focus:ring-red-100':
-                    errors.detectionTypeName
-                }
-              ]"
-              @change="handleDetectionTypeIdChange"
-              @blur="validateDetectionTypeId"
-            >
-              <option value="0" disabled>请选择检测类型</option>
-              <option
-                v-for="item in detectionTypeList"
-                :key="item.id"
-                :value="item.id"
-              >
-                {{ item.detectionTypeName }}
-              </option>
-            </select>
+            <el-cascader
+              :class="{ error: errors.detectionTypeName }"
+              v-model="formData.detectionTypeStandardId"
+              :options="detectionTypeStandardList"
+              :props="{
+                multiple: false, // 是否允许多选
+                checkStrictly: false, // 是否取消父子节点关联（默认选中子节点）
+                emitPath: false, // 是否返回完整层级数据（默认 [value1, value2]）
+                children: 'children', // options 子节点 key
+                label: 'label', // options 节点 label key
+                value: 'value' // options 节点 value key
+              }"
+              placeholder="请选择检测类型"
+              filterable
+              @change="handleDetectionTypeStandardIdChange"
+              @blur="validateDetectionTypeStandardId"
+            />
             <span
               v-if="errors.detectionTypeName"
               class="absolute -bottom-5 left-0 text-xs text-red-500"
@@ -202,7 +198,7 @@
             <el-cascader
               :class="{ error: errors.orderDetectionItemName }"
               v-model="formData.orderDetectionItemList as string[]"
-              :options="detectionItemList"
+              :options="detectionItemStandardList"
               :props="{
                 multiple: true, // 是否允许多选
                 checkStrictly: false, // 是否取消父子节点关联（默认选中子节点）
@@ -649,12 +645,31 @@ const serviceTypeList = ref<SystemDict[]>([])
 const sampleStorageList = ref<SystemDict[]>([])
 const sampleDisposalList = ref<SystemDict[]>([])
 const reportDeliveryList = ref<SystemDict[]>([])
-const detectionTypeList = ref<SalesDetectionType[]>([])
+const detectionTypeList = ref<SalesDetectionTypeStandard[]>([])
 const detectionItemMap = ref<{
   [key: number]: SalesDetectionProjectStandard[]
 }>({})
-const detectionItemList = computed(() => {
-  const list = detectionItemMap.value[formData.value.detectionTypeId] || []
+
+const detectionTypeStandardList = computed(() =>
+  detectionTypeList.value.map(item => ({
+    label: item.detectionTypeName,
+    key: item.id,
+    children: isArray(item.detectionTypeStandardList)
+      ? item.detectionTypeStandardList.map(subItem => ({
+          label: subItem.standardNumber,
+          value: `${subItem.detectionTypeId},${subItem.id}`
+        }))
+      : []
+  }))
+)
+const detectionItemStandardList = computed(() => {
+  if (!formData.value.detectionTypeStandardId) {
+    return []
+  }
+  const detectionTypeId = +(
+    formData.value.detectionTypeStandardId as string
+  ).split(',')[0]
+  const list = detectionItemMap.value[detectionTypeId] || []
   return list.map(item => ({
     label: item.detectionItemName,
     key: item.id,
@@ -679,6 +694,7 @@ const formData = ref<
     | 'inspectedUnit'
     | 'samplingAddress'
     | 'detectionTypeId'
+    | 'detectionTypeStandardId'
     | 'serviceTypeId'
     | 'detectionPoints'
     | 'projectAmount'
@@ -706,7 +722,8 @@ const formData = ref<
   inspectedUnit: '', // 受检单位*
   // 检测信息
   samplingAddress: '', // 采样地址*
-  detectionTypeId: 0, // 检测类型列表*：id、detectionTypeName
+  detectionTypeId: 0, // 检测类型 id*：id、detectionTypeName
+  detectionTypeStandardId: '', // 检测类型标准 id*
   orderDetectionItemList: [], // 检测项目（标准、多选）：id、detectionItemName、detectionItemStandardList -> detectionItemId、id
   serviceTypeId: 0, // 服务类型*：DictType.SERVICE_TYPE
   detectionPoints: 0, // 检测点数*
@@ -802,8 +819,8 @@ function validateSamplingAddress() {
 /**
  * 校验检测类型
  */
-function validateDetectionTypeId() {
-  if (!formData.value.detectionTypeId) {
+function validateDetectionTypeStandardId() {
+  if (!(formData.value.detectionTypeStandardId as string).trim()) {
     errors.value.detectionTypeName = '请选择检测类型'
   } else {
     errors.value.detectionTypeName = ''
@@ -811,7 +828,7 @@ function validateDetectionTypeId() {
 }
 
 /**
- * 校验检测项目
+ * 校验检测项目标准
  */
 function validateOrderDetectionItemList() {
   if (
@@ -902,7 +919,7 @@ function validateForm() {
   validateCustomerId()
   validateInspectedUnit()
   validateSamplingAddress()
-  validateDetectionTypeId()
+  validateDetectionTypeStandardId()
   validateOrderDetectionItemList()
   validateServiceTypeId()
   validateDetectionPoints()
@@ -983,7 +1000,10 @@ watch(() => formData.value.orderTypeId, validateOrderTypeId)
 watch(() => formData.value.customerId, validateCustomerId)
 watch(() => formData.value.inspectedUnit, validateInspectedUnit)
 watch(() => formData.value.samplingAddress, validateSamplingAddress)
-watch(() => formData.value.detectionTypeId, validateDetectionTypeId)
+watch(
+  () => formData.value.detectionTypeStandardId,
+  validateDetectionTypeStandardId
+)
 watch(
   () => formData.value.orderDetectionItemList,
   validateOrderDetectionItemList
@@ -998,7 +1018,7 @@ watch(() => formData.value.projectAmount, validateProjectAmount)
 /**
  * 处理检测类型选择
  */
-function handleDetectionTypeIdChange() {
+function handleDetectionTypeStandardIdChange() {
   formData.value.orderDetectionItemList = []
 }
 
@@ -1028,7 +1048,12 @@ const loadDataSubmit = async () => {
       inspectedUnit: formData.value.inspectedUnit.trim() || '',
       // 检测信息
       samplingAddress: formData.value.samplingAddress.trim() || '',
-      detectionTypeId: formData.value.detectionTypeId || null,
+      detectionTypeId: +(
+        formData.value.detectionTypeStandardId as string
+      ).split(',')[0],
+      detectionTypeStandardId: +(
+        formData.value.detectionTypeStandardId as string
+      ).split(',')[1],
       orderDetectionItemList: isArray(formData.value.orderDetectionItemList)
         ? formData.value.orderDetectionItemList.map(id => ({
             detectionItemId: +(id as string).split(',')[0],
@@ -1107,6 +1132,10 @@ const loadDataDetail = async () => {
         : formData.value
 
       formData.value.customerId = res9.customer.id || null
+      formData.value.detectionTypeStandardId =
+        res9.detectionTypeId && res9.detectionTypeStandard.id
+          ? `${res9.detectionTypeId},${res9.detectionTypeStandard.id}`
+          : ''
       formData.value.orderDetectionItemList = isArray(
         res9.orderDetectionItemList
       )
