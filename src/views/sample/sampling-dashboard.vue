@@ -227,7 +227,7 @@ const tableColumns: TableColumn[] = [
     minWidth: 180,
     slotName: 'updateTime'
   },
-  { label: '操作', props: 'actions', minWidth: 220, slotName: 'actions' }
+  { label: '操作', props: 'actions', minWidth: 150, slotName: 'actions' }
 ]
 
 // 获取状态样式类
@@ -251,15 +251,7 @@ const onClickDetail = (taskId: string) => {
 
 // 分派任务
 const onClickAssign = (type: 'assign' | 'adjust', task: SamplingTask) => {
-  const taskData = {
-    id: String(task.id),
-    company: task.customer?.customerName || '',
-    address: task.order?.inspectedUnit || '',
-    points: 0,
-    priority: task.order?.urgentFlag ? 'urgent' : 'normal',
-    createTime: task.createTime || ''
-  }
-  taskModalRef.value?.open(type, taskData)
+  taskModalRef.value?.open(type, task)
 }
 
 // 重置筛选条件

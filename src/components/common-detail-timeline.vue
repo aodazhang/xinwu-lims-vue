@@ -1,5 +1,5 @@
 <template>
-  <!-- [公共]详情-时间轴 -->
+  <!-- [公共]详情-时间轴* -->
   <div class="relative pl-10">
     <!-- 时间轴线 -->
     <div class="absolute bottom-0 left-3 top-0 w-0.5 bg-gray-200"></div>
